@@ -47,6 +47,7 @@ holdout_period_temp <- holdout_period %>%
   select(ID_CLI, CHURN)
 
 # aggiorno la variabile CHURN per i clienti presenti nel lookback period
+# tutti i clienti che comparivano nell'holdout saranno ovviamente no churner
 library(data.table)
 setDT(lookback_period)[holdout_period_temp, CHURN := i.CHURN, on = .(ID_CLI)]
 
@@ -67,16 +68,13 @@ churn_dataset <- churn_dataset %>%
             TOT_SCONTO = sum(SCONTO),
             TOT_SPESA = TOT_PURCHASE - TOT_SCONTO,
             NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
-            #RECENCY = difftime(as.Date("30/04/2019", format="%d/%m/%Y"), LAST_PURCHASE_DATE, units = "days"),
-            CHURN =names(which.max(table(CHURN)))
+            CHURN = names(which.max(table(CHURN)))
   ) 
 
 churn_dataset$CHURN <- as.factor(churn_dataset$CHURN)
 
-churn_dataset$RECENCY<-difftime(as.Date("30/04/2019",
-                                          format="%d/%m/%Y"),
-                                churn_dataset$LAST_PURCHASE_DATE,
-                                  units = "days")
+churn_dataset$RECENCY<-difftime(as.Date("30/04/2019", format="%d/%m/%Y"), 
+                                churn_dataset$LAST_PURCHASE_DATE, units = "days")
 
 
 # si considerano i clienti che hanno effettuato più di 1 acquisto
@@ -95,8 +93,8 @@ table(churn_dataset$CHURN)
 sapply(churn_dataset, function(x) sum(is.na(x)))
 
 
-# aggiungo altre feature potenzialmente rilevanti, oltre a LAST_PURCHASE_DATE, TOT_PURCHASE, NUM_OF_PURCHASE, TOT_SPESA, TOT_SCONTO
-# df1: LAST_COD_FID, ID_NEG
+# aggiungo altre feature potenzialmente rilevanti, oltre a FIRST_PURCHASE_DATE, LAST_PURCHASE_DATE, TOT_PURCHASE, TOT_SCONTO, TOT_SPESA, NUM_OF_PURCHASE, RECENCY
+# df1: LAST_COD_FID, FIRST_ID_NEG
 # df2: TYP_CLI_ACCOUNT
 # df3: REGION
 # df4:
@@ -149,8 +147,8 @@ churn_dataset$ID_CLI <- NULL
 churn_dataset$FIRST_PURCHASE_DATE <- NULL
 churn_dataset$LAST_PURCHASE_DATE <- NULL
 
-# *si potrebbero considerare come predittori le seguenti variabili:
-# TOT_PURCHASE + TOT_SCONTO + TOT_SPESA + NUM_OF_PURCHASES + REGION + LAST_COD_FID
+# si potrebbero considerare come predittori le seguenti variabili:
+# TOT_PURCHASE + TOT_SCONTO + TOT_SPESA + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + FIRST_ID_NEG + TYP_CLI_ACCOUNT
 
 var_num <- c("TOT_PURCHASE", "TOT_SCONTO", "TOT_SPESA", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
@@ -164,7 +162,7 @@ var_num <- c("TOT_PURCHASE", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
 
 # dunque i predittori considerati risultano essere:
-# TOT_PURCHASE + NUM_OF_PURCHASES + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + LAST_COD_FID + FIRST_ID_NEG
+# TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG 
 
 # per controllare complessivamente la correlazione tra le variabili
 library(corrplot)
@@ -203,9 +201,9 @@ library(rpart.plot)
 library("MLmetrics")
 library(caret)
 
-tree.model <- rpart(CHURN ~ TOT_PURCHASE + RECENCY + NUM_OF_PURCHASES + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + LAST_COD_FID + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
+tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
                     data = train, method = "class")
-
+ 
 rpart.plot(tree.model, extra = "auto")  # la variabile più importante è NUM_OF_PURCHASES, chi ha fatto meno di 7 acquisti è più probabile che sia un churner
 summary(tree.model) 
 printcp(tree.model) 
@@ -218,11 +216,15 @@ tree.prob <- predict(tree.model, test, type="prob")
 tree.result <- confusionMatrix(tree.pred, test$CHURN)
 
 table(Predicted = tree.pred, Actual = test$CHURN)
+#               Actual
+# Predicted     0     1
+#           0  4712  2580
+#           1  7107 19902
 
-tree.accuracy <- Accuracy(tree.pred, test$CHURN) # 0.69
-tree.precision <- precision(tree.pred, test$CHURN,relevant = '1') # 0.73
-tree.recall <- recall(tree.pred, test$CHURN,relevant = '1') # 0.82
-tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.77
+tree.accuracy <- Accuracy(tree.pred, test$CHURN) # 0.7175884
+tree.precision <- precision(tree.pred, test$CHURN,relevant = '1') # 0.7368655
+tree.recall <- recall(tree.pred, test$CHURN,relevant = '1') # 0.8852415
+tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.8042674
 
 
 # ROC
@@ -232,9 +234,9 @@ prf <- performance(pr, measure = "tpr", x.measure = "fpr")
 plot(prf)
 
 # AUC value 
-auc <- performance(pr, measure = "auc")
-auc <- auc@y.values[[1]]
-auc
+tree.auc <- performance(pr, measure = "auc")
+tree.auc <- tree.auc@y.values[[1]]
+tree.auc  # 0.6852627
 
 
 ####  Random Forest #### 
@@ -243,12 +245,12 @@ auc
 # install.packages(randomForest)
 library(randomForest)
 # memory.limit(100000)
-rf.model <- randomForest(CHURN ~  TOT_PURCHASE + RECENCY + NUM_OF_PURCHASES + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + LAST_COD_FID + FIRST_ID_NEG,
+rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                          data = train , ntree = 100)
 print(rf.model)
 
 varImpPlot(rf.model, sort=T, n.var = 4, main = 'Features Importance')
-# come si può notare la variabile più importante risulta essere NUM_OF_PURCHASES
+# come si può notare la variabile più importante risulta essere RECENCY
 
 
 # Making Predictions
@@ -259,11 +261,15 @@ rf.prob <- predict(rf.model, test, type="prob")
 rf.result <- confusionMatrix(rf.pred, test$CHURN)
 
 table(Predicted = rf.pred, Actual = test$CHURN)
+#               Actual
+# Predicted     0     1
+#           0  4565  2307
+#           1  7254 20175
 
-rf.accuracy <- Accuracy(rf.pred,test$CHURN) # 
-rf.precision <- precision(rf.pred, test$CHURN,relevant = '1') # 
-rf.recall <- recall(rf.pred, test$CHURN,relevant = '1') # 
-rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 
+rf.accuracy <- Accuracy(rf.pred,test$CHURN) # 0.7212618
+rf.precision <- precision(rf.pred, test$CHURN,relevant = '1') # 0.7355354
+rf.recall <- recall(rf.pred, test$CHURN,relevant = '1') # 0.8973846
+rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 0.808439
 
 
 # ROC
@@ -274,9 +280,9 @@ plot(prf)
 
 
 # AUC 
-auc <- performance(pr, measure = "auc")
-auc <- auc@y.values[[1]]
-auc
+rf.auc <- performance(pr, measure = "auc")
+rf.auc <- rf.auc@y.values[[1]]
+rf.auc  # 0.7404346
 
 
 
@@ -284,7 +290,7 @@ auc
 # There’s different types of GLMs, which includes logistic regression. To specify that we want to perform a binary logistic regression, we’ll use the argument family=binomial.
 
 # Fitting The Model
-logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + REGION + LAST_COD_FID,
+logistic.model <- glm(CHURN ~ TTOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                       data = train, family=binomial)
 summary(logistic.model)
 
@@ -299,11 +305,15 @@ logistic.pred <- as.factor(logistic.pred)
 logistic.result <- confusionMatrix(logistic.pred, test$CHURN)
 
 table(Predicted = logistic.pred, Actual = test$CHURN)
+#               Actual
+# Predicted     0     1
+#           0  1291  2603
+#           1 10528 19879
 
-logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 
-logistic.precision <- precision(logistic.pred, test$CHURN,relevant = '1') # 
-logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 
-logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 
+logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 0.6171832
+logistic.precision <- precision(logistic.pred, test$CHURN,relevant = '1') # 0.6537639
+logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.8842185
+logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.7517253
 
 
 
@@ -315,9 +325,9 @@ plot(prf)
 
 
 # AUC 
-auc <- performance(pr, measure = "auc")
-auc <- auc@y.values[[1]]
-auc
+logistic.auc <- performance(pr, measure = "auc")
+logistic.auc <- logistic.auc@y.values[[1]]
+logistic.auc  # 0.504914
 
 
 
@@ -334,7 +344,7 @@ Accuracy <- c(tree.accuracy,
            rf.accuracy,
            logistic.accuracy)
 Accuracy_results <- data.frame(Modello, Accuracy)
-View(Accuracy_results)
+# View(Accuracy_results)
 
 # PRECISION: ratio of correctly predicted positive observations to the total predicted positive observations
 tree.precision
@@ -345,7 +355,7 @@ Precision <- c(tree.precision,
               rf.precision,
               logistic.precision)
 Precision_results <- data.frame(Modello, Precision)
-View(Precision_results)
+# View(Precision_results)
 
 # RECALL:  ratio of correctly predicted positive observations to the all observations in actual class
 tree.recall
@@ -356,7 +366,7 @@ Recall <- c(tree.precision,
                rf.precision,
                logistic.precision)
 Recall_results <- data.frame(Modello, Recall)
-View(Recall_results)
+# View(Recall_results)
 
 # F1: the weighted average of Precision and Recall
 tree.F1
@@ -367,15 +377,25 @@ F1_score <- c(tree.F1,
               rf.F1,
               logistic.F1)
 F1_score_results <- data.frame(Modello, F1_score)
-View(F1_score_results)
+# View(F1_score_results)
+
+
+# AUC
+tree.auc
+rf.auc
+logistic.auc
+
+AUC <- c(tree.auc,
+         rf.auc,
+         logistic.auc)
+AUC_results <- data.frame(Modello, AUC)
+# View(AUC_results)
+
 
 # overview risultati
-overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, F1_score_results$F1_score)
-colnames(overview_results)<- c("Modello", "Accuracy","Precision","F1_score")
+overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, Recall_results$Recall, F1_score_results$F1_score, AUC_results$AUC)
+colnames(overview_results)<- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
 View(overview_results)
-
-# si può notare che il Random Forest è il modello che rispetto agli altri ha performance leggermente migliori
-# il seguente modello potrebbe essere utilizzato poi per fare previsioni
 
 
 # overview ROC
@@ -394,3 +414,6 @@ plot(rocs, col = as.list(1:m), main = "ROC Curves")
 legend(x = "bottomright", 
        legend = c("Decision Tree", "Logistic", "Random Forest"),
        fill = 1:m)
+
+# si può notare che il Random Forest è il modello che rispetto agli altri ha performance migliori
+# il seguente modello potrebbe essere utilizzato poi per fare previsioni
