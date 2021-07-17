@@ -367,10 +367,6 @@ logistic.auc  # 0.504914
 #### Neural Network Model ####
 library(nnet)
 nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train, size = 3)
-
-
-
-
 summary(nm.model)
 
 # Making Predictions
@@ -409,10 +405,48 @@ nm.auc <- nm.auc@y.values[[1]]
 nm.auc  # 0.7538587
 
 
+#### Naive Bayes #### 
+library(e1071)
+library(caTools)
+library(caret)
+nb.model <- naiveBayes(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train)
+summary(nb.model)
+
+# Making Predictions
+nb.pred <- predict(nb.model, test, type = "class")  
+nb.prob <- predict(nb.model, test, type="prob")
+
+# Evaluating The Model
+nb.result <- confusionMatrix(nb.pred, test$CHURN)
+
+table(Predicted = nb.pred, Actual = test$CHURN)
+#               Actual
+# Predicted     0     1
+#           0  3196  1481
+#           1  8623 21001
+
+nb.accuracy <- Accuracy(nb.pred,test$CHURN) # 0.7054313
+nb.precision <- precision(nb.pred, test$CHURN,relevant = '1') # 0.7089184
+nb.recall <- recall(nb.pred, test$CHURN,relevant = '1') # 0.9341251
+nb.F1 <- F1_Score(nb.pred, test$CHURN,positive = '1') # 0.8060876
+
+
+# ROC
+library(ROCR)
+pr <- prediction(nb.pred, test$CHURN)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+
+# AUC 
+nb.auc <- performance(pr, measure = "auc")
+nb.auc <- nb.auc@y.values[[1]]
+nb.auc  # 0.7506232
+
 
 
 #### Confronto modelli ####
-Modello <- c("Decision Tree", "Random Forest", "Logistic Regression", "Neural Network Model")
+Modello <- c("Decision Tree", "Random Forest", "Logistic Regression", "Neural Network Model", "Naive Bayes")
 
 
 # ACCURACY: ratio of correctly predicted observation to the total observations
@@ -420,44 +454,52 @@ tree.accuracy
 rf.accuracy
 logistic.accuracy
 nm.accuracy
+nb.accuracy
 
 Accuracy <- c(tree.accuracy,
            rf.accuracy,
            logistic.accuracy,
-           nm.accuracy)
+           nm.accuracy,
+           nb.accuracy)
 Accuracy_results <- data.frame(Modello, Accuracy)
 
 # PRECISION: ratio of correctly predicted positive observations to the total predicted positive observations
 tree.precision
 rf.precision
 logistic.precision
+nb.precision
 
 Precision <- c(tree.precision,
               rf.precision,
               logistic.precision,
-              nm.precision)
+              nm.precision,
+              nb.precision)
 Precision_results <- data.frame(Modello, Precision)
 
 # RECALL:  ratio of correctly predicted positive observations to the all observations in actual class
 tree.recall
 rf.recall
 logistic.recall
+nb.recall
 
 Recall <- c(tree.recall,
                rf.recall,
                logistic.recall,
-            nm.recall)
+                nm.recall,
+                nb.recall)
 Recall_results <- data.frame(Modello, Recall)
 
 # F1: the weighted average of Precision and Recall
 tree.F1
 rf.F1
 logistic.F1
+nb.F1
 
 F1_score <- c(tree.F1,
               rf.F1,
               logistic.F1,
-              nm.F1)
+              nm.F1,
+              nb.F1)
 F1_score_results <- data.frame(Modello, F1_score)
 
 
@@ -465,13 +507,14 @@ F1_score_results <- data.frame(Modello, F1_score)
 tree.auc
 rf.auc
 logistic.auc
+nb.auc
 
 AUC <- c(tree.auc,
          rf.auc,
          logistic.auc,
-         nm.auc)
+         nm.auc,
+         nb.auc)
 AUC_results <- data.frame(Modello, AUC)
-
 
 # overview risultati
 overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, Recall_results$Recall, F1_score_results$F1_score, AUC_results$AUC)
@@ -482,7 +525,7 @@ View(overview_results)
 # overview ROC
 library(ROCR)
 
-preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2], nm.prob)
+preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2], nm.prob, nb.prob[,2])
 
 m <- length(preds_list)
 actuals_list <- rep(list(test$CHURN), m)
@@ -493,8 +536,10 @@ rocs <- performance(pred, "tpr", "fpr")
 par(lwd= 4, lty= 6)
 plot(rocs, col = as.list(1:m), main = "ROC Curves")
 legend(x = "bottomright", 
-       legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model"),
+       legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model", "Naive Bayes"),
        fill = 1:m)
 
-# si può notare che il Random Forest è il modello che rispetto agli altri ha performance migliori
-# il seguente modello potrebbe essere utilizzato poi per fare previsioni
+# si può notare che il Neural Network Model insieme al modello Logistic è il modello che rispetto agli altri ha performance migliori
+# i seguenti modello potrebbero essere utilizzati poi per fare previsioni
+
+# ? il Naive Bayes non dovrebbe essere sopra tipo il Decision tree, rispetto all'AUC
