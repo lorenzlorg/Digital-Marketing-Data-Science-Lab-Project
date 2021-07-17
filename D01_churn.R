@@ -6,6 +6,11 @@
 
 # [ 1 maggio 2018 ------------lockback period------------ 28 febbraio 2019) [28 febbraio 2019 ------------holdout period ------------ 30 aprile 2019]
 
+
+
+# !!! attenzione ai risultati commentati, cambiano ad ogni esecuzione
+
+
 #### 1. choosing a reference date in the past (mettersi ad una di riferimento nel passato) ####
 # eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
 # reference date: 28 febbraio 2019, 60 giorni prima dell'ultima rilevazione
@@ -185,6 +190,8 @@ test <- churn_dataset[-train_index,]
 
 table(train$CHURN)
 table(test$CHURN)
+# essendo il numero di churner più elevateo (secondo questa partizione) si potrebbe pensare
+# che di migliorare le attività di retention
 
 prop.table(table(train$CHURN))
 prop.table(table(test$CHURN))
@@ -204,9 +211,31 @@ library(caret)
 tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
                     data = train, method = "class")
  
-rpart.plot(tree.model, extra = "auto")  # la variabile più importante è NUM_OF_PURCHASES, chi ha fatto meno di 7 acquisti è più probabile che sia un churner
+rpart.plot(tree.model, extra = 1)  # la variabile più importante è RECENCY
+
+library(rattle)
+fancyRpartPlot(tree.model)
+
 summary(tree.model) 
 printcp(tree.model) 
+
+# N.b.
+# The number above these proportions indicates the way that the node is voting 
+# and the number below indicates the proportion of the population that resides in 
+# this node, or bucket
+
+# le percentuali 100%, 36% ecc. rappresentano il numero delle osservazioni in percentuale prese in considerazione in quel nodo
+# il numero 0/1 in alto nel nodo dice come sono state classificate tutte le osservazioni di quel nodo
+# le percentuali di mezzo indicano per lo 0 qual'è la percentuale e per l'1 qual è la percentuale
+
+# ad esempio: nodo 4, riguarda l'11% delle osservazioni totali, in questo nodo (recency < 104 & num_of_purchases >= 8.5) tutte 
+# le osservazioni sono classificate come no churner (in particolare si hanno il 73%
+# delle osservazioni no churner (0) e il 27% delle oss. churner (1). Di conseguenza prelave lo 0, no churner,
+# che ha anche senso, ovvero sono clienti che non aspettano troppo e fanno tanti acquisti.
+
+# in rpart.plot sopra le percentuali del numero totale di osservazioni viene
+# riportata solo la percentuale degli 1, ovvero dei churner
+
 
 # Making Predictions
 tree.pred <- predict(tree.model, test, type = "class")  # viene utilizzato il moodello per fare le previsioni sul test set
@@ -249,6 +278,11 @@ rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + RE
                          data = train , ntree = 100)
 print(rf.model)
 
+plot(rf.mode)  # stima dell’errore di test chiamato Out Of Bag (OOB) error
+# fornisce supporto nella selezione del numero di alberi
+# oltre 40 e 50 alberi non è possibile diminuire ulteriormente l'error
+
+
 varImpPlot(rf.model, sort=T, n.var = 4, main = 'Features Importance')
 # come si può notare la variabile più importante risulta essere RECENCY
 
@@ -290,7 +324,7 @@ rf.auc  # 0.7404346
 # There’s different types of GLMs, which includes logistic regression. To specify that we want to perform a binary logistic regression, we’ll use the argument family=binomial.
 
 # Fitting The Model
-logistic.model <- glm(CHURN ~ TTOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
+logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                       data = train, family=binomial)
 summary(logistic.model)
 
@@ -331,6 +365,69 @@ logistic.auc  # 0.504914
 
 
 
+
+
+
+# -
+####  Network model #### 
+
+# Fitting The Model
+
+variabili_numeriche <- c(churn_dataset$TOT_PURCHASE, churn_dataset$NUM_OF_PURCHASES)
+diseaseInfo_matrix <- data.matrix(variabili_numeriche)
+
+summary(nn0)
+
+# Making Predictions
+logistic.prob <- predict(logistic.model, test, type="response")  
+logistic.pred = rep("0", length(logistic.prob))
+logistic.pred[logistic.prob > 0.5] = "1"
+logistic.pred <- as.factor(logistic.pred)
+
+
+# Evaluating The Model
+logistic.result <- confusionMatrix(logistic.pred, test$CHURN)
+
+table(Predicted = logistic.pred, Actual = test$CHURN)
+#               Actual
+# Predicted     0     1
+#           0  1291  2603
+#           1 10528 19879
+
+logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 0.6171832
+logistic.precision <- precision(logistic.pred, test$CHURN,relevant = '1') # 0.6537639
+logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.8842185
+logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.7517253
+
+
+
+# ROC
+library(ROCR)
+pr <- prediction(logistic.prob, test$CHURN)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+
+# AUC 
+logistic.auc <- performance(pr, measure = "auc")
+logistic.auc <- logistic.auc@y.values[[1]]
+logistic.auc  # 0.504914
+# -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### Confronto modelli ####
 Modello <- c("Decision Tree", "Random Forest", "Logistic Regression")
 
@@ -355,7 +452,6 @@ Precision <- c(tree.precision,
               rf.precision,
               logistic.precision)
 Precision_results <- data.frame(Modello, Precision)
-# View(Precision_results)
 
 # RECALL:  ratio of correctly predicted positive observations to the all observations in actual class
 tree.recall
@@ -366,7 +462,6 @@ Recall <- c(tree.precision,
                rf.precision,
                logistic.precision)
 Recall_results <- data.frame(Modello, Recall)
-# View(Recall_results)
 
 # F1: the weighted average of Precision and Recall
 tree.F1
@@ -377,7 +472,6 @@ F1_score <- c(tree.F1,
               rf.F1,
               logistic.F1)
 F1_score_results <- data.frame(Modello, F1_score)
-# View(F1_score_results)
 
 
 # AUC
@@ -389,7 +483,6 @@ AUC <- c(tree.auc,
          rf.auc,
          logistic.auc)
 AUC_results <- data.frame(Modello, AUC)
-# View(AUC_results)
 
 
 # overview risultati
