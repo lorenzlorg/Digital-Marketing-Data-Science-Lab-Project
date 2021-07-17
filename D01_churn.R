@@ -176,7 +176,6 @@ corr.matrix <- cor(churn_dataset[,numeric.var])
 corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", method="number")
 
 
-
 #### 6. Apply models #### 
 
 # install.packages('caret')
@@ -365,83 +364,68 @@ logistic.auc  # 0.504914
 
 
 
+#### Neural Network Model ####
+library(nnet)
+nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train, size = 3)
 
 
 
-# -
-####  Network model #### 
 
-# Fitting The Model
-
-variabili_numeriche <- c(churn_dataset$TOT_PURCHASE, churn_dataset$NUM_OF_PURCHASES)
-diseaseInfo_matrix <- data.matrix(variabili_numeriche)
-
-summary(nn0)
+summary(nm.model)
 
 # Making Predictions
-logistic.prob <- predict(logistic.model, test, type="response")  
-logistic.pred = rep("0", length(logistic.prob))
-logistic.pred[logistic.prob > 0.5] = "1"
-logistic.pred <- as.factor(logistic.pred)
+nm.prob <- predict(nm.model, test)  
+nm.pred <- ifelse(nm.prob > 0.5, 1, 0)
+nm.pred <- as.factor(nm.pred)
+
 
 
 # Evaluating The Model
-logistic.result <- confusionMatrix(logistic.pred, test$CHURN)
+nm.result <- confusionMatrix(nm.pred, test$CHURN)
 
-table(Predicted = logistic.pred, Actual = test$CHURN)
+table(Predicted = nm.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  1291  2603
-#           1 10528 19879
+#           0  5109  2757
+#           1  6710 19725
 
-logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 0.6171832
-logistic.precision <- precision(logistic.pred, test$CHURN,relevant = '1') # 0.6537639
-logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.8842185
-logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.7517253
+nm.accuracy <- Accuracy(nm.pred,test$CHURN) # 0.7240022
+nm.precision <- precision(nm.pred, test$CHURN,relevant = '1') # 0.7461699
+nm.recall <- recall(nm.pred, test$CHURN,relevant = '1') # 0.8773686
+nm.F1 <- F1_Score(nm.pred, test$CHURN,positive = '1') # 0.8064681
 
 
 
 # ROC
 library(ROCR)
-pr <- prediction(logistic.prob, test$CHURN)
+pr <- prediction(nm.prob, test$CHURN)
 prf <- performance(pr, measure = "tpr", x.measure = "fpr")
 plot(prf)
 
 
 # AUC 
-logistic.auc <- performance(pr, measure = "auc")
-logistic.auc <- logistic.auc@y.values[[1]]
-logistic.auc  # 0.504914
-# -
-
-
-
-
-
-
-
-
-
-
-
+nm.auc <- performance(pr, measure = "auc")
+nm.auc <- nm.auc@y.values[[1]]
+nm.auc  # 0.7538587
 
 
 
 
 #### Confronto modelli ####
-Modello <- c("Decision Tree", "Random Forest", "Logistic Regression")
+Modello <- c("Decision Tree", "Random Forest", "Logistic Regression", "Neural Network Model")
 
 
 # ACCURACY: ratio of correctly predicted observation to the total observations
 tree.accuracy
 rf.accuracy
 logistic.accuracy
+nm.accuracy
 
 Accuracy <- c(tree.accuracy,
            rf.accuracy,
-           logistic.accuracy)
+           logistic.accuracy,
+           nm.accuracy)
 Accuracy_results <- data.frame(Modello, Accuracy)
-# View(Accuracy_results)
 
 # PRECISION: ratio of correctly predicted positive observations to the total predicted positive observations
 tree.precision
@@ -450,7 +434,8 @@ logistic.precision
 
 Precision <- c(tree.precision,
               rf.precision,
-              logistic.precision)
+              logistic.precision,
+              nm.precision)
 Precision_results <- data.frame(Modello, Precision)
 
 # RECALL:  ratio of correctly predicted positive observations to the all observations in actual class
@@ -458,9 +443,10 @@ tree.recall
 rf.recall
 logistic.recall
 
-Recall <- c(tree.precision,
-               rf.precision,
-               logistic.precision)
+Recall <- c(tree.recall,
+               rf.recall,
+               logistic.recall,
+            nm.recall)
 Recall_results <- data.frame(Modello, Recall)
 
 # F1: the weighted average of Precision and Recall
@@ -470,7 +456,8 @@ logistic.F1
 
 F1_score <- c(tree.F1,
               rf.F1,
-              logistic.F1)
+              logistic.F1,
+              nm.F1)
 F1_score_results <- data.frame(Modello, F1_score)
 
 
@@ -481,20 +468,21 @@ logistic.auc
 
 AUC <- c(tree.auc,
          rf.auc,
-         logistic.auc)
+         logistic.auc,
+         nm.auc)
 AUC_results <- data.frame(Modello, AUC)
 
 
 # overview risultati
 overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, Recall_results$Recall, F1_score_results$F1_score, AUC_results$AUC)
-colnames(overview_results)<- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
+colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
 View(overview_results)
 
 
 # overview ROC
 library(ROCR)
 
-preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2])
+preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2], nm.prob)
 
 m <- length(preds_list)
 actuals_list <- rep(list(test$CHURN), m)
@@ -505,7 +493,7 @@ rocs <- performance(pred, "tpr", "fpr")
 par(lwd= 4, lty= 6)
 plot(rocs, col = as.list(1:m), main = "ROC Curves")
 legend(x = "bottomright", 
-       legend = c("Decision Tree", "Logistic", "Random Forest"),
+       legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model"),
        fill = 1:m)
 
 # si può notare che il Random Forest è il modello che rispetto agli altri ha performance migliori
