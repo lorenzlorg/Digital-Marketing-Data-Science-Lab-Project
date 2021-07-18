@@ -250,13 +250,13 @@ tree.result <- confusionMatrix(tree.pred, test$CHURN)
 table(Predicted = tree.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  4712  2580
-#           1  7107 19902
+#           0  5402  3399
+#           1  6417 19083
 
-tree.accuracy <- Accuracy(tree.pred, test$CHURN) # 0.7175884
-tree.precision <- precision(tree.pred, test$CHURN,relevant = '1') # 0.7368655
-tree.recall <- recall(tree.pred, test$CHURN,relevant = '1') # 0.8852415
-tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.8042674
+tree.accuracy <- Accuracy(tree.pred, test$CHURN) # 0.7138276
+tree.precision <- precision(tree.pred, test$CHURN,relevant = '1') # 0.7483529
+tree.recall <- recall(tree.pred, test$CHURN,relevant = '1') # 0.8488124
+tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.7954233
 
 
 # ROC
@@ -270,7 +270,7 @@ abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 # AUC value 
 tree.auc <- performance(tree.pr, measure = "auc")
 tree.auc <- tree.auc@y.values[[1]]
-tree.auc  # 0.6852627
+tree.auc  # 0.6824019
 
 
 
@@ -304,13 +304,13 @@ rf.result <- confusionMatrix(rf.pred, test$CHURN)
 table(Predicted = rf.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  4565  2307
-#           1  7254 20175
+#           0  4596  2389
+#           1  7223 20093
 
-rf.accuracy <- Accuracy(rf.pred,test$CHURN) # 0.7212618
-rf.precision <- precision(rf.pred, test$CHURN,relevant = '1') # 0.7355354
-rf.recall <- recall(rf.pred, test$CHURN,relevant = '1') # 0.8973846
-rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 0.808439
+rf.accuracy <- Accuracy(rf.pred,test$CHURN) # 0.7197749
+rf.precision <- precision(rf.pred, test$CHURN,relevant = '1') # 0.7355762
+rf.recall <- recall(rf.pred, test$CHURN,relevant = '1') # 0.8937372
+rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 0.8069802
 
 
 # ROC
@@ -324,7 +324,7 @@ abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 # AUC 
 rf.auc <- performance(rf.pr, measure = "auc")
 rf.auc <- rf.auc@y.values[[1]]
-rf.auc  # 0.7404346
+rf.auc  # 0.7386719
 
 
 
@@ -350,13 +350,13 @@ logistic.result <- confusionMatrix(logistic.pred, test$CHURN)
 table(Predicted = logistic.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  1291  2603
-#           1 10528 19879
+#           0  4389  2230
+#           1  7430  20252
 
-logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 0.6171832
+logistic.accuracy <- Accuracy(logistic.pred,test$CHURN) # 0.7183756
 logistic.precision <- precision(logistic.pred, test$CHURN,relevant = '1') # 0.6537639
-logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.8842185
-logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.7517253
+logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.9008095
+logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.8074316
 
 
 # ROC
@@ -370,7 +370,7 @@ abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 # AUC 
 logistic.auc <- performance(logistic.pr, measure = "auc")
 logistic.auc <- logistic.auc@y.values[[1]]
-logistic.auc  # 0.504914
+logistic.auc  # 0.7461111
 
 
 
@@ -393,13 +393,13 @@ nm.result <- confusionMatrix(nm.pred, test$CHURN)
 table(Predicted = nm.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  5109  2757
-#           1  6710 19725
+#           0  5054  2822
+#           1  6765 19660
 
-nm.accuracy <- Accuracy(nm.pred,test$CHURN) # 0.7240022
-nm.precision <- precision(nm.pred, test$CHURN,relevant = '1') # 0.7461699
-nm.recall <- recall(nm.pred, test$CHURN,relevant = '1') # 0.8773686
-nm.F1 <- F1_Score(nm.pred, test$CHURN,positive = '1') # 0.8064681
+nm.accuracy <- Accuracy(nm.pred,test$CHURN) # 0.7205038
+nm.precision <- precision(nm.pred, test$CHURN,relevant = '1') # 0.7439924
+nm.recall <- recall(nm.pred, test$CHURN,relevant = '1') # 0.8744774
+nm.F1 <- F1_Score(nm.pred, test$CHURN,positive = '1') # 0.8039749
 
 
 # ROC
@@ -413,7 +413,7 @@ abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 # AUC 
 nm.auc <- performance(nm.pr, measure = "auc")
 nm.auc <- nm.auc@y.values[[1]]
-nm.auc  # 0.7538587
+nm.auc  # 0.7462316
 
 
 
@@ -435,13 +435,13 @@ nb.result <- confusionMatrix(nb.pred, test$CHURN)
 table(Predicted = nb.pred, Actual = test$CHURN)
 #               Actual
 # Predicted     0     1
-#           0  3196  1481
-#           1  8623 21001
+#           0  3153  1480
+#           1  8666  21002
 
-nb.accuracy <- Accuracy(nb.pred,test$CHURN) # 0.7054313
-nb.precision <- precision(nb.pred, test$CHURN,relevant = '1') # 0.7089184
-nb.recall <- recall(nb.pred, test$CHURN,relevant = '1') # 0.9341251
-nb.F1 <- F1_Score(nb.pred, test$CHURN,positive = '1') # 0.8060876
+nb.accuracy <- Accuracy(nb.pred,test$CHURN) # 0.7042069
+nb.precision <- precision(nb.pred, test$CHURN,relevant = '1') # 0.7079008
+nb.recall <- recall(nb.pred, test$CHURN,relevant = '1') # 0.9341696
+nb.F1 <- F1_Score(nb.pred, test$CHURN,positive = '1') # 0.8054458
 
 
 # ROC
@@ -455,7 +455,7 @@ abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 # AUC 
 nb.auc <- performance(nb.pr, measure = "auc")
 nb.auc <- nb.auc@y.values[[1]]
-nb.auc  # 0.7506232
+nb.auc  # 0.7339499
 
 
 
@@ -535,6 +535,12 @@ overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_re
 colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
 View(overview_results)
 
+# Modello              Accuracy     Precision    Recall       F1_score     AUC
+# Decision Tree        0.7138276    0.7483529    0.8488124    0.7954233    0.6824019
+# Random Forest        0.7197749    0.7355762    0.8937372    0.8069802    0.7386719
+# Logistic Regression  0.7183756    0.7315945    0.9008095    0.8074316    0.7461111
+# Neural Network Model 0.7205038    0.7439924    0.8744774    0.8039749    0.7462316
+# Naive Bayes          0.7042069    0.7079008    0.9341696    0.8054458    0.7339499
 
 # overview ROC
 library(ROCR)
