@@ -10,6 +10,7 @@
 
 # !!! attenzione ai risultati commentati, cambiano ad ogni esecuzione
 
+set.seed(100)  # per avere sempre gli stessi risultati
 
 #### 1. choosing a reference date in the past (mettersi ad una di riferimento nel passato) ####
 # eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
@@ -93,6 +94,7 @@ churn_dataset <- churn_dataset %>%
 # complessivamente
 str(churn_dataset)
 table(churn_dataset$CHURN)
+prop.table(table(churn_dataset$CHURN))
 
 # controllo nuovamente la presenza di eventuali na
 sapply(churn_dataset, function(x) sum(is.na(x)))
@@ -218,6 +220,7 @@ fancyRpartPlot(tree.model)
 summary(tree.model) 
 printcp(tree.model) 
 
+
 # N.b.
 # The number above these proportions indicates the way that the node is voting 
 # and the number below indicates the proportion of the population that resides in 
@@ -239,6 +242,7 @@ printcp(tree.model)
 # Making Predictions
 tree.pred <- predict(tree.model, test, type = "class")  # viene utilizzato il moodello per fare le previsioni sul test set
 tree.prob <- predict(tree.model, test, type="prob")
+qplot(x=tree.prob[, "1"], geom="histogram")
 
 # Evaluating The Model
 tree.result <- confusionMatrix(tree.pred, test$CHURN)
@@ -257,14 +261,17 @@ tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.8042674
 
 # ROC
 library(ROCR)
-pr <- prediction(tree.prob[,2], test$CHURN)
-prf <- performance(pr, measure = "tpr", x.measure = "fpr")
-plot(prf)
+tree.pr <- prediction(tree.prob[,2], test$CHURN)
+tree.prf <- performance(tree.pr, measure = "tpr", x.measure = "fpr")
+plot(tree.prf, main = "ROC DECISION TREE")
+abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
+
 
 # AUC value 
-tree.auc <- performance(pr, measure = "auc")
+tree.auc <- performance(tree.pr, measure = "auc")
 tree.auc <- tree.auc@y.values[[1]]
 tree.auc  # 0.6852627
+
 
 
 ####  Random Forest #### 
@@ -277,7 +284,7 @@ rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + RE
                          data = train , ntree = 100)
 print(rf.model)
 
-plot(rf.mode)  # stima dell’errore di test chiamato Out Of Bag (OOB) error
+plot(rf.model)  # stima dell’errore di test chiamato Out Of Bag (OOB) error
 # fornisce supporto nella selezione del numero di alberi
 # oltre 40 e 50 alberi non è possibile diminuire ulteriormente l'error
 
@@ -289,6 +296,7 @@ varImpPlot(rf.model, sort=T, n.var = 4, main = 'Features Importance')
 # Making Predictions
 rf.pred <- predict(rf.model, test, type = "class")  
 rf.prob <- predict(rf.model, test, type="prob")
+qplot(x=rf.prob[, "1"], geom="histogram")
 
 # Evaluating The Model
 rf.result <- confusionMatrix(rf.pred, test$CHURN)
@@ -307,13 +315,14 @@ rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 0.808439
 
 # ROC
 library(ROCR)
-pr <- prediction(rf.prob[,2], test$CHURN)
-prf <- performance(pr, measure = "tpr", x.measure = "fpr")
-plot(prf)
+rf.pr <- prediction(rf.prob[,2], test$CHURN)
+rf.prf <- performance(rf.pr, measure = "tpr", x.measure = "fpr")
+plot(rf.prf, main = "ROC RANDOM FOREST")
+abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 
 
 # AUC 
-rf.auc <- performance(pr, measure = "auc")
+rf.auc <- performance(rf.pr, measure = "auc")
 rf.auc <- rf.auc@y.values[[1]]
 rf.auc  # 0.7404346
 
@@ -328,9 +337,10 @@ logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION
 summary(logistic.model)
 
 # Making Predictions
-logistic.prob <- predict(logistic.model, test, type="response")  
-logistic.pred = rep("0", length(logistic.prob))
-logistic.pred[logistic.prob > 0.5] = "1"
+logistic.prob <- predict(logistic.model, test, type="response") 
+qplot(x=logistic.prob, geom="histogram")
+logistic.pred <- rep("0", length(logistic.prob))
+logistic.pred[logistic.prob > 0.5] <- "1"
 logistic.pred <- as.factor(logistic.pred)
 
 
@@ -349,16 +359,16 @@ logistic.recall <- recall(logistic.pred, test$CHURN,relevant = '1') # 0.8842185
 logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.7517253
 
 
-
 # ROC
 library(ROCR)
-pr <- prediction(logistic.prob, test$CHURN)
-prf <- performance(pr, measure = "tpr", x.measure = "fpr")
-plot(prf)
+logistic.pr <- prediction(logistic.prob, test$CHURN)
+logistic.prf <- performance(logistic.pr, measure = "tpr", x.measure = "fpr")
+plot(logistic.prf, main = "ROC LOGISTIC REGRESSION")
+abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 
 
 # AUC 
-logistic.auc <- performance(pr, measure = "auc")
+logistic.auc <- performance(logistic.pr, measure = "auc")
 logistic.auc <- logistic.auc@y.values[[1]]
 logistic.auc  # 0.504914
 
@@ -370,7 +380,8 @@ nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LA
 summary(nm.model)
 
 # Making Predictions
-nm.prob <- predict(nm.model, test)  
+nm.prob <- predict(nm.model, test) 
+qplot(x=nm.prob, geom="histogram")
 nm.pred <- ifelse(nm.prob > 0.5, 1, 0)
 nm.pred <- as.factor(nm.pred)
 
@@ -391,18 +402,19 @@ nm.recall <- recall(nm.pred, test$CHURN,relevant = '1') # 0.8773686
 nm.F1 <- F1_Score(nm.pred, test$CHURN,positive = '1') # 0.8064681
 
 
-
 # ROC
 library(ROCR)
-pr <- prediction(nm.prob, test$CHURN)
-prf <- performance(pr, measure = "tpr", x.measure = "fpr")
-plot(prf)
+nm.pr <- prediction(nm.prob, test$CHURN)
+nm.prf <- performance(nm.pr, measure = "tpr", x.measure = "fpr")
+plot(nm.prf, main = "ROC NEURAL NETWORK MODEL")
+abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 
 
 # AUC 
-nm.auc <- performance(pr, measure = "auc")
+nm.auc <- performance(nm.pr, measure = "auc")
 nm.auc <- nm.auc@y.values[[1]]
 nm.auc  # 0.7538587
+
 
 
 #### Naive Bayes #### 
@@ -414,7 +426,8 @@ summary(nb.model)
 
 # Making Predictions
 nb.pred <- predict(nb.model, test, type = "class")  
-nb.prob <- predict(nb.model, test, type="prob")
+nb.prob <- predict(nb.model, test, type = "raw")
+qplot(x=nb.prob[, "1"], geom="histogram")
 
 # Evaluating The Model
 nb.result <- confusionMatrix(nb.pred, test$CHURN)
@@ -433,13 +446,14 @@ nb.F1 <- F1_Score(nb.pred, test$CHURN,positive = '1') # 0.8060876
 
 # ROC
 library(ROCR)
-pr <- prediction(nb.pred, test$CHURN)
-prf <- performance(pr, measure = "tpr", x.measure = "fpr")
-plot(prf)
+nb.pr <- prediction(nb.prob[, "1"], test$CHURN)
+nb.prf <- performance(nb.pr, measure = "tpr", x.measure = "fpr")
+plot(nb.prf, main = "ROC NAIVE BAYES")
+abline(a = 0,b = 1,lwd = 2,lty = 3,col = "black")
 
 
 # AUC 
-nb.auc <- performance(pr, measure = "auc")
+nb.auc <- performance(nb.pr, measure = "auc")
 nb.auc <- nb.auc@y.values[[1]]
 nb.auc  # 0.7506232
 
@@ -538,8 +552,32 @@ plot(rocs, col = as.list(1:m), main = "ROC Curves")
 legend(x = "bottomright", 
        legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model", "Naive Bayes"),
        fill = 1:m)
+abline(a=0, b= 1, col=c("grey"))
 
-# si può notare che il Neural Network Model insieme al modello Logistic è il modello che rispetto agli altri ha performance migliori
-# i seguenti modello potrebbero essere utilizzati poi per fare previsioni
+# in alternativa
 
-# ? il Naive Bayes non dovrebbe essere sopra tipo il Decision tree, rispetto all'AUC
+# plot ROC for each method
+
+roc_tree <- data.frame(fpr=unlist(tree.prf@x.values), tpr=unlist(tree.prf@y.values))
+roc_tree$method <- "Decision Tree"
+
+roc_rf <- data.frame(fpr=unlist(rf.prf@x.values), tpr=unlist(rf.prf@y.values))
+roc_rf$method <- "Random Forest"
+
+roc_logistic <- data.frame(fpr=unlist(logistic.prf@x.values), tpr=unlist(logistic.prf@y.values))
+roc_logistic$method <- "Logistic Regression"
+
+roc_nm <- data.frame(fpr=unlist(nm.prf@x.values), tpr=unlist(nm.prf@y.values))
+roc_nm$method <- "Neural Network Model"
+
+roc_nb <- data.frame(fpr=unlist(nb.prf@x.values), tpr=unlist(nb.prf@y.values))
+roc_nb$method <- "Naive Bayes"
+
+rbind(roc_tree, roc_rf, roc_logistic, roc_nm, roc_nb) %>%
+  ggplot(data=., aes(x=fpr, y=tpr, linetype=method, color=method)) + 
+  geom_line() +
+  geom_abline(a=1, b=0, linetype=2) +
+  theme(legend.position=c(0.8,0.2), legend.title=element_blank())
+
+# si può notare che il Neural Network Model insieme al modello Logistic è il modello che rispetto agli altri ha performance migliori, anche se di poco.
+# i seguenti modelli potrebbero essere utilizzati poi per fare previsioni
