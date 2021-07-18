@@ -10,7 +10,7 @@
 
 # !!! attenzione ai risultati commentati, cambiano ad ogni esecuzione
 
-set.seed(100)  # per avere sempre gli stessi risultati
+#set.seed(100)  # per avere sempre gli stessi risultati
 
 #### 1. choosing a reference date in the past (mettersi ad una di riferimento nel passato) ####
 # eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
