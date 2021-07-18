@@ -17,7 +17,7 @@ install_github("nicolasturaro/mapIT")
 ## add other libraries
 
 #### DIRECTORIES ####
-working_dir = "/Users/lorenzolorgna/Google Drive/Progetto digital marketing/DMktg_DSLab_R_Scripts"  # <path for scripts directory>
+working_dir = "~/Desktop/progetto digital/progetto_digital_marketing"  # <path for scripts directory>
 # working_dir = "E://Universit? Drive//Progetto digital marketing//DMktg_DSLab_R_Scripts"  # <path for scripts directory>
 
 data_dir = "/Users/lorenzolorgna/Google Drive/Progetto digital marketing/DMktg_DSLab_Data"  # <path for datasets directory>
