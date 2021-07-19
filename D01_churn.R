@@ -7,11 +7,6 @@
 # [ 1 maggio 2018 ------------lockback period------------ 28 febbraio 2019) [28 febbraio 2019 ------------holdout period ------------ 30 aprile 2019]
 
 
-
-# !!! attenzione ai risultati commentati, cambiano ad ogni esecuzione
-
-#set.seed(100)  # per avere sempre gli stessi risultati
-
 #### 1. choosing a reference date in the past (mettersi ad una di riferimento nel passato) ####
 # eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
 # reference date: 28 febbraio 2019, 60 giorni prima dell'ultima rilevazione
