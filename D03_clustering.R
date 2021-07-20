@@ -159,16 +159,18 @@ km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 # dimensioni dei cluster identificati
 # km_3$size
 table(km_3$cluster)
-# 18 21836  2440
+# 1     2     3 
+# 2833 21443    18 
 
 km_3$withinss
-# 8260.103  7747.000 17878.634
+# 25609.158 14007.608  8312.117
 
 # valutazione qualità: The quality of a k-means partition is found by calculating the percentage of 
 # the TSS “explained” by the partition using the following formula: BSS / TSS * 100 
 BSS_km_3 <- km_3$betweenss
 TSS_km_3 <- km_3$totss
-BSS_km_3 / TSS_km_3 * 100  #  53.50411, higher quality means a higher explained percentage
+BSS_km_3 / TSS_km_3 * 100  #  50.67624 
+# higher quality means a higher explained percentage
 # where BSS and TSS stand for Between Sum of Squares and Total Sum of Squares, respectively. 
 # The higher the percentage, the better the score (and thus the quality) because 
 # it means that BSS is large and/or WSS is small
@@ -180,17 +182,15 @@ data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand
 data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
 data.orig_km_3
 
-# visualizzazione grafica
-# fviz_cluster(km_3, data = customer_data_stand)
-
-# TOT_PURCHASE TOT_SCONTO NUM_OF_PURCHASES
-# 1   72378.6839 9631.48222         9.777778   # size: 18
-# 2     695.0499   41.83827         5.925215   # size: 21836
-# 3    3542.1070  340.72767        17.416803   # size: 2440
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
+# 6                     73            3198.2312  287.73131
+# 6                     21            688.3021   43.36208
+# 10                    51            72378.6839 9631.48222
 
 # lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
-
+# visualizzazione grafica
+# fviz_cluster(km_3, data = customer_data_stand)
 
 
 ####  K = 4 #### 
@@ -200,15 +200,16 @@ km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
 # dimensioni dei cluster identificati
 # km_4$size
 table(km_4$cluster)
-# 2393 21744     9   148
+# 1     2     3     4 
+# 18 18524  5037   715 
 
 km_4$withinss
-# 8884.459 8329.182 4647.728 4183.320
+# 8312.117  6625.369 16067.988  8473.249
 
 # valutazione qualità
 BSS_km_4 <- km_4$betweenss
 TSS_km_4 <- km_4$totss
-BSS_km_4 / TSS_km_4 * 100   # 64.26311
+BSS_km_4 / TSS_km_4 * 100   # 59.37233
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
@@ -216,14 +217,14 @@ data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand
 data.orig_km_4[,c(1, 2)] <- round(data.orig_km_4[,c(1, 2)])
 data.orig_km_4
 
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
+# 10                    51          72378.684     9631.48222
+# 5                     18          559.086       32.39457
+# 11                    48          2111.392      182.54776
+# 25                    113         3955.607      315.22485
+
 # visualizzazione grafica
 # fviz_cluster(km_4, data = customer_data_stand)
-
-# TOT_PURCHASE  TOT_SCONTO NUM_OF_PURCHASES
-# 1    2439.4871   187.47748        17.972002   # size: 2393
-# 2     725.5564    46.26548         5.864928   # size: 21744
-# 3  104990.8267 12376.54111        12.111111   # size: 9
-# 4   17321.3422  2380.42986         9.547297   # size: 148
 
 
 
@@ -238,15 +239,16 @@ km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 # dimensioni dei cluster identificati
 # km_5$size
 table(km_5$cluster)
-# 4497   117 19096   575     9
+# 1     2     3     4     5 
+# 18261   700   113  5211     9 
 
 km_5$withinss
-# 6274.085 3538.018 3399.972 3313.790 4647.728
+# 6613.788 6997.301 3650.434 9528.098 4684.452
 
 # valutazione qualità
 BSS_km_5 <- km_5$betweenss
 TSS_km_5 <- km_5$totss
-BSS_km_5 / TSS_km_5 * 100   # 70.94616
+BSS_km_5 / TSS_km_5 * 100   # 67.60994
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig_km_5 <- t(apply(km_5$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
@@ -257,12 +259,12 @@ data.orig_km_5
 # visualizzazione grafica
 # fviz_cluster(km_5, data = customer_data_stand)
 
-# TOT_PURCHASE  TOT_SCONTO NUM_OF_PURCHASES
-# 1    1999.1261   165.93408        11.740147   # size: 4491
-# 2     575.0564    31.58948         5.334189   # size: 19094
-# 3    3250.8821   235.70480        28.247818   # size: 573
-# 4  104990.8267 12376.54111        12.111111   # size: 9
-# 5   18557.4143  2547.20740         9.330709   # size: 127
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE  TOT_SCONTO
+# 5                     18          570.7831      34.42337
+# 25                    114         3548.1202     259.29213
+# 9                     41          19366.6642    2691.37265
+# 11                    48          1742.9595     132.93016
+# 12                    62          104990.8267   12376.54111
 
 # N.B.
 # With more classes, the partition will be finer, and the BSS contribution will be higher. 
@@ -293,13 +295,12 @@ pam.res$medoids
 data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 
-
-# TOT_PURCHASE TOT_SCONTO NUM_OF_PURCHASES
-# [1,]       490.29      18.81                6
-# [2,]       687.14      24.15                9
-# [3,]       234.18       5.00                4
-# [4,]      3812.71     405.53                7
-# [5,]      1559.80      82.78               17
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
+# 6                     20            491.20      19.23
+# 13                    46            1303.14      71.99
+# 4                     11            276.16      13.50
+# 7                     38            1086.10      64.72
+# 19                    92            3234.32     234.36
 
 # Cluster numbers
 head(pam.res$clustering)
@@ -310,14 +311,13 @@ head(pam.res$clustering)
 library("fpc")
 library("dbscan")
 
-
 # in questo caso non è necessario stabilire a priori il numero di cluster da considerare
 Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
-Dbscan_cl
-# The clustering contains 7 cluster(s) and 262 noise points.
+
+# The clustering contains 11 cluster(s) and 748 noise points.
 # 
-# 0     1     2     3     4     5     6     7 
-# 262 23996     5     5     6    12     3     5 
+# 0     1       2     3     4     5     6     7     8     9    10    11 
+# 748 23497     3     5     6     5     7     3     5     4     6     5 
 
 # Checking cluster
 Dbscan_cl$cluster
