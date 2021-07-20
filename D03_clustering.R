@@ -3,17 +3,19 @@
 #### preparazione dataset ####
 
 # variabili da considerare
+# NUMERO ACQUISTI
 # NUMERO SCONTRINI
-# NUMERO ARTICOLI PER SCONTRINO
 # TOT SPESA
+# TOTO SCONTO
 
-# ricavo NUMERO SCONTRINI & TOT SPESA
-churn_dataset <- df_7_tic_clean_final %>%
+# si prende un considerazione un periodo temporale specifico
+clustering_dataset <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATETIME >= as.Date("01/01/2019",
                                  format="%d/%m/%Y"))
-  
-churn_dataset <- churn_dataset %>%
+
+# si selezionano le variabili di interesse
+clustering_dataset <- clustering_dataset %>%
   group_by(ID_CLI) %>%
   summarize(
     NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
@@ -22,40 +24,40 @@ churn_dataset <- churn_dataset %>%
     TOT_SCONTO = sum(SCONTO)
   ) 
 
-# # ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO
-# churn_dataset_1 <- df_7_tic_clean_final %>%
+# # ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO: variabile non presa in considerazione
+# clustering_dataset_1 <- df_7_tic_clean_final %>%
 #   filter(DIREZIONE == 1) %>%
 #   filter(TIC_DATETIME >= as.Date("01/01/2019",
 #                                  format="%d/%m/%Y"))
 # 
-# churn_dataset_1 <- churn_dataset_1 %>%
+# clustering_dataset_1 <- clustering_dataset_1 %>%
 #   group_by(ID_CLI, ID_SCONTRINO) %>%
 #   summarize(
 #     NUM_OF_ART_SCONTRINO = n_distinct(ID_ARTICOLO)
 #   ) 
 # 
-# churn_dataset_1 <- churn_dataset_1 %>%
+# clustering_dataset_1 <- clustering_dataset_1 %>%
 #   group_by(ID_CLI) %>%
 #   summarize(
 #     AVG_NUM_OF_ART_SCONTRINO = mean(NUM_OF_ART_SCONTRINO)
 #   ) 
 # 
-# churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
+# clustering_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(clustering_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
 # 
 # # unisco i due dataset
-# churn_dataset <- left_join(churn_dataset, churn_dataset_1, by = "ID_CLI" )
+# clustering_dataset <- left_join(clustering_dataset, clustering_dataset_1, by = "ID_CLI" )
 
 
 # si considerano i clienti che hanno effettuato più di 1 acquisto
-churn_dataset <- churn_dataset %>%
+clustering_dataset <- clustering_dataset %>%
   filter(NUM_OF_PURCHASES > 3)
 
 
 # complessivamente
-str(churn_dataset)
+str(clustering_dataset)
 
-# controllo nuovamente la presenza di eventuali na
-sapply(churn_dataset, function(x) sum(is.na(x)))
+# controllo la presenza di eventuali na
+sapply(clustering_dataset, function(x) sum(is.na(x)))
 
 
 # attenzione agli outliers
@@ -63,7 +65,7 @@ sapply(churn_dataset, function(x) sum(is.na(x)))
 # sarebbe da considerare con più attenzione, sulla base di ulteriorI dettagli forniti dal cliente
 
 # non considero l'ID_CLI
-customer_data <- churn_dataset[,-1]
+customer_data <- clustering_dataset[,-1]
 
 
 #### setting clustering ####
@@ -140,7 +142,7 @@ duda$Best.nc  # numero ottimale cluster = 5
 # Using K-Means Instead of the Traditional Approach
 # The traditional RFM approach requires you to manually rank customers from 1 to 5 on each of their RFM features.
 
-# vengono provati tre scenari
+# vengono provati tre scenari, K=3,4,5
 
 #### K = 3 #### 
 # possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
@@ -167,6 +169,7 @@ BSS / TSS * 100  #  53.50411, higher quality means a higher explained percentage
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
+data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
 data.orig
 # visualizzazione grafica
 # fviz_cluster(km, data = customer_data_stand)
@@ -201,6 +204,7 @@ BSS / TSS * 100   # 64.26311
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
+data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
 data.orig
 
 # visualizzazione grafica
@@ -238,6 +242,7 @@ BSS / TSS * 100   # 70.94616
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
+data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
 data.orig
 
 # visualizzazione grafica
@@ -277,9 +282,8 @@ print(pam.res)
 pam.res$medoids
 
 # scale data -> original data
-data.orig = t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
-
 
 
 # TOT_PURCHASE TOT_SCONTO NUM_OF_PURCHASES
