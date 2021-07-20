@@ -1,20 +1,47 @@
 # CLUSTERING
 
 #### preparazione dataset ####
+
+# variabili da considerare
+# NUMERO SCONTRINI
+# NUMERO ARTICOLI PER SCONTRINO
+# TOT SPESA
+
+# ricavo NUMERO SCONTRINI & TOT SPESA
 churn_dataset <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATETIME >= as.Date("01/01/2019",
                                  format="%d/%m/%Y"))
   
-
 churn_dataset <- churn_dataset %>%
   group_by(ID_CLI) %>%
   summarize(
-            TOT_PURCHASE = sum(IMPORTO_LORDO),
-            TOT_SCONTO = sum(SCONTO),
-            NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
+    NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
+    TOT_PURCHASE = sum(IMPORTO_LORDO)
   ) 
 
+# ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO
+churn_dataset_1 <- df_7_tic_clean_final %>%
+  filter(DIREZIONE == 1) %>%
+  filter(TIC_DATETIME >= as.Date("01/01/2019",
+                                 format="%d/%m/%Y"))
+
+churn_dataset_1 <- churn_dataset_1 %>%
+  group_by(ID_CLI, ID_SCONTRINO) %>%
+  summarize(
+    NUM_OF_ART_SCONTRINO = n_distinct(ID_ARTICOLO)
+  ) 
+
+churn_dataset_1 <- churn_dataset_1 %>%
+  group_by(ID_CLI) %>%
+  summarize(
+    AVG_NUM_OF_ART_SCONTRINO = mean(NUM_OF_ART_SCONTRINO)
+  ) 
+
+churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
+
+# unisco i due dataset
+churn_dataset <- left_join(churn_dataset, churn_dataset_1, by = "ID_CLI" )
 
 
 # si considerano i clienti che hanno effettuato più di 1 acquisto
@@ -31,7 +58,7 @@ sapply(churn_dataset, function(x) sum(is.na(x)))
 
 # attenzione agli outliers
 # l'algorimto k-means è molto sensibile agli outliers
-# sarebbe da considerare con più attenzione, sulla base di ulteriore dettagli forniti dal cliente
+# sarebbe da considerare con più attenzione, sulla base di ulteriorI dettagli forniti dal cliente
 
 # non considero l'ID_CLI
 customer_data <- churn_dataset[,-1]
@@ -52,9 +79,11 @@ twcss <- sapply(1:k_max, function(k){kmeans(customer_data_stand, k)$tot.withinss
 library(ggplot2)
 g <- qplot(x = 1:k_max, y = twcss, geom = 'line')
 g + scale_x_continuous(breaks = seq(0, 10, by = 1))
+# questo grafico deve essere letto da destra verso sinistra
+# si deve trovare il punto in cui la curva tende a salire in modo più consistente
+# dal grafico sopra riportato si potrebbe pensare al valore 4, come numero ottimale di cluster suggerito
 
-
-# per individuare in maniera più precisa il numero ottimale di cluster da considerare
+# per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
 # si possono consideare i metodi sotto riportati (non eseguiti per limiti computazionali)
 
 library(factoextra)
@@ -81,7 +110,7 @@ library(NbClust)
 
 
 # NbClust
-# nbclust_out <- NbClust(  
+# nbclust_out <- NbClust(
 #   data = customer_data_stand,
 #   distance = "euclidean",
 #   min.nc = 2, # minimum number of clusters
@@ -145,7 +174,7 @@ data.orig = t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled
 # 2     695.0499   41.83827         5.925215   # size: 21836
 # 3    3542.1070  340.72767        17.416803   # size: 2440
 
-
+# lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
 
 
