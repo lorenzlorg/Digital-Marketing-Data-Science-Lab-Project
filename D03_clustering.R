@@ -57,7 +57,7 @@ clustering_dataset <- clustering_dataset %>%
 str(clustering_dataset)
 
 # controllo la presenza di eventuali na
-sapply(clustering_dataset, function(x) sum(is.na(x)))
+sapply(clustering_dataset, function(x) sum(is.na(x)))  # non sono presenti valori mancanti
 
 
 # attenzione agli outliers
@@ -85,7 +85,7 @@ g <- qplot(x = 1:k_max, y = twcss, geom = 'line')
 g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # questo grafico deve essere letto da destra verso sinistra
 # si deve trovare il punto in cui la curva tende a salire in modo più consistente
-# dal grafico sopra riportato si potrebbe pensare al valore 4, come numero ottimale di cluster suggerito
+# dal grafico sopra riportato si potrebbe pensare al valore 3, 4 o 5, come numero ottimale di cluster suggerito
 
 # per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
 # si possono consideare i metodi sotto riportati (non eseguiti per limiti computazionali)
@@ -130,12 +130,20 @@ pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.
 
 # il valore ottimale di numero di cluster dovrebbe coincidere con il valore più
 # elevato di duda a cui corrisponde il valore pseudo-T2 minore
+
 duda$All.index
+# 2      3      4      5      6      7      8      9 
+# 0.5921 0.6235 0.6254 1.3995 0.7372 0.6309 0.4539 0.7500 
+
 pseudot2$All.index
+# 2          3          4          5          6          7          8         9
+# 832.0622   723.8854 13827.2146    -1.9982  3541.1738   560.3696   287.5806  2371.9318  
+
 
 # oppure più semplicemente
 duda$Best.nc  # numero ottimale cluster = 5
-
+# Number_clusters     Value_Index 
+# 5.0000          1.3995 
 
 
 #### K-means ####
@@ -146,33 +154,34 @@ duda$Best.nc  # numero ottimale cluster = 5
 
 #### K = 3 #### 
 # possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
-km <-kmeans(customer_data_stand, centers = 3, nstart=20)
+km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 
 # dimensioni dei cluster identificati
-# km$size
-table(km$cluster)
+# km_3$size
+table(km_3$cluster)
 # 18 21836  2440
 
-km$withinss
+km_3$withinss
 # 8260.103  7747.000 17878.634
 
 # valutazione qualità: The quality of a k-means partition is found by calculating the percentage of 
 # the TSS “explained” by the partition using the following formula: BSS / TSS * 100 
-BSS <- km$betweenss
-TSS <- km$totss
-BSS / TSS * 100  #  53.50411, higher quality means a higher explained percentage
+BSS_km_3 <- km_3$betweenss
+TSS_km_3 <- km_3$totss
+BSS_km_3 / TSS_km_3 * 100  #  53.50411, higher quality means a higher explained percentage
 # where BSS and TSS stand for Between Sum of Squares and Total Sum of Squares, respectively. 
 # The higher the percentage, the better the score (and thus the quality) because 
 # it means that BSS is large and/or WSS is small
 
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
-data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
-data.orig
+data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
+data.orig_km_3
+
 # visualizzazione grafica
-# fviz_cluster(km, data = customer_data_stand)
+# fviz_cluster(km_3, data = customer_data_stand)
 
 # TOT_PURCHASE TOT_SCONTO NUM_OF_PURCHASES
 # 1   72378.6839 9631.48222         9.777778   # size: 18
@@ -186,29 +195,29 @@ data.orig
 
 ####  K = 4 #### 
 # possiamo selezionare n cluster = 4, applichiamo l'algoritmo kmeans
-km <-kmeans(customer_data_stand, centers = 4, nstart=20)
+km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
 
 # dimensioni dei cluster identificati
-# km$size
-table(km$cluster)
+# km_4$size
+table(km_4$cluster)
 # 2393 21744     9   148
 
-km$withinss
+km_4$withinss
 # 8884.459 8329.182 4647.728 4183.320
 
 # valutazione qualità
-BSS <- km$betweenss
-TSS <- km$totss
-BSS / TSS * 100   # 64.26311
+BSS_km_4 <- km_4$betweenss
+TSS_km_4 <- km_4$totss
+BSS_km_4 / TSS_km_4 * 100   # 64.26311
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
-data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
-data.orig
+data.orig_km_4[,c(1, 2)] <- round(data.orig_km_4[,c(1, 2)])
+data.orig_km_4
 
 # visualizzazione grafica
-# fviz_cluster(km, data = customer_data_stand)
+# fviz_cluster(km_4, data = customer_data_stand)
 
 # TOT_PURCHASE  TOT_SCONTO NUM_OF_PURCHASES
 # 1    2439.4871   187.47748        17.972002   # size: 2393
@@ -224,29 +233,29 @@ data.orig
 
 ####  K = 5 #### 
 # possiamo selezionare n cluster = 5, applichiamo l'algoritmo kmeans
-km <-kmeans(customer_data_stand, centers = 5, nstart=20)
+km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 
 # dimensioni dei cluster identificati
-# km$size
-table(km$cluster)
+# km_5$size
+table(km_5$cluster)
 # 4497   117 19096   575     9
 
-km$withinss
+km_5$withinss
 # 6274.085 3538.018 3399.972 3313.790 4647.728
 
 # valutazione qualità
-BSS <- km$betweenss
-TSS <- km$totss
-BSS / TSS * 100   # 70.94616
+BSS_km_5 <- km_5$betweenss
+TSS_km_5 <- km_5$totss
+BSS_km_5 / TSS_km_5 * 100   # 70.94616
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_5 <- t(apply(km_5$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
-data.orig[,c(1, 2)] <- round(data.orig[,c(1, 2)])
-data.orig
+data.orig_km_5[,c(1, 2)] <- round(data.orig_km_5[,c(1, 2)])
+data.orig_km_5
 
 # visualizzazione grafica
-# fviz_cluster(km, data = customer_data_stand)
+# fviz_cluster(km_5, data = customer_data_stand)
 
 # TOT_PURCHASE  TOT_SCONTO NUM_OF_PURCHASES
 # 1    1999.1261   165.93408        11.740147   # size: 4491
@@ -266,12 +275,11 @@ data.orig
 # per il clustering si potrebbero usare anche K-medians o DBSCAN che sono più robusti agli outliers
 
 #### K-medians ####
-install.packages(c("cluster", "factoextra"))
 library(cluster)
 library(factoextra)
 
 # in base ai risultati precedenti, k = 5
-pam.res <- pam(customer_data_stand, 5)
+pam.res <- pam(customer_data_stand, 5)  # esecuzione lenta
 print(pam.res)
 
 # The function pam() returns an object of class pam which components include:
@@ -282,7 +290,7 @@ print(pam.res)
 pam.res$medoids
 
 # scale data -> original data
-data.orig <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 
 
@@ -299,8 +307,6 @@ head(pam.res$clustering)
 
 
 #### DBSCAN ####
-install.packages("fpc")
-install.packages("dbscan")
 library("fpc")
 library("dbscan")
 

@@ -38,7 +38,7 @@ PIPELINE_scripts <- c(
   , 'C07_preparation_df7.R'
   , 'D01_churn.R'
   # , 'D02_rfm.R'
-  # , 'D03_clustering'
+  , 'D03_clustering.R'
   )
 
 for(i in PIPELINE_scripts){
