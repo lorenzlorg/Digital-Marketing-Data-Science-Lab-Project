@@ -4,7 +4,7 @@
 
 # variabili da considerare
 # NUMERO ACQUISTI
-# NUMERO SCONTRINI
+# NUMERO ARTICOLI
 # TOT SPESA
 # TOTO SCONTO
 
@@ -152,7 +152,7 @@ duda$Best.nc  # numero ottimale cluster = 5
 
 # vengono provati tre scenari, K=3,4,5
 
-#### K = 3 #### 
+# K = 3
 # possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
 km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 
@@ -190,10 +190,13 @@ data.orig_km_3
 # lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
 # visualizzazione grafica
-# fviz_cluster(km_3, data = customer_data_stand)
+fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
 
-
-####  K = 4 #### 
+#  K = 4
 # possiamo selezionare n cluster = 4, applichiamo l'algoritmo kmeans
 km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
 
@@ -224,15 +227,18 @@ data.orig_km_4
 # 25                    113         3955.607      315.22485
 
 # visualizzazione grafica
-# fviz_cluster(km_4, data = customer_data_stand)
+fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800", "#FF0000"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
 
 
 
 
 
 
-
-####  K = 5 #### 
+#  K = 5
 # possiamo selezionare n cluster = 5, applichiamo l'algoritmo kmeans
 km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 
@@ -257,7 +263,11 @@ data.orig_km_5[,c(1, 2)] <- round(data.orig_km_5[,c(1, 2)])
 data.orig_km_5
 
 # visualizzazione grafica
-# fviz_cluster(km_5, data = customer_data_stand)
+fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800","#01AFBB","#E8D800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE  TOT_SCONTO
 # 5                     18          570.7831      34.42337
