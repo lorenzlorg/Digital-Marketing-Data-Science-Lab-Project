@@ -24,30 +24,6 @@ clustering_dataset <- clustering_dataset %>%
     TOT_SCONTO = sum(SCONTO)
   ) 
 
-# # ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO: variabile non presa in considerazione
-# clustering_dataset_1 <- df_7_tic_clean_final %>%
-#   filter(DIREZIONE == 1) %>%
-#   filter(TIC_DATETIME >= as.Date("01/01/2019",
-#                                  format="%d/%m/%Y"))
-# 
-# clustering_dataset_1 <- clustering_dataset_1 %>%
-#   group_by(ID_CLI, ID_SCONTRINO) %>%
-#   summarize(
-#     NUM_OF_ART_SCONTRINO = n_distinct(ID_ARTICOLO)
-#   ) 
-# 
-# clustering_dataset_1 <- clustering_dataset_1 %>%
-#   group_by(ID_CLI) %>%
-#   summarize(
-#     AVG_NUM_OF_ART_SCONTRINO = mean(NUM_OF_ART_SCONTRINO)
-#   ) 
-# 
-# clustering_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(clustering_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
-# 
-# # unisco i due dataset
-# clustering_dataset <- left_join(clustering_dataset, clustering_dataset_1, by = "ID_CLI" )
-
-
 # si considerano i clienti che hanno effettuato più di 1 acquisto
 clustering_dataset <- clustering_dataset %>%
   filter(NUM_OF_PURCHASES > 3)
