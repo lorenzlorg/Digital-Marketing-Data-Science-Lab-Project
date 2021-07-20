@@ -1,5 +1,8 @@
 # CLUSTERING
 
+# ! PCA
+# ! check risultati commentati
+
 #### preparazione dataset ####
 
 # variabili da considerare
@@ -132,6 +135,9 @@ duda$Best.nc  # numero ottimale cluster = 5
 # possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
 km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 
+# general info
+str(km_3)
+
 # dimensioni dei cluster identificati
 # km_3$size
 table(km_3$cluster)
@@ -159,7 +165,7 @@ data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
 data.orig_km_3
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
-# 6                     73            3198.2312  287.73131
+# 16                    73            3198.2312  287.73131
 # 6                     21            688.3021   43.36208
 # 10                    51            72378.6839 9631.48222
 
@@ -172,9 +178,14 @@ fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
              ggtheme = theme_bw()
 )
 
+
+
 #  K = 4
 # possiamo selezionare n cluster = 4, applichiamo l'algoritmo kmeans
 km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
+
+# general info
+str(km_4)
 
 # dimensioni dei cluster identificati
 # km_4$size
@@ -211,12 +222,12 @@ fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
 
 
 
-
-
-
 #  K = 5
 # possiamo selezionare n cluster = 5, applichiamo l'algoritmo kmeans
 km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
+
+# general info
+str(km_5)
 
 # dimensioni dei cluster identificati
 # km_5$size
@@ -245,7 +256,7 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
              ggtheme = theme_bw()
 )
 
-# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE  TOT_SCONTO
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE  TOT_SCONTO 
 # 5                     18          570.7831      34.42337
 # 25                    114         3548.1202     259.29213
 # 9                     41          19366.6642    2691.37265
@@ -257,7 +268,6 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
 # On the other hand, the “model” will be more complex, requiring more classes. 
 # In the extreme case where k = n (each observation is a singleton class), we have BSS = TSS, 
 # but the partition has lost all interest.
-
 
 
 # per il clustering si potrebbero usare anche K-medians o DBSCAN che sono più robusti agli outliers
@@ -277,19 +287,31 @@ print(pam.res)
 # Cluster medoids
 pam.res$medoids
 
+# Number obs for each cluster
+pam.res.list <- pam.res$clustering
+pam.res.df <- data.frame(matrix(unlist(pam.res.list), nrow=length(pam.res.list), byrow=TRUE))
+names(pam.res.df)[1] <- "cluster"
+pam.res.df %>% 
+  group_by(pam.res.df$cluster) %>%
+  summarise(Count = n())
+# cluster 1  7816
+# cluster 2  2490
+# cluster 3  8294
+# cluster 4  4531
+# cluster 5  1163
+
+
 # scale data -> original data
 data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
 # 6                     20            491.20      19.23
-# 13                    46            1303.14      71.99
+# 13                    46            1303.14     71.99
 # 4                     11            276.16      13.50
-# 7                     38            1086.10      64.72
+# 7                     38            1086.10     64.72
 # 19                    92            3234.32     234.36
 
-# Cluster numbers
-head(pam.res$clustering)
 
 
 
@@ -298,13 +320,21 @@ library("fpc")
 library("dbscan")
 
 # in questo caso non è necessario stabilire a priori il numero di cluster da considerare
+
+# scaled data
 Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
+
 
 # The clustering contains 11 cluster(s) and 748 noise points.
 # 
 # 0     1       2     3     4     5     6     7     8     9    10    11 
 # 748 23497     3     5     6     5     7     3     5     4     6     5 
 
+# N.b.
+# noise point: A selected point that is neither a core point nor a border point. 
+# It means these points are outliers that are not associated with any dense clusters
+
 # Checking cluster
 Dbscan_cl$cluster
 
+# DBSCAN visti i risultati poco soddisfacienti non viene considerato
