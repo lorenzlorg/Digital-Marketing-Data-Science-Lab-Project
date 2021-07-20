@@ -17,31 +17,33 @@ churn_dataset <- churn_dataset %>%
   group_by(ID_CLI) %>%
   summarize(
     NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
-    TOT_PURCHASE = sum(IMPORTO_LORDO)
+    NUM_OF_ARTICLES = n_distinct(ID_ARTICOLO),
+    TOT_PURCHASE = sum(IMPORTO_LORDO),
+    TOT_SCONTO = sum(SCONTO)
   ) 
 
-# ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO
-churn_dataset_1 <- df_7_tic_clean_final %>%
-  filter(DIREZIONE == 1) %>%
-  filter(TIC_DATETIME >= as.Date("01/01/2019",
-                                 format="%d/%m/%Y"))
-
-churn_dataset_1 <- churn_dataset_1 %>%
-  group_by(ID_CLI, ID_SCONTRINO) %>%
-  summarize(
-    NUM_OF_ART_SCONTRINO = n_distinct(ID_ARTICOLO)
-  ) 
-
-churn_dataset_1 <- churn_dataset_1 %>%
-  group_by(ID_CLI) %>%
-  summarize(
-    AVG_NUM_OF_ART_SCONTRINO = mean(NUM_OF_ART_SCONTRINO)
-  ) 
-
-churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
-
-# unisco i due dataset
-churn_dataset <- left_join(churn_dataset, churn_dataset_1, by = "ID_CLI" )
+# # ricavo NUMERO MEDIO ARTICOLI PER SCONTRINO
+# churn_dataset_1 <- df_7_tic_clean_final %>%
+#   filter(DIREZIONE == 1) %>%
+#   filter(TIC_DATETIME >= as.Date("01/01/2019",
+#                                  format="%d/%m/%Y"))
+# 
+# churn_dataset_1 <- churn_dataset_1 %>%
+#   group_by(ID_CLI, ID_SCONTRINO) %>%
+#   summarize(
+#     NUM_OF_ART_SCONTRINO = n_distinct(ID_ARTICOLO)
+#   ) 
+# 
+# churn_dataset_1 <- churn_dataset_1 %>%
+#   group_by(ID_CLI) %>%
+#   summarize(
+#     AVG_NUM_OF_ART_SCONTRINO = mean(NUM_OF_ART_SCONTRINO)
+#   ) 
+# 
+# churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO <- floor(churn_dataset_1$AVG_NUM_OF_ART_SCONTRINO)
+# 
+# # unisco i due dataset
+# churn_dataset <- left_join(churn_dataset, churn_dataset_1, by = "ID_CLI" )
 
 
 # si considerano i clienti che hanno effettuato più di 1 acquisto
@@ -163,9 +165,9 @@ BSS / TSS * 100  #  53.50411, higher quality means a higher explained percentage
 
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig = t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
-
+data.orig
 # visualizzazione grafica
 # fviz_cluster(km, data = customer_data_stand)
 
@@ -197,8 +199,9 @@ TSS <- km$totss
 BSS / TSS * 100   # 64.26311
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig = t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
+data.orig
 
 # visualizzazione grafica
 # fviz_cluster(km, data = customer_data_stand)
@@ -233,8 +236,9 @@ TSS <- km$totss
 BSS / TSS * 100   # 70.94616
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig = t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig <- t(apply(km$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
+data.orig
 
 # visualizzazione grafica
 # fviz_cluster(km, data = customer_data_stand)
@@ -299,7 +303,7 @@ library("dbscan")
 
 # in questo caso non è necessario stabilire a priori il numero di cluster da considerare
 Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
-
+Dbscan_cl
 # The clustering contains 7 cluster(s) and 262 noise points.
 # 
 # 0     1     2     3     4     5     6     7 
@@ -307,7 +311,4 @@ Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
 
 # Checking cluster
 Dbscan_cl$cluster
-
-# Table
-table(Dbscan_cl$cluster, iris$Species)
 
