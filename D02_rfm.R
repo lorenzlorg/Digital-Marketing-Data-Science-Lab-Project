@@ -247,7 +247,7 @@ ggplot(data = recency_frequency_var,
 # Top: cienti che hanno acquistato recentemnte/abbastanza recentemente e con alta frequenza
 # Leaving Top: cienti che non hanno acquistato di recente ma con alta frequenza
 
-# ! aggiungo qualche grafico
+# ! aggiungo qualche grafico (matrice colorata con assi frequency e recency e valori RECENCY_FREQUENCY)
 # ! correggere grafico, manca "Leaving"
 
 #### RECENCY E FREQUENCY COMBINED with MONETARY ####
@@ -305,12 +305,14 @@ ggplot(data = recency_frequency_monetary_var,
 # Silver:
 # Tin:
 
-# ! aggiungo qualche grafico
+# ! aggiungo qualche grafico (matrice colorata con assi monetary e valori matrice precedente e valori RECENCY_FREQUENCY_MONETARY)
 
 
 
 
 
+# In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
+# della libreria "rfm"
 
 
 
@@ -333,219 +335,17 @@ ggplot(data = recency_frequency_monetary_var,
 
 
 
-# ALTRO ---------
-# costruisco un dataset con le informazioni ottenute
 
-recency_frequency_df <- as.data.frame(rbind(c("Leaving",         "High",   "Low",    34853),  # questi numeri da dove si ricavano?
-                             c("Leaving",         "High",   "Medium", 34853),
-                             c("Leaving Top", "High",   "High", 1339 ),
-                             c("One-Timer",     "Medium", "Low",    36587),
-                             c("Engaged",     "Medium", "Medium", 46139),
-                             c("Top",     "Medium", "High",   27811),
-                             c("One-Timer",   "Low",    "Low", 36587 ),
-                             c("Engaged",   "Low",    "Medium", 46139),
-                             c("Top",     "Low",    "High",   27811)))
 
-colnames(recency_frequency_df) <-  c("Level", "Recency", "Frequency", "Value")
 
-recency_frequency_df$Frequency <- factor(recency_frequency_df$Frequency,
-                          levels = c("High", "Medium", "Low"))
 
-recency_frequency_df$Recency <- factor(recency_frequency_df$Recency,
-                        levels = c("High", "Medium", "Low"))
-recency_frequency_df$Value <- as.numeric(recency_frequency_df$Value)
 
 
-# plot segmentation
 
 
-ggplot(recency_frequency_df, aes(x = Frequency, y = Recency, fill = Value)) + 
-  geom_tile() +
-  geom_text(aes(label = Level)) +
-  scale_fill_distiller(palette = "Spectral") +
-  theme_minimal()
 
 
-# plot RF classes
 
-recency_frequency <- as.data.frame(table(rfm$recency_frequency))
-recency_frequency
-
-ggplot(data = recency_frequency,
-       aes(x = Var1, y = Freq,
-           fill = Freq)) +                        
-  geom_bar(stat = "identity") +                   
-  scale_colour_brewer(palette = "Spectral") +
-  labs(title = "Recency-frequency Distribution",
-       x     = "Recency-frequency Classes",
-       y     = "Total Clients") +                
-  theme_minimal() +                               
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_discrete(labels = c("Engaged", "Leaving", "Leaving Top",
-                              "One Timer", "Top")) + 
-  guides(fill = FALSE)
-
-# la maggior parte dei cienti sono Engaged.
-
-# combino le classi con i monetary group
-
-rfm$recency_frequency_monetary <- NA
-
-for(i in c(1:nrow(rfm))){
-  if(rfm$recency_frequency[i] == "Top" && rfm$MONETARY_CLASS[i] == "low") rfm$recency_frequency_monetary[i] <- "Silver"
-  if(rfm$recency_frequency[i] == "Leaving Top" && rfm$MONETARY_CLASS[i] == "low") rfm$recency_frequency_monetary[i] <- "Bronze"
-  if(rfm$recency_frequency[i] == "Engaged" && rfm$MONETARY_CLASS[i] == "low") rfm$recency_frequency_monetary[i] <- "Copper"
-  if(rfm$recency_frequency[i] == "Leaving" && rfm$MONETARY_CLASS[i] == "low") rfm$recency_frequency_monetary[i] <- "Tin"
-  if(rfm$recency_frequency[i] == "One-Timer" && rfm$MONETARY_CLASS[i] == "low") rfm$recency_frequency_monetary[i] <- "Cheap"
-  
-  
-  if(rfm$recency_frequency[i] == "Top" && rfm$MONETARY_CLASS[i] == "medium") rfm$recency_frequency_monetary[i] <- "Gold"
-  if(rfm$recency_frequency[i] == "Leaving Top" && rfm$MONETARY_CLASS[i] == "medium") rfm$recency_frequency_monetary[i] <- "Silver"
-  if(rfm$recency_frequency[i] == "Engaged" && rfm$MONETARY_CLASS[i] == "medium") rfm$recency_frequency_monetary[i] <- "Bronze"
-  if(rfm$recency_frequency[i] == "Leaving" && rfm$MONETARY_CLASS[i] == "medium") rfm$recency_frequency_monetary[i] <- "Copper"
-  if(rfm$recency_frequency[i] == "One-Timer" && rfm$MONETARY_CLASS[i] == "medium") rfm$recency_frequency_monetary[i] <- "Tin"
-  
-  
-  if(rfm$recency_frequency[i] == "Top" && rfm$MONETARY_CLASS[i] == "high") rfm$recency_frequency_monetary[i] <- "Diamond"
-  if(rfm$recency_frequency[i] == "Leaving Top" && rfm$MONETARY_CLASS[i] == "high") rfm$recency_frequency_monetary[i] <- "Gold"
-  if(rfm$recency_frequency[i] == "Engaged" && rfm$MONETARY_CLASS[i] == "high") rfm$recency_frequency_monetary[i] <- "Silver"
-  if(rfm$recency_frequency[i] == "Leaving" && rfm$MONETARY_CLASS[i] == "high") rfm$recency_frequency_monetary[i] <- "Bronze"
-  if(rfm$recency_frequency[i] == "One-Timer" && rfm$MONETARY_CLASS[i] == "high") rfm$recency_frequency_monetary[i] <- "Copper"
-  
-}
-
-table(rfm$recency_frequency_monetary)
-
-
-
-rfm_df <- as.data.frame(rbind(c("Top", "High", "Diamond", 17341),
-                              c("Top", "Medium", "Gold", 11157),
-                                c("Top", "Low", "Silver", 11107),
-                                c("Leaving Top", "High", "Gold", 11157),
-                                c("Leaving Top", "Medium", "Silver", 457),
-                                c("Leaving Top", "Low", "Bronze",  33249),
-                                c("Engaged", "High", "Silver", 11107),
-                                c("Engaged", "Medium", "Bronze", 33249),
-                                c("Engaged", "Low", "Copper", 27460),
-                                c("Leaving", "High", "Bronze", 33249),
-                                c("Leaving", "Medium", "Copper", 27460),
-                                c("Leaving", "Low", "Tin", 28319),
-                                c("One Timer", "High", "Copper", 27460),
-                                c("One Timer", "Medium", "Tin", 28319),
-                                c("One Timer", "Low", "Cheap", 17639 )))
-
-
-colnames(rfm_df) <- c("recency_frequency", "Monetary", "Level", "Value")
-
-rfm_df$recency_frequency <- factor(rfm_df$recency_frequency,
-                    levels = c("Top", "Leaving Top",
-                               "Engaged", "Leaving","One-Timer"))
-
-rfm_df$Monetary <- factor(rfm_df$Monetary,
-                          levels = c("Low", "Medium", "High"))
-
-rfm_df$Value <- as.numeric(rfm_df$Value)
-
-
-# plot matrix
-
-ggplot(rfm_df, aes(x = recency_frequency, y = Monetary, fill = Value)) + 
-  geom_tile() +
-  geom_text(aes(label = Level)) +
-  scale_fill_distiller(palette = "Spectral") +
-  theme_minimal()
-
-# plot  RFM classes
-table(is.na(rfm$recency_frequency_monetary))
-
-rfm_plot <- as.data.frame(table(rfm$recency_frequency_monetary))
-ggplot(data = rfm_plot,
-       aes(x = Var1, y = Freq,
-           fill = Freq)) +                        
-  geom_bar(stat = "identity") +                   
-  scale_colour_brewer(palette = "Spectral") +
-  labs(title = "RFM Distribution",
-       x     = "RFM Classes",
-       y     = "Total Clients") +                 
-  theme_minimal() +                              
-  theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("Bronze", "Cheap", "Copper",
-                              "Gold", "Silver", "Tin")) + 
-  guides(fill = FALSE)
-
-# la classe più frequente è la bronze
-
-
-
-
-
-
-
-###### RFM table libreria --------
-
-# utilizzando libreria già fatta
-library(rfm)
-library(lubridate)
-library(magrittr)
-
-df_7_tic_clean_final$MONETARY_VALUE<-(df_7_tic_clean_final$IMPORTO_LORDO)-(df_7_tic_clean_final$SCONTO)
-analysis_date<-lubridate::as_date("2019/04/30")
-
-result<-rfm_table_order(df_7_tic_clean_final, ID_CLI, TIC_DATE, MONETARY_VALUE, analysis_date)
-
-rfm_results<-as.data.frame(result$rfm)
-
-# heat map
-
-rfm_heatmap(result)
-
-# monetary vaulue si concentra nella classe high frequency
-
-# label of the various segments
-
-segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
-                   "New Customers", "Promising", "Need Attention", "About To Sleep",
-                   "At Risk", "Can't Lose Them", "Lost")
-
-# set the upper and lower bounds for recency, frequency, and monetary
-
-recency_lower <- c(4, 2, 3, 4, 3, 2, 2, 1, 1, 1)
-recency_upper <- c(5, 5, 5, 5, 4, 3, 3, 2, 1, 2)
-frequency_lower <- c(4, 3, 1, 1, 1, 2, 1, 2, 4, 1)
-frequency_upper <- c(5, 5, 3, 1, 1, 3, 2, 5, 5, 2)
-monetary_lower <- c(4, 3, 1, 1, 1, 2, 1, 2, 4, 1)
-monetary_upper <- c(5, 5, 3, 1, 1, 3, 2, 5, 5, 2)
-
-# We use the segments and the bounds we previously established to group our users into different segments
-
-
-library(kableExtra)
-segment <- rfm_segment(result,
-                       segment_names,
-                       recency_lower,
-                       recency_upper,
-                       frequency_lower, 
-                       frequency_upper, 
-                       monetary_lower,
-                       monetary_upper)
-
-
-head(segment) %>% 
-  kable() %>% 
-  kable_classic_2()
-
-# RFM visuals
-
-# median recency by segment 
-
-rfm_plot_median_recency(segment)
-
-# median monetary_value by segment 
-
-rfm_plot_median_monetary(segment)
-
-# Il grafico  mostra l'importanza del segmento Champions 
-# in quanto hanno di gran lunga il valore monetario mediano più grande.
 
 
 
