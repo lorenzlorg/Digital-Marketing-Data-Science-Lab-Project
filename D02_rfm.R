@@ -34,10 +34,11 @@ recency_data<-rfm_data %>%
 recency_data
 
 # costruisco la variabile RECENCY 
-recency_data$RECENCY_VALUE<-difftime(as.Date("30/04/2019",
+recency_data$RECENCY_VALUE <- difftime(as.Date("30/04/2019",
                                       format="%d/%m/%Y"),
                                   recency_data$LAST_PURCHASE_DATE,
                               units = "days")
+recency_data$RECENCY_VALUE <- as.numeric(recency_data$RECENCY_VALUE, units="days")
 
 library(ggplot2)
 library(gridExtra)
@@ -54,6 +55,7 @@ frequency_data <- rfm_data %>%
   group_by(ID_CLI)  %>% 
   summarise(FREQUENCY_VALUE = n_distinct(ID_SCONTRINO)) %>%
   arrange(desc(FREQUENCY_VALUE))
+frequency_data$FREQUENCY_VALUE <- as.numeric(frequency_data$FREQUENCY_VALUE)
 
 frequency_data
 
@@ -72,6 +74,7 @@ monetary_data <- rfm_data %>%
   ungroup() %>%
   as.data.frame() %>%
   arrange(desc(IMPORTO_LORDO))
+monetary_data$MONETARY_VALUE <- as.numeric(monetary_data$MONETARY_VALUE)
 
 monetary_data
 ggplot(monetary_data) + geom_density(aes(x = MONETARY_VALUE))
@@ -100,11 +103,26 @@ hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY")
 #### RECENCY CLASS ####
 
 rfm_data_clean<- within(rfm_data_clean,
-                        RECENCY_CLASS <- cut(as.numeric(rfm_data_clean$RECENCY_VALUE),
+                        RECENCY_CLASS <- cut(rfm_data_clean$RECENCY_VALUE,
                                              breaks = quantile(rfm_data_clean$RECENCY_VALUE,
                                                                probs = c(0, .25, .75, 1)), 
                                              include.lowest = T,
                                              labels = c("low", "medium", "high")))         
+
+
+# alternativa calcolo classi (per recency, frequency, monetary)
+summary(rfm_data_clean)  # si osservano i valori dei quantili qui riportati
+quantile(rfm_data_clean$RECENCY_VALUE, probs = c(0, .25, .75, 1))
+
+rfm_data_clean$RECENCY_CLASS_1 <- 0
+rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE <= 10.00] <- "low"
+rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE > 10.00 & rfm_data_clean$RECENCY_VALUE <= 41.00] <- "medium"
+rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE > 41.00] <- "high"
+
+rfm_data_clean %>% 
+  group_by(RECENCY_CLASS_1) %>%
+  summarise(Count = n())
+
 
 rfm_data_clean %>% 
   group_by(RECENCY_CLASS) %>%
