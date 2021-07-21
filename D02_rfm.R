@@ -34,11 +34,15 @@ recency_data<-rfm_data %>%
 recency_data
 
 # costruisco la variabile RECENCY 
-
 recency_data$RECENCY_VALUE<-difftime(as.Date("30/04/2019",
                                       format="%d/%m/%Y"),
                                   recency_data$LAST_PURCHASE_DATE,
                               units = "days")
+
+library(ggplot2)
+library(gridExtra)
+ggplot(recency_data) + geom_density(aes(x= RECENCY_VALUE))
+
 # la recency è ottenuta come differenza tra l'ultimo giorno di acquisto per cliente e l'ultimo giorno di rilevazione
 # as esempio: il cliente con ID 5 ha acquistato l'ultima volta il 23 novembre 2018, ovvero 158 giorni entro l'ultima data di rilevazione
 
@@ -52,6 +56,9 @@ frequency_data <- rfm_data %>%
   arrange(desc(FREQUENCY_VALUE))
 
 frequency_data
+
+ggplot(frequency_data) + geom_density(aes(x = FREQUENCY_VALUE))
+
 
 
 #### MONETARY VALUE: amount spent in the reference range ####
@@ -67,6 +74,8 @@ monetary_data <- rfm_data %>%
   arrange(desc(IMPORTO_LORDO))
 
 monetary_data
+ggplot(monetary_data) + geom_density(aes(x = MONETARY_VALUE))
+
 
 
 #### Merge Recency, Frequency, Monetary ####
@@ -78,6 +87,8 @@ rfm_data_clean <- merge(frequency_data,
 rfm_data_clean <- merge(rfm_data_clean,           
              recency_data,  
              by = "ID_CLI")
+
+sum(is.na(rfm_data_clean)) 
 
 rfm_data_clean <- rfm_data_clean[,c(1,2,5,7)]
 
@@ -300,6 +311,12 @@ ggplot(data = recency_frequency_monetary_var,
 
 
 
+
+
+
+
+
+# ALTRO ---------
 # costruisco un dataset con le informazioni ottenute
 
 recency_frequency_df <- as.data.frame(rbind(c("Leaving",         "High",   "Low",    34853),  # questi numeri da dove si ricavano?
@@ -442,7 +459,12 @@ ggplot(data = rfm_plot,
 # la classe più frequente è la bronze
 
 
-###### RFM table
+
+
+
+
+
+###### RFM table libreria --------
 
 # utilizzando libreria già fatta
 library(rfm)
