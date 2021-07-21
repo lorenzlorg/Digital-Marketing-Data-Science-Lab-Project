@@ -102,27 +102,16 @@ hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY")
 
 #### RECENCY CLASS ####
 
-rfm_data_clean<- within(rfm_data_clean,
-                        RECENCY_CLASS <- cut(rfm_data_clean$RECENCY_VALUE,
-                                             breaks = quantile(rfm_data_clean$RECENCY_VALUE,
-                                                               probs = c(0, .25, .75, 1)), 
-                                             include.lowest = T,
-                                             labels = c("low", "medium", "high")))         
+summary(rfm_data_clean$RECENCY_VALUE)  # si osservano i valori dei quantili qui riportati
 
+quantile(rfm_data_clean$RECENCY_VALUE)
+# 0%  25%  50%  75% 100% 
+# 0   10   24   41   60  # cutpoints
 
-# alternativa calcolo classi (per recency, frequency, monetary)
-summary(rfm_data_clean)  # si osservano i valori dei quantili qui riportati
-quantile(rfm_data_clean$RECENCY_VALUE, probs = c(0, .25, .75, 1))
-
-rfm_data_clean$RECENCY_CLASS_1 <- 0
-rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE <= 10.00] <- "low"
-rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE > 10.00 & rfm_data_clean$RECENCY_VALUE <= 41.00] <- "medium"
-rfm_data_clean$RECENCY_CLASS_1[rfm_data_clean$RECENCY_VALUE > 41.00] <- "high"
-
-rfm_data_clean %>% 
-  group_by(RECENCY_CLASS_1) %>%
-  summarise(Count = n())
-
+rfm_data_clean$RECENCY_CLASS <- 0
+rfm_data_clean$RECENCY_CLASS[rfm_data_clean$RECENCY_VALUE <= 10.00] <- "low"
+rfm_data_clean$RECENCY_CLASS[rfm_data_clean$RECENCY_VALUE > 10.00 & rfm_data_clean$RECENCY_VALUE <= 41.00] <- "medium"
+rfm_data_clean$RECENCY_CLASS[rfm_data_clean$RECENCY_VALUE > 41.00] <- "high"
 
 rfm_data_clean %>% 
   group_by(RECENCY_CLASS) %>%
@@ -140,20 +129,22 @@ ggplot(data = recency_var,
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# La classe media è la più frequente: la maggior parte degli acquisti effettuati (36601) sono abbastanza recenti
-# N.B la classe recency high corrisponde alla classe con il maggior numero di giorni dall'ultimo acquisto
+# La classe media è la più frequente: la maggior parte dei clienti ha effettuato degli acquisti abbastanza recenti
 
 
 
 #### FREQUENCY CLASS ####
 
-rfm_data_clean <- within(rfm_data_clean,
-                         FREQUENCY_CLASS <- cut(rfm_data_clean$FREQUENCY_VALUE,
-                                                breaks = c(0, 2, 5, 101),             
-                                                include.lowest = T,
-                                                right = F,
-                                                labels = c("low", "medium", "high"))) 
-rfm_data_clean %>% 
+summary(rfm_data_clean$FREQUENCY_VALUE)  # si osservano i valori dei quantili qui riportati
+
+quantile(rfm_data_clean$FREQUENCY_VALUE)
+
+rfm_data_clean$FREQUENCY_CLASS <- 0
+rfm_data_clean$FREQUENCY_CLASS[rfm_data_clean$RECENCY_VALUE <= 2] <- "low"
+rfm_data_clean$FREQUENCY_CLASS[rfm_data_clean$RECENCY_VALUE > 2 & rfm_data_clean$RECENCY_VALUE <= 5] <- "medium"
+rfm_data_clean$FREQUENCY_CLASS[rfm_data_clean$RECENCY_VALUE > 5] <- "high"
+
+rfm_data_clean %>%
   group_by(FREQUENCY_CLASS) %>%
   summarise(Count = n())
 
@@ -164,29 +155,32 @@ ggplot(data = frequency_var,
            fill = Freq)) +                       
   geom_bar(stat = "identity", fill="turquoise3") +                 
   labs(x     = "Frequency Type",
-       y     = "Totla Purchase") +               
+       y     = "Total Purchases") +               
   theme_classic() +                             
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("Low", "Medium", "High")) + 
+  scale_x_discrete(labels = c("High", "Low", "Medium")) + 
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# la maggior parte degli acquisti (41817) appartiene  alla classe con minor frequenza di acquisto
+# la maggior parte dei clienti ha una frequency associata di tipo high
 
 
 
 #### MONETARY CLASS ####
+summary(rfm_data_clean$MONETARY_VALUE)
 
-rfm_data_clean <- within(rfm_data_clean,
-                        MONETARY_CLASS <- cut(rfm_data_clean$MONETARY_VALUE,
-                                              breaks = quantile(rfm_data_clean$MONETARY_VALUE,
-                                                                probs = c(0, .25, .75, 1)),
-                                              include.lowest = T,
-                                              
-                                              labels = c("low", "medium", "high"))) 
+quantile(rfm_data_clean$MONETARY_VALUE)
+
+rfm_data_clean$MONETARY_CLASS <- 0
+rfm_data_clean$MONETARY_CLASS[rfm_data_clean$MONETARY_VALUE <= 31.30] <- "low"
+rfm_data_clean$MONETARY_CLASS[rfm_data_clean$MONETARY_VALUE > 31.30 & rfm_data_clean$MONETARY_VALUE <= 247.51] <- "medium"
+rfm_data_clean$MONETARY_CLASS[rfm_data_clean$MONETARY_VALUE > 247.51] <- "high"
+
+
 rfm_data_clean %>% 
   group_by(MONETARY_CLASS) %>%
   summarise(Count = n())
+
 
 monetary_var <- as.data.frame(table(rfm_data_clean$MONETARY_CLASS))
 
@@ -199,13 +193,15 @@ ggplot(data = monetary_var,
        y     = "Total Amount") +                  
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("Low", "Medium", "High")) + 
+  scale_x_discrete(labels = c("High", "Low", "Medium")) + 
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# la classe più lucrosa, in termini monetari è la medium, ovvero 38275 degli acquisti sono abbastanza costosi
+# più della metà dei clienti viene categorizzata come medium dal punto di vista di monetary
 
-
+# avendo a disposizione maggiori informazioni da parte dell'esperto di dominio
+# si potrebbe procedere ad una più attenta e precisa suddivisione in classi di
+# recency, frequency, monetary
 
 #### RECENCY E FREQUENCY COMBINED ####
 # in modo tale che si vengano a creare delle nuove classi che descrivono i clienti
@@ -226,6 +222,8 @@ for(i in c(1:nrow(rfm_data_clean))){
 rfm_data_clean %>% 
   group_by(RECENCY_FREQUENCY) %>%
   summarise(Count = n())
+
+table(rfm_data_clean$RECENCY_FREQUENCY)
 
 
 recency_frequency_var <- as.data.frame(table(rfm_data_clean$RECENCY_FREQUENCY))
@@ -250,6 +248,7 @@ ggplot(data = recency_frequency_var,
 # Leaving Top: cienti che non hanno acquistato di recente ma con alta frequenza
 
 # ! aggiungo qualche grafico
+# ! correggere grafico, manca "Leaving"
 
 #### RECENCY E FREQUENCY COMBINED with MONETARY ####
 
