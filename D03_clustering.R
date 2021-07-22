@@ -1,8 +1,5 @@
 # CLUSTERING
 
-# ! PCA
-# ! check risultati commentati
-
 #### preparazione dataset ####
 
 # variabili da considerare
@@ -131,7 +128,7 @@ duda$Best.nc  # numero ottimale cluster = 5
 
 # vengono provati tre scenari, K=3,4,5
 
-# K = 3
+##### K = 3 ##### 
 # possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
 km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 
@@ -178,9 +175,37 @@ fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
              ggtheme = theme_bw()
 )
 
+# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
+
+# si estraggono le coordinate
+index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
+
+# si aggiungono i cluster ottenuti con l'algoritmo k-means
+index_coordinate$cluster <- factor(km_3$cluster)
+
+# ispezione
+head(index_coordinate)
+
+# si ottiene la percentuale di varianza spiegata dalla dimensioni
+eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
+variance_percent <- eigen_value$variance_percent
+head(eigen_value)
+
+# visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
+library(ggpubr)
+ggscatter(
+  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  size = 1.5,  legend = "right", ggtheme = theme_bw(),
+  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+) +
+  stat_mean(aes(color = cluster), size = 4)
 
 
-#  K = 4
+
+#####   K = 4 ##### 
 # possiamo selezionare n cluster = 4, applichiamo l'algoritmo kmeans
 km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
 
@@ -220,9 +245,35 @@ fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
              ggtheme = theme_bw()
 )
 
+# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
 
+# si estraggono le coordinate
+index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
 
-#  K = 5
+# si aggiungono i cluster ottenuti con l'algoritmo k-means
+index_coordinate$cluster <- factor(km_4$cluster)
+
+# ispezione
+head(index_coordinate)
+
+# si ottiene la percentuale di varianza spiegata dalla dimensioni
+eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
+variance_percent <- eigen_value$variance_percent
+head(eigen_value)
+
+# visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
+library(ggpubr)
+ggscatter(
+  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  size = 1.5,  legend = "right", ggtheme = theme_bw(),
+  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+) +
+  stat_mean(aes(color = cluster), size = 4)
+
+#####   K = 5 ##### 
 # possiamo selezionare n cluster = 5, applichiamo l'algoritmo kmeans
 km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 
@@ -269,6 +320,33 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
 # In the extreme case where k = n (each observation is a singleton class), we have BSS = TSS, 
 # but the partition has lost all interest.
 
+# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
+
+# si estraggono le coordinate
+index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
+
+# si aggiungono i cluster ottenuti con l'algoritmo k-means
+index_coordinate$cluster <- factor(km_5$cluster)
+
+# ispezione
+head(index_coordinate)
+
+# si ottiene la percentuale di varianza spiegata dalla dimensioni
+eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
+variance_percent <- eigen_value$variance_percent
+head(eigen_value)
+
+# visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
+library(ggpubr)
+ggscatter(
+  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  size = 1.5,  legend = "right", ggtheme = theme_bw(),
+  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+) +
+  stat_mean(aes(color = cluster), size = 4)
 
 # per il clustering si potrebbero usare anche K-medians o DBSCAN che sono più robusti agli outliers
 
