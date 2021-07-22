@@ -4,14 +4,52 @@ options(scipen=999)
 set.seed(123456)
 
 #### LIBRARIES ####
+
+# # Package names
+# packages <- c("dplyr", "magrittr", "ggplot2", "forcats", "lubridate", "RQuantLib", "devtools", 
+#               "mapIT", "data.table", "corrplot", "rpart", "rpart.plot", "MLmetrics", "caret", 
+#               "rattle", "randomForest", "ROCR", "nnet", "e1071", "caTools", 
+#               "gridExtra", "factoextra", "NbClust", "ggpubr", "cluster", "fpc", 
+#               "dbscan")  # togliere quelli non utilizzati
+# 
+# # Install packages not yet installed
+# installed_packages <- packages %in% rownames(installed.packages())
+# if (any(installed_packages == FALSE)) {
+#   install.packages(packages[!installed_packages])
+# }
+# 
+# # Packages loading
+# invisible(lapply(packages, library, character.only = TRUE))
+
+
+
 library(dplyr)
-library(magrittr)
+# library(magrittr)
 library(ggplot2)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
 library(devtools)
 library(mapIT)
+library(data.table)
+library(corrplot)
+library(rpart)
+library(rpart.plot)
+library(MLmetrics)
+library(caret)
+library(rattle)
+library(randomForest)
+library(ROCR)
+library(nnet)
+library(e1071)
+# library(caTools)
+# library(gridExtra)
+library(factoextra)
+library(NbClust)
+library(ggpubr)
+library(cluster)
+# library(fpc)
+library(dbscan)
 install_github("nicolasturaro/mapIT")
 
 ## add other libraries

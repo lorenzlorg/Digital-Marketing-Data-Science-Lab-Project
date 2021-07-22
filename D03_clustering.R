@@ -51,12 +51,9 @@ customer_data_stand <- scale(customer_data)
 
 
 # Number of Clusters
-library(factoextra)
-
 k_max <- 10
 twcss <- sapply(1:k_max, function(k){kmeans(customer_data_stand, k)$tot.withinss})
 
-library(ggplot2)
 g <- qplot(x = 1:k_max, y = twcss, geom = 'line')
 g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # questo grafico deve essere letto da destra verso sinistra
@@ -66,8 +63,7 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
 # si possono consideare i metodi sotto riportati (non eseguiti per limiti computazionali)
 
-library(factoextra)
-library(NbClust)
+
 
 # Elbow method
 # fviz_nbclust(customer_data_stand, kmeans, method = "wss") +
@@ -193,7 +189,6 @@ variance_percent <- eigen_value$variance_percent
 head(eigen_value)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
-library(ggpubr)
 ggscatter(
   index_coordinate, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
@@ -263,7 +258,6 @@ variance_percent <- eigen_value$variance_percent
 head(eigen_value)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
-library(ggpubr)
 ggscatter(
   index_coordinate, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
@@ -338,7 +332,6 @@ variance_percent <- eigen_value$variance_percent
 head(eigen_value)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
-library(ggpubr)
 ggscatter(
   index_coordinate, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
@@ -351,8 +344,6 @@ ggscatter(
 # per il clustering si potrebbero usare anche K-medians o DBSCAN che sono più robusti agli outliers
 
 #### K-medians ####
-library(cluster)
-library(factoextra)
 
 # in base ai risultati precedenti, k = 5
 pam.res <- pam(customer_data_stand, 5)  # esecuzione lenta
@@ -394,8 +385,6 @@ data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_sta
 
 
 #### DBSCAN ####
-library("fpc")
-library("dbscan")
 
 # in questo caso non è necessario stabilire a priori il numero di cluster da considerare
 

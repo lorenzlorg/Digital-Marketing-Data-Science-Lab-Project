@@ -37,8 +37,7 @@ recency_data$RECENCY_VALUE <- difftime(as.Date("30/04/2019",
                               units = "days")
 recency_data$RECENCY_VALUE <- as.numeric(recency_data$RECENCY_VALUE, units="days")
 
-library(ggplot2)
-library(gridExtra)
+
 ggplot(recency_data) + geom_density(aes(x= RECENCY_VALUE))
 
 # la recency è ottenuta come differenza tra l'ultimo giorno di acquisto per cliente e l'ultimo giorno di rilevazione
@@ -113,6 +112,8 @@ rfm_data_clean$RECENCY_CLASS[rfm_data_clean$RECENCY_VALUE > 41.00] <- "high"
 rfm_data_clean %>% 
   group_by(RECENCY_CLASS) %>%
   summarise(Count = n())
+
+recency_var <- as.data.frame(table(rfm_data_clean$RECENCY_CLASS))
 
 ggplot(data = recency_var,
        aes(x = Var1, y = Freq,

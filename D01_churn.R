@@ -49,7 +49,6 @@ holdout_period_temp <- holdout_period %>%
 
 # aggiorno la variabile CHURN per i clienti presenti nel lookback period
 # tutti i clienti che comparivano nell'holdout saranno ovviamente no churner
-library(data.table)
 setDT(lookback_period)[holdout_period_temp, CHURN := i.CHURN, on = .(ID_CLI)]
 
 table(lookback_period$CHURN)
@@ -167,7 +166,6 @@ cor(churn_dataset[,var_num])
 # TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG 
 
 # per controllare complessivamente la correlazione tra le variabili
-library(corrplot)
 numeric.var <- sapply(churn_dataset, is.numeric)
 corr.matrix <- cor(churn_dataset[,numeric.var])
 corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", method="number")
@@ -176,7 +174,6 @@ corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", metho
 #### 6. Apply models #### 
 
 # install.packages('caret')
-library(caret)
 train_index <- createDataPartition(churn_dataset$CHURN, 
                                    p = .70, 
                                    list = FALSE, 
@@ -199,17 +196,12 @@ prop.table(table(test$CHURN))
 # Fitting The Model
 # install.packages("MLmetrics")
 # install.packages("rpart.plot")
-library(rpart)
-library(rpart.plot)
-library("MLmetrics")
-library(caret)
 
 tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
                     data = train, method = "class")
  
 rpart.plot(tree.model, extra = 1)  # la variabile più importante è RECENCY
 
-library(rattle)
 fancyRpartPlot(tree.model)
 
 summary(tree.model) 
@@ -255,7 +247,6 @@ tree.F1 <- F1_Score(tree.pred, test$CHURN,positive = '1') # 0.7954233
 
 
 # ROC
-library(ROCR)
 tree.pr <- prediction(tree.prob[,2], test$CHURN)
 tree.prf <- performance(tree.pr, measure = "tpr", x.measure = "fpr")
 plot(tree.prf, main = "ROC DECISION TREE")
@@ -273,7 +264,6 @@ tree.auc  # 0.6824019
 
 # Fitting The Model
 # install.packages(randomForest)
-library(randomForest)
 # memory.limit(100000)
 rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                          data = train , ntree = 100)
@@ -309,7 +299,6 @@ rf.F1 <- F1_Score(rf.pred, test$CHURN,positive = '1') # 0.8069802
 
 
 # ROC
-library(ROCR)
 rf.pr <- prediction(rf.prob[,2], test$CHURN)
 rf.prf <- performance(rf.pr, measure = "tpr", x.measure = "fpr")
 plot(rf.prf, main = "ROC RANDOM FOREST")
@@ -355,7 +344,6 @@ logistic.F1 <- F1_Score(logistic.pred, test$CHURN,positive = '1') # 0.8074316
 
 
 # ROC
-library(ROCR)
 logistic.pr <- prediction(logistic.prob, test$CHURN)
 logistic.prf <- performance(logistic.pr, measure = "tpr", x.measure = "fpr")
 plot(logistic.prf, main = "ROC LOGISTIC REGRESSION")
@@ -370,7 +358,6 @@ logistic.auc  # 0.7461111
 
 
 #### Neural Network Model ####
-library(nnet)
 nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train, size = 3)
 summary(nm.model)
 
@@ -398,7 +385,6 @@ nm.F1 <- F1_Score(nm.pred, test$CHURN,positive = '1') # 0.8039749
 
 
 # ROC
-library(ROCR)
 nm.pr <- prediction(nm.prob, test$CHURN)
 nm.prf <- performance(nm.pr, measure = "tpr", x.measure = "fpr")
 plot(nm.prf, main = "ROC NEURAL NETWORK MODEL")
@@ -413,9 +399,6 @@ nm.auc  # 0.7462316
 
 
 #### Naive Bayes #### 
-library(e1071)
-library(caTools)
-library(caret)
 nb.model <- naiveBayes(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train)
 summary(nb.model)
 
@@ -440,7 +423,6 @@ nb.F1 <- F1_Score(nb.pred, test$CHURN,positive = '1') # 0.8054458
 
 
 # ROC
-library(ROCR)
 nb.pr <- prediction(nb.prob[, "1"], test$CHURN)
 nb.prf <- performance(nb.pr, measure = "tpr", x.measure = "fpr")
 plot(nb.prf, main = "ROC NAIVE BAYES")
@@ -538,8 +520,6 @@ View(overview_results)
 # Naive Bayes          0.7042069    0.7079008    0.9341696    0.8054458    0.7339499
 
 # overview ROC
-library(ROCR)
-
 preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2], nm.prob, nb.prob[,2])
 
 m <- length(preds_list)
