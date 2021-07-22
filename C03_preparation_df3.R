@@ -153,7 +153,7 @@ df_3_dist_region
 # mappa geografica
 values = df_3_dist_region$TOT_ADDs  
 id = df_3_dist_region$REGION
-mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))
+# mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi con installazione libreria
 # qui non stiamo considerano il numero di clienti totale perchè inizialmente abbiamo rimosso i duplicati
 
 #### FINAL REVIEW df_3_clean ####
