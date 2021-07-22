@@ -286,5 +286,3 @@ print(UM_line)
 
 str(df_1_cli_fid_clean)
 summary(df_1_cli_fid_clean)
-
-# si potrebbero esplorare anche le altre variabili

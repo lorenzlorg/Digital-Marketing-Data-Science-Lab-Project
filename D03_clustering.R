@@ -64,7 +64,6 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # si possono consideare i metodi sotto riportati (non eseguiti per limiti computazionali)
 
 
-
 # Elbow method
 # fviz_nbclust(customer_data_stand, kmeans, method = "wss") +
 #   geom_vline(xintercept = 4, linetype = 2) + # add line for better visualisation

@@ -400,6 +400,5 @@ ggplot(recency_frequency_monetary__df, aes(x = RF, y = Monetary, fill = Value)) 
   theme_minimal()
 
 
-
 # In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"

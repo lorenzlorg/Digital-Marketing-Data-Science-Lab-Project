@@ -98,10 +98,7 @@ sapply(churn_dataset, function(x) sum(is.na(x)))
 # df1: LAST_COD_FID, FIRST_ID_NEG
 # df2: TYP_CLI_ACCOUNT
 # df3: REGION
-# df4:
-# df5:
-# df6:
-# df7:
+
 
 churn_dataset <- left_join(churn_dataset, df_1_cli_fid_clean[,c("ID_CLI", "LAST_COD_FID", "NUM_FIDs", "FIRST_ID_NEG")], by = "ID_CLI")  # LAST_COD_FID, FIRST_ID_NEG, NUM_FIDs
 churn_dataset$FIRST_ID_NEG <- as.factor(churn_dataset$FIRST_ID_NEG)
@@ -510,7 +507,7 @@ AUC_results <- data.frame(Modello, AUC)
 # overview risultati
 overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, Recall_results$Recall, F1_score_results$F1_score, AUC_results$AUC)
 colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
-View(overview_results)
+# View(overview_results)
 
 # Modello              Accuracy     Precision    Recall       F1_score     AUC
 # Decision Tree        0.7138276    0.7483529    0.8488124    0.7954233    0.6824019

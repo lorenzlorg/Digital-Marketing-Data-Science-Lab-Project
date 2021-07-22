@@ -154,7 +154,7 @@ df_3_dist_region
 values = df_3_dist_region$TOT_ADDs  
 id = df_3_dist_region$REGION
 # mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi con installazione libreria
-# qui non stiamo considerano il numero di clienti totale perchè inizialmente abbiamo rimosso i duplicati
+# qui non si sta considerando il numero di clienti totale perchè inizialmente si sono rimossi i duplicati
 
 #### FINAL REVIEW df_3_clean ####
 

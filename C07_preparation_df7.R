@@ -82,34 +82,23 @@ cons_idcli_df1_df7
 
 #### RESHAPING df_7 ####
 
-# df_7_tic_clean_final <- df_7_tic_clean %>%
-#   ## adding day characterization ##
-#   mutate(TIC_DATE_WEEKDAY = wday(TIC_DATE, week_start = getOption("lubridate.week.start", 1))) %>%
-#   mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) %>%
-#   mutate(TIC_DATE_TYP = case_when(
-#     (TIC_DATE_WEEKDAY %in% c(6,7)) ~ "weekend"
-#     , (TIC_DATE_HOLIDAY == TRUE) ~ "holiday"
-#     , (TIC_DATE_WEEKDAY < 7) ~ "weekday"
-#     , TRUE ~ "other"
-#   )
-#   )
-
-# è stato specificato il parametro weekstart=1 in modo tale da considerare correttamente 1=lunedì, 2=martedì e cosi via.
-
-
-
-# sistemazione temporanea 
 df_7_tic_clean_final <- df_7_tic_clean %>%
-  mutate(TIC_DATE_WEEKDAY = wday(TIC_DATE) - 1) %>%
-  mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) %>%
+  mutate(TIC_DATE_WEEKDAY = wday(TIC_DATE)) %>%
+  mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) 
+  
+# correggo TIC_DATE_WEEKDAY dato che domenica viene mappata come 1. Si vuole lunedì come 1
+
+df_7_tic_clean_final$TIC_DATE_WEEKDAY <- dplyr::recode(df_7_tic_clean_final$TIC_DATE_WEEKDAY, `1` = 7, `2` = 1, `3` = 2, `4` = 3, `5` = 4, `6` = 5, `7` = 6)
+
+df_7_tic_clean_final <- df_7_tic_clean_final %>% 
   mutate(TIC_DATE_TYP = case_when(
-    (TIC_DATE_WEEKDAY %in% c(5,6)) ~ "weekend"
+    (TIC_DATE_WEEKDAY %in% c(6,7)) ~ "weekend"
     , (TIC_DATE_HOLIDAY == TRUE) ~ "holiday"
-    , (TIC_DATE_WEEKDAY < 6) ~ "weekday"
+    , (TIC_DATE_WEEKDAY < 7) ~ "weekday"
     , TRUE ~ "other"
   )
   )
-# sistemazione temporanea 
+
 
 #### EXPLORE VARIABLES in df_7 ####
 
@@ -487,39 +476,8 @@ ggplot(diff_days_diff,
   geom_line(size = 1) +
   theme_classic() 
 
-#---
-# data_for_next_purchase <- df_7_tic_clean_final %>%
-#   filter(DIREZIONE == 1) %>% #-- Only Purchases
-#   select(ID_CLI,
-#          ID_ARTICOLO,
-#          TIC_DATE,
-#          DIREZIONE)      %>% #-- Variable Selection
-#   arrange(ID_CLI)
-# data_for_next_purchase
-# 
-# df_np <- data_for_next_purchase %>%
-#   group_by(ID_CLI, TIC_DATE)%>%summarise(NUM_OBJ = n())%>%mutate(Diff = TIC_DATE - lag(TIC_DATE))
-# 
-# x <- as.data.frame(table(df_np$Diff))
-# x$Perc <- x$Freq/sum(x$Freq)
-# 
-# ggplot(x,
-#        aes(x = as.numeric(Var1),
-#            y = cumsum(Perc))) +
-#   labs(title = "Next Purchase Curve",
-#        x = "Last Purchase Date (in Days)",
-#        y = "Cumulative Percent") +
-#   theme_minimal() +
-#   theme(plot.title = element_text(hjust = 0.5)) +    #-- Centering Title
-#   scale_x_continuous(breaks = seq(0, 400, 25)) +     #-- Scale X
-#   geom_vline(xintercept = 75, linetype = "dotted") +
-#   geom_line(size = 1)
-#---
-
-# per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto
-# OPPURE 
-# !!che dopo circa 70 giorni il 90% dei clienti totali ha effettuto nuovamente un acquisto ????
-# !!che dopo circa 40 giorni l'80% dei clienti totali ha effettuato nuovamente un acquisto
+# dopo circa 70 giorni dall'ultimo acquisto il 90% dei clienti totali ha effettuto nuovamente un acquisto ????
+# dopo circa 40 giorni dall'ultimo acquisto l'80% dei clienti totali ha effettuato nuovamente un acquisto
 
 # EXPLORE distribuzione net amount (importo lordo - sconto)
 
@@ -543,26 +501,6 @@ plot_df7_nett_amount_monthly<- ggplot(data=df7_nett_amount_monthly, aes(Date, ne
 
 plot_df7_nett_amount_monthly
 # il picco di nett amount è stato raggiunto tra Ottobre e Gennaio 2018
-
-# Nett amount per Customer Type 
-# First_purchase <- plot_df7_revenue%>%
-#   group_by(ID_CLI) %>%
-#   mutate(Date=floor_date(TIC_DATETIME, "month"),First_Purchase= min(TIC_DATETIME), 
-#          Type = case_when(TIC_DATETIME == First_Purchase ~'NEW', TRUE ~ 'EXISTING')) 
-# 
-# New_vs_Existing_Revenue <- First_purchase %>%
-#   group_by(Date = floor_date(TIC_DATETIME, 'month'), Type) %>%
-#   summarise(Revenue = sum(Revenue))
-# 
-# ggplot(New_vs_Existing_Revenue, aes(Date, Revenue, col=Type)) + 
-#   geom_line() + 
-#   scale_y_continuous(labels = scales::dollar, limits = c(0,11000000))+
-#   theme_light() +
-#   theme_classic()               
-
-# i clienti esistenti contribusiscono molto di più in termini di guadagni rispetto ai nuovi clienti
-
-
 
 # altro grafico interessante potrebbe essere: customer by number of purchase (vedi slide, lab1 ...)
 
