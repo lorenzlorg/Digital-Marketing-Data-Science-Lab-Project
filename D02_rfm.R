@@ -1,8 +1,5 @@
 ### RFM MODEL: provides a deterministic description of the value of each customer in term of purchase behaviour
 
-# ! Modificare un po la suddivisione delle classi
-# ! Vedi aggiunte grafici
-
 # Le metriche utilizzate sono:
 # Recency: How recently a customer has made a purchase
 # Frequency: How often a customer makes a purchase
@@ -219,14 +216,31 @@ for(i in c(1:nrow(rfm_data_clean))){
   if(rfm_data_clean$RECENCY_CLASS[i] == "high" && rfm_data_clean$FREQUENCY_CLASS[i] == "high") rfm_data_clean$RECENCY_FREQUENCY[i] <- "Leaving Top"
 }
 
+# conteggio classi
+low_low_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "low" & FREQUENCY_CLASS == "low"))  # "One-Timer"
+medium_low_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "medium" & FREQUENCY_CLASS == "low")) # "One-Timer"
+high_low_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "high" & FREQUENCY_CLASS == "low"))  # "Leaving"
+low_medium_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "low" & FREQUENCY_CLASS == "medium"))  # "Engaged"
+medium_medium_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "medium" & FREQUENCY_CLASS == "medium"))  #"Engaged"
+high_medium_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "high" & FREQUENCY_CLASS == "medium"))  # "Leaving"
+low_high_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "low" & FREQUENCY_CLASS == "high"))  # "Top"
+medium_high_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "medium" & FREQUENCY_CLASS == "high"))  # "Top"
+high_high_count <- nrow(subset(rfm_data_clean,RECENCY_CLASS == "high" & FREQUENCY_CLASS == "high"))  # "Leaving Top"
+
 rfm_data_clean %>% 
   group_by(RECENCY_FREQUENCY) %>%
   summarise(Count = n())
+# non vi sono valori per "leaving"
 
 table(rfm_data_clean$RECENCY_FREQUENCY)
 
-
 recency_frequency_var <- as.data.frame(table(rfm_data_clean$RECENCY_FREQUENCY))
+temp <- data.frame("Var1" = "Leaving", "Freq" = 0)  # per evidenziare "leaving" = 0 nel grafico
+recency_frequency_var <- rbind(recency_frequency_var[1,], temp, recency_frequency_var[2:4,])
+rownames(recency_frequency_var) <- 1:nrow(recency_frequency_var)
+recency_frequency_var <- recency_frequency_var[c(5,3,1,2,4),]
+rownames(recency_frequency_var) <- 1:nrow(recency_frequency_var)
+recency_frequency_var$Var1 <- factor(recency_frequency_var$Var1, levels = c("Top", "Leaving Top", "Engaged", "Leaving", "One-Timer"))
 
 ggplot(data = recency_frequency_var,
        aes(x = Var1, y = Freq,
@@ -237,7 +251,7 @@ ggplot(data = recency_frequency_var,
        y     = "Total Amount") +                  
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("Engaged", "Leaving", "Leaving Top", "One-Timer", "Top")) + 
+  scale_x_discrete(labels = c("Top", "Leaving Top", "Engaged", "Leaving", "One-Timer")) + 
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -247,8 +261,35 @@ ggplot(data = recency_frequency_var,
 # Top: cienti che hanno acquistato recentemnte/abbastanza recentemente e con alta frequenza
 # Leaving Top: cienti che non hanno acquistato di recente ma con alta frequenza
 
-# ! aggiungo qualche grafico (matrice colorata con assi frequency e recency e valori RECENCY_FREQUENCY)
-# ! correggere grafico, manca "Leaving"
+recency_frequency_df <- as.data.frame(rbind(c("Top",         "High",   "Low",    low_high_count),
+                             c("Top",         "High",   "Medium", medium_high_count),
+                             c("Leaving Top", "High",   "High",   high_high_count),
+                             c("Engaged",     "Medium", "Low",    low_medium_count),
+                             c("Engaged",     "Medium", "Medium", medium_medium_count),
+                             c("Leaving",     "Medium", "High",   high_medium_count),
+                             c("One Timer",   "Low",    "Low",    low_low_count),
+                             c("One Timer",   "Low",    "Medium", medium_low_count),
+                             c("Leaving",     "Low",    "High",   high_low_count)))
+
+# in alternativa si può usare lo stesso valore per stessi classi senza fare distinzioni in base a recency e frequency
+# dunque per onetimer usare in entrambi i casi il valore 5357
+
+colnames(recency_frequency_df) <-  c("Level", "Frequency", "Recency", "Value")
+
+recency_frequency_df$Frequency <- factor(recency_frequency_df$Frequency,
+                          levels = c("High", "Medium", "Low"))
+
+recency_frequency_df$Recency <- factor(recency_frequency_df$Recency,
+                        levels = c("High", "Medium", "Low"))
+
+recency_frequency_df$Value <- as.numeric(recency_frequency_df$Value)
+
+ggplot(recency_frequency_df, aes(x = Frequency, y = Recency, fill = Value)) + 
+  geom_tile() +
+  geom_text(aes(label = Level)) +
+  scale_fill_distiller(palette = "Spectral") +
+  theme_minimal()
+
 
 #### RECENCY E FREQUENCY COMBINED with MONETARY ####
 
@@ -276,6 +317,25 @@ for(i in c(1:nrow(rfm_data_clean))){
   if(rfm_data_clean$RECENCY_FREQUENCY[i] == "One-Timer" && rfm_data_clean$MONETARY_CLASS[i] == "high") rfm_data_clean$RECENCY_FREQUENCY_MONETARY[i] <- "Copper"
   
 }
+
+# conteggio classi
+top_low_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Top" & MONETARY_CLASS == "low"))  # "Silver"
+leavingtop_low_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving Top" & MONETARY_CLASS == "low"))  # "Bronze"
+engaged_low_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Engaged" & MONETARY_CLASS == "low"))  # "Copper"
+leaving_low_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving" & MONETARY_CLASS == "low"))  # "Tin"
+onetimer_low_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "One-Timer" & MONETARY_CLASS == "low"))  # "Cheap"
+
+top_medium_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Top" & MONETARY_CLASS == "medium"))  # "Gold"
+leavingtop_medium_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving Top" & MONETARY_CLASS == "medium"))  # "Silver"
+engaged_medium_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Engaged" & MONETARY_CLASS == "medium"))  # "Bronze"
+leaving_medium_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving" & MONETARY_CLASS == "medium"))  # "Copper"
+onetimer_medium_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "One-Timer" & MONETARY_CLASS == "medium"))  # "Tin"
+
+top_high_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Top" & MONETARY_CLASS == "high"))  # "Diamond"
+leavingtop_high_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving Top" & MONETARY_CLASS == "high"))  # "Gold"
+enaged_high_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Engaged" & MONETARY_CLASS == "high"))  # "Silver"
+leaving_high_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "Leaving" & MONETARY_CLASS == "high"))  # "Bronze"
+onetimer_high_count <- nrow(subset(rfm_data_clean,RECENCY_FREQUENCY == "One-Timer" & MONETARY_CLASS == "high"))  # "Copper"
 
 rfm_data_clean %>% 
   group_by(RECENCY_FREQUENCY_MONETARY) %>%
@@ -305,47 +365,40 @@ ggplot(data = recency_frequency_monetary_var,
 # Silver:
 # Tin:
 
-# ! aggiungo qualche grafico (matrice colorata con assi monetary e valori matrice precedente e valori RECENCY_FREQUENCY_MONETARY)
+recency_frequency_monetary__df <- as.data.frame(rbind(c("Top", "High", "Diamond", top_high_count),
+                              c("Top", "Medium", "Gold", top_medium_count),
+                              c("Top", "Low", "Silver", top_low_count),
+                              c("Leaving Top", "High", "Gold", leavingtop_high_count),
+                              c("Leaving Top", "Medium", "Silver", leavingtop_medium_count),
+                              c("Leaving Top", "Low", "Bronze", leavingtop_low_count),
+                              c("Engaged", "High", "Silver", enaged_high_count),
+                              c("Engaged", "Medium", "Bronze", engaged_medium_count),
+                              c("Engaged", "Low", "Copper", engaged_low_count),
+                              c("Leaving", "High", "Bronze", leaving_high_count),
+                              c("Leaving", "Medium", "Copper", leaving_medium_count),
+                              c("Leaving", "Low", "Tin", leaving_low_count),
+                              c("One Timer", "High", "Copper", onetimer_high_count),
+                              c("One Timer", "Medium", "Tin", onetimer_medium_count),
+                              c("One Timer", "Low", "Cheap", onetimer_low_count)))
 
+colnames(recency_frequency_monetary__df) <- c("RF", "Monetary", "Level", "Value")
 
+recency_frequency_monetary__df$RF <- factor(recency_frequency_monetary__df$RF,
+                    levels = c("Top", "Leaving Top",
+                               "Engaged", "Leaving", "One Timer"))
+
+recency_frequency_monetary__df$Monetary <- factor(recency_frequency_monetary__df$Monetary,
+                          levels = c("Low", "Medium", "High"))
+
+recency_frequency_monetary__df$Value <- as.numeric(recency_frequency_monetary__df$Value)
+
+ggplot(recency_frequency_monetary__df, aes(x = RF, y = Monetary, fill = Value)) + 
+  geom_tile() +
+  geom_text(aes(label = Level)) +
+  scale_fill_distiller(palette = "Spectral") +
+  theme_minimal()
 
 
 
 # In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
