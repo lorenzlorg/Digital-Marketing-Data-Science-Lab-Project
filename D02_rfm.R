@@ -358,13 +358,13 @@ ggplot(data = recency_frequency_monetary_var,
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# Bronze-Timer: 
-# Cheap: 
-# Copper: 
-# Diamond: 
-# Gold: 
-# Silver:
-# Tin:
+# Bronze-Time
+# Cheap
+# Copper
+# Diamond
+# Gold
+# Silver
+# Tin
 
 recency_frequency_monetary__df <- as.data.frame(rbind(c("Top", "High", "Diamond", top_high_count),
                               c("Top", "Medium", "Gold", top_medium_count),
@@ -402,3 +402,54 @@ ggplot(recency_frequency_monetary__df, aes(x = RF, y = Monetary, fill = Value)) 
 
 # In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"
+
+library(rfm)
+library(devtools)
+library(kableExtra)
+
+rfm_data_auto <- rfm_data %>%
+  mutate(REVENUE = IMPORTO_LORDO - SCONTO)
+
+rfm_result <- rfm_table_order(
+  data = rfm_data_auto,
+  customer_id = ID_CLI,
+  revenue = REVENUE,
+  order_date = TIC_DATE, 
+  analysis_date = as.Date("2019-04-30") 
+)
+
+# visualizzo i risultati ottenuti
+rfm_heatmap(rfm_result) 
+rfm_bar_chart(rfm_result)  
+rfm_rm_plot(rfm_result) 
+rfm_fm_plot(rfm_result)
+
+
+# vengono create delle categorie
+segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
+                   "New Customers", "Promising", "Need Attention", "About To Sleep",
+                   "At Risk", "Can't Lose Them", "Lost")
+
+recency_lower <- c(4, 2, 3, 4, 3, 2, 2, 1, 1, 1)
+recency_upper <- c(5, 5, 5, 5, 4, 3, 3, 2, 1, 2)
+frequency_lower <- c(4, 3, 1, 1, 1, 2, 1, 2, 4, 1)
+frequency_upper <- c(5, 5, 3, 1, 1, 3, 2, 5, 5, 2)
+monetary_lower <- c(4, 3, 1, 1, 1, 2, 1, 2, 4, 1)
+monetary_upper <- c(5, 5, 3, 1, 1, 3, 2, 5, 5, 2)
+
+segment <- rfm_segment(rfm_result,
+                       segment_names,
+                       recency_lower,
+                       recency_upper,
+                       frequency_lower, 
+                       frequency_upper, 
+                       monetary_lower,
+                       monetary_upper)
+
+head(segment) %>% 
+  kable() %>% 
+  kable_classic_2()
+
+# visualizzo i risultati finali
+rfm_plot_median_recency(segment)
+rfm_plot_median_monetary(segment)
