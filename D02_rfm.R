@@ -403,10 +403,6 @@ ggplot(recency_frequency_monetary__df, aes(x = RF, y = Monetary, fill = Value)) 
 # In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"
 
-library(rfm)
-library(devtools)
-library(kableExtra)
-
 rfm_data_auto <- rfm_data %>%
   mutate(REVENUE = IMPORTO_LORDO - SCONTO)
 

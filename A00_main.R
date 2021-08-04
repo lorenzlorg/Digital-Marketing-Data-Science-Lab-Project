@@ -10,7 +10,7 @@ packages <- c("dplyr",  "ggplot2", "forcats", "lubridate", "RQuantLib", "devtool
               "data.table", "corrplot", "rpart", "rpart.plot", "MLmetrics", "caret",
               "rattle", "randomForest", "ROCR", "nnet", "e1071",
               "factoextra", "NbClust", "ggpubr", "cluster", 
-              "dbscan") 
+              "dbscan", "rfm", "kableExtra") 
 
 # ci sarebbe anche il package "mapIT" ma potrebbero verificarsi problemi di compatibilità
 # install_github("nicolasturaro/mapIT")
