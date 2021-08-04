@@ -453,3 +453,8 @@ head(segment) %>%
 # visualizzo i risultati finali
 rfm_plot_median_recency(segment)
 rfm_plot_median_monetary(segment)
+rfm_plot_median_frequency(segment)
+
+# aggiungo anche altri grafici
+
+
