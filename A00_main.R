@@ -12,9 +12,6 @@ packages <- c("dplyr",  "ggplot2", "forcats", "lubridate", "RQuantLib", "devtool
               "factoextra", "NbClust", "ggpubr", "cluster", 
               "dbscan", "rfm", "kableExtra") 
 
-# ci sarebbe anche il package "mapIT" ma potrebbero verificarsi problemi di compatibilità
-# install_github("nicolasturaro/mapIT")
-
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -25,6 +22,11 @@ if (any(installed_packages == FALSE)) {
 
 # Packages loading
 invisible(lapply(packages, library, character.only = TRUE))
+
+
+# Load package with potential compatibility issues
+install_github("nicolasturaro/mapIT")
+library(mapIT)
 
 #### DIRECTORIES ####
 working_dir = "~/Desktop/progetto digital/progetto_digital_marketing"  # <path for scripts directory>

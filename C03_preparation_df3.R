@@ -78,8 +78,8 @@ df_3_cli_address_clean %>% filter(!is.na(PRV) & is.na(REGION))
 ## MISSING VALUES rows are removed ##
 df_3_cli_address_clean <- df_3_cli_address_clean %>%  
   filter(!is.na(CAP) & !is.na(PRV) & !is.na(REGION))
-# mantengo solo le righe del dataset dove ho valori validi per cap, provincia e regione
-# elimino 23864 osservazioni
+# si mantengono solo le righe del dataset dove si hanno valori validi per cap, provincia e regione
+# vengono eliminate 23864 osservazioni
 
 #### CONSISTENCY CHECK ID_ADDRESS in df_2/df_3 ####
 
@@ -105,8 +105,10 @@ cons_idaddress_df2_df3
 #!!! NOTE:  there are ID_ADDRESSes actually not mapped in df_3 !!!#
 #!!!        this issue should be taken into account in joining these two tables !!!#
 
-# si potrebb pensare di eseguire un left join ma, allo stato attuale, non avendo alcuna informazione aggiuntiva da integrare (dell'indirizzo 900091 non si ha nessun dettaglio ad esempio) si è deciso di procedere ugualmente non considerando tali indirizzi non mappati
 # df_3_cli_address_clean <- left_join(df_2_cli_account_clean, df_3_cli_address_clean , by = "ID_ADDRESS")
+# si potrebbe pensare di eseguire un left join ma, allo stato attuale, non avendo 
+# alcuna informazione aggiuntiva da integrare (dell'indirizzo 900091 non si ha nessun 
+# dettaglio ad esempio) si è deciso di procedere ugualmente non considerando tali indirizzi non mappati
 
 #### EXPLORE COLUMNS of df_3 ####
 
@@ -142,7 +144,7 @@ head(df_3_dist_prv)
 ### Variable REGION ###
 df_3_dist_region <- df_3_cli_address_clean %>%
   group_by(REGION) %>%
-  summarize(TOT_ADDs = n_distinct(ID_ADDRESS)) %>%  # dal momento in cui un indirizzo
+  summarize(TOT_ADDs = n_distinct(ID_ADDRESS)) %>%  
   mutate(PERCENT = TOT_ADDs/sum(TOT_ADDs)) %>%
   arrange(desc(PERCENT)) %>%
   as.data.frame()
@@ -153,7 +155,7 @@ df_3_dist_region
 # mappa geografica
 values = df_3_dist_region$TOT_ADDs  
 id = df_3_dist_region$REGION
-# mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi con installazione libreria
+ mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi con installazione libreria
 # qui non si sta considerando il numero di clienti totale perchè inizialmente si sono rimossi i duplicati
 
 #### FINAL REVIEW df_3_clean ####
