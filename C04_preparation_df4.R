@@ -6,9 +6,9 @@
 
 
 #### INSIGHTS ####
-# 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 no (34%)
+# 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 (34%) no
 # 345682 (94%) hanno accettato la flag profiling policy mentre 23790 (6%) no 
-# 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 no (33%)
+# 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 (33%) no
 
 #### FIRST LOOK of df_4 ####
 
@@ -26,7 +26,9 @@ df_4_cli_privacy_clean %>%
   summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
             , TOT_ROWs = n())
 
-# ci sono un totale di 369472 valori unici per l'id cliente, pari al numero di osservazioni del dataset. Dunque non si osservano duplicati.
+# ci sono un totale di 369472 valori unici per l'id cliente, pari al numero di osservazioni 
+# del dataset. Dunque non si osservano duplicati
+
 #!!! NOTE:  no duplicates !!!#
 
 #### CLEANING DATA TYPES in df_4 ####
@@ -82,7 +84,7 @@ df_4_cli_privacy_clean %>%
   theme_classic()+
   labs(x = 'Flag privacy policy', y = 'Percentage')
 
-# 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 no (34%)
+# 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 (34%) no
 
 # compute distribution: FLAG_PRIVACY2 (profiling)
 
@@ -134,11 +136,11 @@ df_4_cli_privacy_clean %>%
   theme_classic()+
   labs(x = 'Flag direct marketing privacy', y = 'Percentage')
 
-# 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 no (33%)
+# 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 (33%) no
 
-# anilizziamo in che percentuali i clienti accentano una sola privacy policy, due, tre oppure nessuna
+# si analizza in quali percentuali i clienti accentano una sola privacy policy, due, tre oppure nessuna
 
-#compute distribution
+# compute distribution
 
 num_flag_cli<-df_4_cli_privacy_clean %>%
   group_by(FLAG_PRIVACY_1,FLAG_PRIVACY_2,FLAG_DIRECT_MKT) %>%
@@ -157,11 +159,10 @@ num_flag_cli$ACCEPTED<-as.factor(c(3,1,2,2,2,0,1,1))
 num_flag_cli_data <- num_flag_cli[,c("PERCENT", "TOT_CLIs", "ACCEPTED")]
 
 
-num_flag_cli_data <- num_flag_cli_data %>%       # Specify data frame
-  group_by(ACCEPTED) %>%                         # Specify group indicator
-  summarise_at(vars(PERCENT, TOT_CLIs),          # Specify column
+num_flag_cli_data <- num_flag_cli_data %>%       
+  group_by(ACCEPTED) %>%                         
+  summarise_at(vars(PERCENT, TOT_CLIs),          
                list(name = sum)) 
-
 
 
 colnames(num_flag_cli_data) <- c( "ACCEPTED", "PERCENT_aggregate", "TOT_CLIs_aggregate")
