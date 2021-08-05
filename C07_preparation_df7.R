@@ -86,7 +86,7 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   mutate(TIC_DATE_WEEKDAY = wday(TIC_DATE)) %>%
   mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) 
   
-# correggo TIC_DATE_WEEKDAY dato che domenica viene mappata come 1. Si vuole lunedì come 1
+# viene corretta TIC_DATE_WEEKDAY dato che domenica viene mappata come 1. Si vuole lunedì come 1
 
 df_7_tic_clean_final$TIC_DATE_WEEKDAY <- dplyr::recode(df_7_tic_clean_final$TIC_DATE_WEEKDAY, `1` = 7, `2` = 1, `3` = 2, `4` = 3, `5` = 4, `6` = 5, `7` = 6)
 
@@ -161,7 +161,8 @@ plot_df7_dist_hour <- (
 
 plot_df7_dist_hour
 
-# la maggior parte delle transazioni sono acquisti. Si può notare che dalle 16 alle 20 vi è una maggiore frequenza di acquisti.
+# la maggior parte delle transazioni sono acquisti. Si può notare che dalle 16 alle 20 
+# vi è una maggiore frequenza di acquisti.
 
 ## plot aggregate percent
 plot_df7_dist_hour_percent <- (
@@ -502,7 +503,26 @@ plot_df7_nett_amount_monthly<- ggplot(data=df7_nett_amount_monthly, aes(Date, ne
 plot_df7_nett_amount_monthly
 # il picco di nett amount è stato raggiunto tra Ottobre e Gennaio 2018
 
-# altro grafico interessante potrebbe essere: customer by number of purchase (vedi slide, lab1 ...)
+# DA CONCLUDERE!!!!!!!!!!! altro grafico interessante potrebbe essere: customer by number of purchase (vedi slide, lab1 ...)
+df7_dist_num_purch_customer
+
+df7_dist_num_purch_customer_plot <- df7_dist_num_purch_customer %>% 
+  group_by(NUM_PURCHASES) %>% 
+  summarise(NUM_CLI = n_distinct(ID_CLI))
+
+df7_dist_num_purch_customer_plot_redux <- df7_dist_num_purch_customer_plot %>% 
+  filter(df7_dist_num_purch_customer_plot < 10)
+
+# dovrei calcolare distribuzione cumulata
+
+plot_df7_nett_amount_monthly<- ggplot(data=df7_dist_num_purch_customer_plot_redux, aes(NUM_PURCHASES, NUM_CLI)) +
+  geom_bar(stat = "identity") +
+  labs(y='NUM CUSTOMERS') + 
+  theme_light() +
+  theme_classic()    
+plot_df7_nett_amount_monthly
+
+
 
 #### FINAL REVIEW df_7_clean ####
 

@@ -57,7 +57,8 @@ cons_idcli_df1_df6 <- df_1_cli_fid_clean %>%
 cons_idcli_df1_df6
 
 #!!! NOTE: all ID_CLI in df_6 are mapped in df_1, but not all ID_CLI in df_1 are mapped in df_6 !!!#  
-# questo significa che ci sono dei clienti a cui non è associata nessuna informazione relativa a comunicazioni mail di marketing 
+# questo significa che ci sono dei clienti a cui non è associata nessuna informazione 
+# relativa a comunicazioni mail di marketing 
 
 
 #### CONSISTENCY CHECK ID_CAMP in df_5/df_6 ####
@@ -243,7 +244,8 @@ df6_overview <- df_6_camp_event_clean_final %>%
 
 df6_overview
 
-# le rilevazioni sono state effettuate da gennaio 2019 a marzo 2019 per un totale di 1556646 comunicazioni email di marketing che riguardano 190427 clienti
+# le rilevazioni sono state effettuate da gennaio 2019 a marzo 2019 per un totale 
+# di 1556646 comunicazioni email di marketing che riguardano 190427 clienti
 
 ### GENERAL OVERVIEW by TYP_CAMP ###
 
@@ -266,7 +268,8 @@ ggplot(data=df6_overviewbytyp
   xlab("Type campaign") + ylab("Number of emails") +
   geom_text(aes(label=TOT_EVENTs), position=position_dodge(width=0.9), vjust=-0.25)
 
-# il tipo di campagna che registra più eventi (aperture, clicks, fallimenti) risulta essere national. Vengono coinvolti 177153 clienti 
+# il tipo di campagna che registra più eventi (aperture, clicks, fallimenti) 
+# risulta essere national. Vengono coinvolti 177153 clienti 
 
 
 ### Variable OPENED ###
@@ -281,7 +284,8 @@ df6_dist_opened <- df_6_camp_event_clean_final %>%
          , PERCENT_CLIs = TOT_CLIs/df6_overview$TOT_CLIs)
 
 df6_dist_opened
-# la maggior parte delle comunicazioni email di marketing (di qualsiasi tipologia di campagna) non vengono aperte
+# la maggior parte delle comunicazioni email di marketing (di qualsiasi tipologia 
+# di campagna) non vengono aperte
 
 ## plot aggregate
 
@@ -401,7 +405,7 @@ str(df_6_camp_event_clean_final)
 
 # - CLICKED/CLICKED by TYP_CAMP
 
-#plot distribution: CLICKED
+# plot distribution: CLICKED
 
 ## compute aggregate
 df6_dist_clicked <- df_6_camp_event_clean_final %>%
@@ -427,7 +431,7 @@ plot_df6_dist_clicked <- (
 plot_df6_dist_clicked
 
 
-#plot distribution: CLICKED BY TYP_CAMP
+# plot distribution: CLICKED BY TYP_CAMP
 
 ## compute aggregate
 df6_dist_clicked_bytyp <- df_6_camp_event_clean_final %>%
