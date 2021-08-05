@@ -13,8 +13,8 @@
 # Il 99.8% dei clienti, ovvero 368833 clienti, hanno associato 1 sottoscrizione in una sola data
 # Per alcuni clienti ci sono più sottoscrizioni di carte fedeltà anche lo stesso giorno
 # La maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una una sottoscrizione standard
-# Il 99% possiedono una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
-# Nel 2018 sono state attivite più carte fedeltà rispetto al 2019
+# Il 99% dei clienti possiede una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
+# Nel 2018 sono state attivate più carte fedeltà rispetto al 2019
 
 
 #### FIRST LOOK of df_1 ####
@@ -43,10 +43,15 @@ df_1_cli_fid_clean %>%
 
 # concentrandosi sui duplicati di ID_CLI
 sum(duplicated(df_1_cli_fid_clean$ID_CLI))  # 663
-df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)] 
+df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)]  # id_cliente che si ripetono
 
-# è possibile osservare che ci sono più registrazioni di carte fedeltà per ciascun cliente dal momento in cui il numero di identificativi dei clienti è maggiore del numero degli identificavi delle carte fedeltà
-# nonostante ciò non ci sono duplicati considerando la coppia cliente-fidelty. Questo significa che ci sono clienti a cui è associata più di uan carta fidelty, ma queste sono tra loro diverse.
+# è possibile osservare che ci sono più registrazioni di carte fedeltà per ciascun 
+# cliente dal momento in cui il numero di identificativi dei clienti è maggiore del 
+# numero degli identificavi delle carte fedeltà
+
+# nonostante ciò, non ci sono duplicati considerando la coppia cliente-fidelty. 
+# Questo significa che ci sono clienti a cui è associata più di uan carta fidelty, 
+# ma queste sono tra loro diverse.
 
 
 #### CLEANING DATA TYPES in df_1 ####
@@ -91,7 +96,7 @@ dist_num_fid_x_cli
 # 7 clienti con 3 sottoscrizioni in una sola data e 8 in due date diverse e 5 in tre
 # 2 clienti con 4 sottoscrizioni in una sola data
 
-# plotto la distribuzione dei clienti con più di una sottoscrizione
+# viene mostrata la distribuzione dei clienti con più di una sottoscrizione
 
 dist_num_fid_x_cli2<-dist_num_fid_x_cli[dist_num_fid_x_cli$NUM_FIDs>1,]
 ggplot(dist_num_fid_x_cli2
@@ -118,7 +123,7 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 
 # ad esempio, il cliente 320880 ha sottoscritto 3 fidelity nello stesso negozio: la prima sottoscrizione standard nel giorno 25-04-2018
 # il giorno dopo è passato ad una sottoscrizione premium per poi lo stesso giorno ripassare ad una sottoscrizione standard
-# le prime due sottoscrizioni non sono più attive.
+# (le prime due sottoscrizioni non sono più attive).
 
 #### RESHAPING df_1 ####
 
@@ -128,7 +133,7 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 # from last subscription   --> type of fidelity, status
 # from subscriptions count --> number of subscriptions made
 
-# ricavo info dalla prima sottoscrizione: registration date, store for registration
+# si ricavano informazioni dalla prima sottoscrizione: registration date, store for registration
 df_1_cli_fid_first <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
   filter(DT_ACTIVE == min(DT_ACTIVE)) %>%
@@ -138,7 +143,7 @@ df_1_cli_fid_first <- df_1_cli_fid_clean %>%
   as.data.frame()
 
 
-# osserviamo meglio qual è la tipologia di sottoscrizione più frequente in occasione dell'attivazione
+# si osserva meglio qual è la tipologia di sottoscrizione più frequente in occasione dell'attivazione
 df_1_cli_fid_first %>%
   group_by(COD_FID) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -159,7 +164,7 @@ df_1_cli_fid_first %>%
 # la maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una una sottoscrizione standard
 
 
-# ricavo info da'ultima sottoscrizione: type of fidelity, status
+# si ricavano informazioni da'ultima sottoscrizione: type of fidelity, status
 df_1_cli_fid_last <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
   filter(DT_ACTIVE == max(DT_ACTIVE)) %>%
@@ -169,7 +174,7 @@ df_1_cli_fid_last <- df_1_cli_fid_clean %>%
   as.data.frame()
 
 
-# ricombino le info ricavate per ottenere un dataset completo
+# si ricombinano le informazioni ricavate per ottenere un dataset unico
 df_1_cli_fid_clean <- df_1_cli_fid_last %>%
   select(ID_CLI
          , ID_FID
@@ -213,9 +218,7 @@ df_1_cli_fid_clean %>%
     theme_classic()+
   labs(x = 'Last fidelity subscription status', y = 'Percentage')
 
-
-# il 99% possiedono una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
-
+# il 99% dei clienti possiede una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
 
 
 ## compute the distribution: LAST_COD_FID
@@ -239,7 +242,7 @@ df_1_cli_fid_clean %>%
   labs(x = 'Laste code fidelity subscription', y = 'Percentage')
 
 
-# Sproporzione elevata tra clienti con sottoscrizione standard rispetto agli altri con 
+# sproporzione elevata tra clienti con sottoscrizione standard rispetto agli altri con 
 # sottocrizioni di categoria premium, con sottocategorizzazione tra premium e premium business
 # standard e standard business, in concomitanza dell'utlima data registrata per cliente
 
@@ -265,21 +268,21 @@ df_1_cli_fid_clean %>%
 
 # quasi la totalità dei clienti posseggono una sola sottoscrizione
 
-# si procede con un'ulteriore esplorazione: monthly active users - CANCELLO 
-Unique_MU <- df_1_cli_fid_clean %>%
-  mutate(Date=floor_date(LAST_DT_ACTIVE, "month")) %>%
-  group_by(Date)  %>%
-  summarise(Unique_Active_Users=n_distinct(ID_CLI))
+# si procede con un'ulteriore esplorazione: monthly activations 
+num_monthly_activation <- df_1_cli_fid_clean %>%
+  mutate(Month=floor_date(LAST_DT_ACTIVE, "month")) %>%
+  group_by(Month)  %>%
+  summarise(num_activation=n_distinct(ID_CLI))
 
-UM_line <- ggplot(data=Unique_MU, aes(Date, Unique_Active_Users)) +
+num_monthly_activation_plot <- ggplot(data=num_monthly_activation, aes(Month, num_activation)) +
   geom_line(colour='turquoise3') +
   geom_point() +
   labs(y='Active Users') +
   scale_y_continuous(labels = scales::comma) +
   theme_light()
-print(UM_line)
+print(num_monthly_activation_plot)
 
-# nel 2018 c'è stata più attività rispetto al 2019.
+# nel 2018 ci sono state più "activations" rispetto al 2019
 
 
 #### FINAL REVIEW df_1_clean ####
