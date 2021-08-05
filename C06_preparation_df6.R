@@ -265,6 +265,7 @@ ggplot(data=df6_overviewbytyp
   geom_bar(stat="identity"
            , fill="turquoise3") +
   theme_classic() + 
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   xlab("Type campaign") + ylab("Number of emails") +
   geom_text(aes(label=TOT_EVENTs), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -331,6 +332,7 @@ plot_df6_dist_openedbytyp <- (
          , aes(fill=OPENED, x=TYP_CAMP, y=TOT_EVENTs)) +
     geom_bar(stat="identity") +
     xlab("Type campaign") + ylab("Number of emails") +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     theme_classic()
 )
 
@@ -368,6 +370,7 @@ plot_df6_dist_daystoopen <- (
     geom_bar(stat="identity", fill="steelblue") +
     xlab("Average days to open") + ylab("Number of clients") +
     scale_x_continuous(breaks=seq(0, 14, 1)) + 
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     theme_classic()
 )
 
@@ -461,6 +464,7 @@ plot_df6_dist_clicked_bytyp <- (
          , aes(fill=CLICKED, x=TYP_CAMP, y=TOT_EVENTs)) +
     geom_bar(stat="identity") +
     xlab("Type campaign") + ylab("Number of emails") +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     theme_classic()
 )
 
@@ -536,6 +540,7 @@ plot_df6_dist_failed_bytyp <- (
          , aes(fill=FAILED, x=TYP_CAMP, y=TOT_EVENTs)) +
     geom_bar(stat="identity") +
     xlab("Type campaign") + ylab("Number of emails") +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     theme_classic()
 )
 
@@ -571,7 +576,8 @@ ggplot(data = df6_dist_numopens[1:10,],
   geom_bar(stat = "identity",
            fill = "turquoise3") + 
   xlab("Number of opens") + ylab("Number of emails") +
-  scale_x_continuous(breaks=seq(0, 10, 1))+         
+  scale_x_continuous(breaks=seq(0, 10, 1)) +  
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   theme_classic()    
 # si nota che nella maggior parte dei casi si registra una sola apertura
 
@@ -614,7 +620,8 @@ ggplot(data = df6_dist_numclicks[1:10,],
   geom_bar(stat = "identity",
            fill = "turquoise3") + 
   xlab("Number of clicks") + ylab("Number of emails") +
-  scale_x_continuous(breaks=seq(0, 10, 1))+         
+  scale_x_continuous(breaks=seq(0, 10, 1))+ 
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   theme_classic()    
 # si nota che nella maggior parte dei casi si registra un click
 
