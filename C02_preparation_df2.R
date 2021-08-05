@@ -106,20 +106,19 @@ tot_emailproviders
 #!!! NOTE: too many different values for EMAIL_PROVIDER to be an useful category !!!#
 
 
-# COMPUTE THE DISTRIBUTION for the remaining df_2_cli_fid_clean variables # voleva intendere df_2_cli_account_clean ???
-
 ### Variable W_PHONE ###
 
 ## compute distribution
 df_2_dist_w_phone <- df_2_cli_account_clean %>%
   group_by(W_PHONE) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>% # sum indica la somma tra le due righe?
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>% 
   arrange(desc(PERCENT)) %>%
   as.data.frame()
 
 df_2_dist_w_phone
 # il 92% circa dei clienti ha aggiunto il proprio numero di telefono
+
 
 ### Variable ID_ADDRESS ###
 df_2_dist_id_address <- df_2_cli_account_clean %>%
@@ -143,8 +142,7 @@ df_2_dist_typ_cli_account <- df_2_cli_account_clean %>%
   as.data.frame()
 
 df_2_dist_typ_cli_account
-# si distinguono due tipologie di account, 4 e 2. Il 90% dei clienti ha un 
-# account di tipo 4
+# si distinguono due tipologie di account, 4 e 2. Il 90% dei clienti ha un account di tipo 4
 
 ### Variable TYP_JOB ###
 df_2_dist_typ_job <- df_2_cli_account_clean %>%
@@ -229,18 +227,6 @@ plot_df2_dist_w_phone <- (
   )
 
 plot_df2_dist_w_phone
-
-### Variable ID_ADDRESS ###  - non ha molto senso generare un grafico per questa variabile 
-# si può cacellare
-# plot_df2_dist_id_address <- (
-#   ggplot(data=df_2_dist_id_address
-#          , aes(x=ID_ADDRESS, y=TOT_CLIs)) +
-#     geom_bar(stat="identity"
-#              , fill="steelblue") +
-#     theme_minimal()
-# )
-# 
-# plot_df2_dist_id_address
 
 ### Variable TYP_CLI_ACCOUNT ###
 plot_df2_dist_typ_cli_account <- (
