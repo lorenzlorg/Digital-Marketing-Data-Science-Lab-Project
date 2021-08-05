@@ -27,7 +27,8 @@
 # per id_cli: la media dell'importo lordo per purchase risulta essere 703, mentre per refund -212
 # per id_cli:la media dello sconto per purchase risulta essere 50.3, mentre per refund -16.0
 # i 3 clienti che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 con rispettivamente 177, 155, 154 acquisti
-# per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto
+# Gran parte dei clienti (173939) ha effettuato 1 o più acqusiti. Ad aver effettuato 6 o più acquisti sono 8504 clienti
+# Per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto
 
 
 #### FIRST LOOK of df_7 ####
@@ -155,9 +156,9 @@ plot_df7_dist_hour <- (
     theme_classic()+
     xlab("Hour")+ylab("Number of transactions") +
     scale_x_continuous(breaks=seq(0, 24, 1))+
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase"))
 )
-
 
 plot_df7_dist_hour
 
@@ -204,6 +205,7 @@ plot_df7_dist_dep <- (
     geom_bar(stat="identity") +
     theme_classic()+
     xlab("Business unit code")+ylab("Number of transactions")+
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase")) 
 )
 
@@ -241,6 +243,7 @@ df7_dist_date
 ggplot(data=df7_dist_date, aes(x=TIC_DATE, y=TOT_TICs))+
   geom_line()+
   theme_classic()+
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   labs(x = "Date", 
        y = "Number of transactions")
 
@@ -270,6 +273,7 @@ plot_df7_dist_datetyp <- (
          , aes(fill=DIREZIONE, x=TIC_DATE_TYP, y=TOT_TICs)) +
     geom_bar(stat="identity") +
     theme_classic()+
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     xlab("Date type")+ylab("Number of transactions")+
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase"))
 )
@@ -321,6 +325,7 @@ plot_df7_dist_importo <- (
     geom_histogram(binwidth=10, fill="white", alpha=0.5) +
     theme_classic()+
     xlab("Gross amount")+ylab("Count")+
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase"))
 )
 
@@ -336,6 +341,7 @@ plot_df7_dist_sconto <- (
     geom_histogram(binwidth=10, fill="white", alpha=0.5) +
     theme_classic()+
     xlab("Sconto")+ylab("Count")+
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase"))
   
 )
@@ -374,8 +380,10 @@ ggplot(data = df7_dist_importosconto_by_codreparto,
   geom_bar(stat = "identity") + 
   xlab("Business unit code")+ylab("Gross amount")+
   scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase")) +
-  theme_classic()               
+  theme_classic() +
+  scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6))
 )
+
 plot_df7_dist_importo_by_codreparto
 
 
@@ -386,7 +394,8 @@ plot_df7_dist_sconto_by_codreparto <- (
     geom_bar(stat = "identity") + 
     xlab("Business unit code")+ylab("Sconto")+
     scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase")) +
-    theme_classic()               
+    theme_classic() +
+    scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) # millions
 )
 plot_df7_dist_sconto_by_codreparto
 
@@ -525,7 +534,8 @@ plot_num_purch_customer_redux_cumulate<- ggplot(data=num_purch_customer_redux_cu
                               "4 or more purchases", "5 or more purchases", "6 or more purchases")) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") +
-  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')})
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
+  geom_text(aes(label=num), position=position_dodge(width=0.9), vjust=-0.25)
 
 plot_num_purch_customer_redux_cumulate 
 
