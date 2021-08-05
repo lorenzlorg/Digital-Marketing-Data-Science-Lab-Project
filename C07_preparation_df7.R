@@ -27,7 +27,7 @@
 # per id_cli: la media dell'importo lordo per purchase risulta essere 703, mentre per refund -212
 # per id_cli:la media dello sconto per purchase risulta essere 50.3, mentre per refund -16.0
 # i 3 clienti che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 con rispettivamente 177, 155, 154 acquisti
-# Gran parte dei clienti (173939) ha effettuato 1 o più acqusiti. Ad aver effettuato 6 o più acquisti sono 8504 clienti
+# Gran parte dei clienti (173939, circa il 47% dei clienti) ha effettuato 1 o più acqusiti. Ad aver effettuato 6 o più acquisti sono 8504 clienti, circa lo 0,2% dei clienti
 # Per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto
 
 
@@ -523,6 +523,11 @@ num_purch_customer_redux <- num_purch_customer %>%
 
 num_purch_customer_redux_cumulate <- num_purch_customer_redux %>%
   mutate(num = rev(cumsum(rev(NUM_CLI))))
+
+num_purch_customer_redux_cumulate <- num_purch_customer_redux_cumulate %>%
+  mutate(perc = (num/369472))
+
+num_purch_customer_redux_cumulate
 
 plot_num_purch_customer_redux_cumulate<- ggplot(data=num_purch_customer_redux_cumulate, aes(NUM_PURCHASES, num)) +
   geom_bar(stat = "identity") +
