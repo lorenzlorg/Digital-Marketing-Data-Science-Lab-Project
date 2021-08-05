@@ -204,7 +204,7 @@ plot_df7_dist_dep <- (
     geom_bar(stat="identity") +
     theme_classic()+
     xlab("Business unit code")+ylab("Number of transactions")+
-    scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase"))
+    scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase")) 
 )
 
 plot_df7_dist_dep
@@ -503,25 +503,31 @@ plot_df7_nett_amount_monthly<- ggplot(data=df7_nett_amount_monthly, aes(Date, ne
 plot_df7_nett_amount_monthly
 # il picco di nett amount è stato raggiunto tra Ottobre e Gennaio 2018
 
-# DA CONCLUDERE!!!!!!!!!!! altro grafico interessante potrebbe essere: customer by number of purchase (vedi slide, lab1 ...)
-df7_dist_num_purch_customer
+# si analizza più nel dettaglio il numero di purchase per cliente
 
-df7_dist_num_purch_customer_plot <- df7_dist_num_purch_customer %>% 
+num_purch_customer <- df7_dist_num_purch_customer %>% 
   group_by(NUM_PURCHASES) %>% 
   summarise(NUM_CLI = n_distinct(ID_CLI))
 
-df7_dist_num_purch_customer_plot_redux <- df7_dist_num_purch_customer_plot %>% 
-  filter(df7_dist_num_purch_customer_plot < 10)
+num_purch_customer_redux <- num_purch_customer %>% 
+  filter(num_purch_customer < 7)
 
-# dovrei calcolare distribuzione cumulata
+num_purch_customer_redux_cumulate <- num_purch_customer_redux %>%
+  mutate(num = rev(cumsum(rev(NUM_CLI))))
 
-plot_df7_nett_amount_monthly<- ggplot(data=df7_dist_num_purch_customer_plot_redux, aes(NUM_PURCHASES, NUM_CLI)) +
+plot_num_purch_customer_redux_cumulate<- ggplot(data=num_purch_customer_redux_cumulate, aes(NUM_PURCHASES, num)) +
   geom_bar(stat = "identity") +
-  labs(y='NUM CUSTOMERS') + 
+  labs(y='NUM_CUSTOMERS') + 
   theme_light() +
-  theme_classic()    
-plot_df7_nett_amount_monthly
+  theme_classic() +
+  scale_x_discrete(limit = c("1", "2","3", "4", "5", "6"),
+                   labels = c("1 or more purchases","2 or more purchases","3 or more purchases", 
+                              "4 or more purchases", "5 or more purchases", "6 or more purchases")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") +
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')})
 
+plot_num_purch_customer_redux_cumulate 
 
 
 #### FINAL REVIEW df_7_clean ####
