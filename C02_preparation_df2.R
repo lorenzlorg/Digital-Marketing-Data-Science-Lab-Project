@@ -206,6 +206,7 @@ plot_df2_dist_emailproviderclean <- (
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal() + 
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     xlab("Email provider") + ylab("Number of clients")
 )
 
@@ -223,6 +224,7 @@ plot_df2_dist_w_phone <- (
     theme_classic() + 
     xlab("Phone number") + ylab("Number of clients") +
     scale_x_discrete(labels=c("0" = "not added", "1" = "added")) +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     geom_text(aes(label=TOT_CLIs), position=position_dodge(width=0.9), vjust=-0.25)
   )
 
@@ -237,6 +239,8 @@ plot_df2_dist_typ_cli_account <- (
     theme_classic() + 
     xlab("Type account") + ylab("Number of clients") +
     scale_x_discrete(labels=c("2" = "2", "4" = "4")) +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
+    
     geom_text(aes(label=TOT_CLIs), position=position_dodge(width=0.9), vjust=-0.25)
 )
 
@@ -251,6 +255,7 @@ plot_df2_dist_typ_job <- (
     theme_classic() + 
     xlab("Type job") + ylab("Number of clients") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     geom_text(aes(label=TOT_CLIs), position=position_dodge(width=0.9), vjust=-0.25)
 )
 
