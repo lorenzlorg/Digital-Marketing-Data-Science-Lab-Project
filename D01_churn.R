@@ -1,6 +1,6 @@
 # Churn Model: propensity model supervised 
 
-# Churn event: moment when the customer stops purchasing
+# Eveneto di churn event: il momento in cui il cliente smette di acquistare
 # Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, 
 #secondo diverse ricerche pubblicate
 
@@ -15,7 +15,7 @@
 # [ 1 maggio 2018 ------------lockback period------------ 28 febbraio 2019) [28 febbraio 2019 ------------holdout period ------------ 30 aprile 2019]
 
 
-#### 1. choosing a reference date in the past (mettersi ad una di riferimento nel passato) ####
+#### 1. choosing a reference date in the past (posizionarsi ad una data di riferimento nel passato) ####
 # eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
 # reference date: 28 febbraio 2019, 60 giorni prima dell'ultima rilevazione
 
@@ -24,7 +24,8 @@ reference_date <- as.Date("28/02/2019", format = "%d/%m/%Y")
 
 
 #### 2. imposing the length of an holdout period after each reference date. The length correspondes to the frequencey of the distribution and/or the purchase time scale ####
-# considerando una via di mezzo tra il 90% e l'80% dei clienti coinvolti, si seleziona come numero di giorni per l'acquisto successivo 60 (vedi days for next purchase curve df7) 
+# considerando una via di mezzo tra il 90% e l'80% dei clienti coinvolti, 
+# si seleziona come numero di giorni per l'acquisto successivo 60 (vedi days for next purchase curve df7) 
 # 60 giorni
 # holdout period: 28 febbraio 2019 - 30 aprile 2019
 
@@ -32,20 +33,24 @@ holdout_period <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATE >= reference_date)
 
-# tutti i clienti presenti nell'holdout sono no churner, dal momento in cui hanno effettuato un acquisto dopo la reference date
+# tutti i clienti presenti nell'holdout sono no churner, dal momento in cui 
+# hanno effettuato un acquisto dopo la reference date
 holdout_period['CHURN'] <- 0
 
 
 
 #### 3. choosing the lenght of a lookback period before the reference date ####
-# non si definisce solitmante una lunghezza fissa. Bisogna controllare cosa conviene, se dunque può essere vantaggioso o meno considerare tutti i dati a nostra disposizione, a partire dal 1 maggio 2018, o meno
+# non si definisce solitmante una lunghezza fissa. Bisogna controllare cosa conviene, 
+# se dunque può essere vantaggioso o meno considerare tutti i dati a nostra 
+# disposizione, a partire dal 1 maggio 2018, o meno
 # lookback period: 01 maggio 2018 - 28 febbraio 2019
 
 lookback_period <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATE < reference_date)
 
-# assumo per comodità di calcolo che tutti i clienti presenti nel lookback period sono churner
+# si assume, inzialmente, per comodità di calcolo che tutti i clienti presenti 
+# nel lookback period siano churner
 lookback_period['CHURN'] <- 1
 
 
@@ -55,7 +60,7 @@ lookback_period['CHURN'] <- 1
 holdout_period_temp <- holdout_period %>%
   select(ID_CLI, CHURN)
 
-# aggiorno la variabile CHURN per i clienti presenti nel lookback period
+# si aggiorna la variabile CHURN per i clienti presenti nel lookback period
 # tutti i clienti che comparivano nell'holdout saranno ovviamente no churner
 setDT(lookback_period)[holdout_period_temp, CHURN := i.CHURN, on = .(ID_CLI)]
 
@@ -89,7 +94,8 @@ churn_dataset$RECENCY<-difftime(as.Date("30/04/2019", format="%d/%m/%Y"),
 churn_dataset <- churn_dataset %>%
   filter(NUM_OF_PURCHASES > 1)
 
-# non si considerano i clienti che hanno effettuato il primo acquisto dopo il 28/02/2019 dal momento in cu si rischia di avere poche informazioni su di essi
+# non si considerano i clienti che hanno effettuato il primo acquisto dopo il 
+# 28/02/2019 dal momento in cu si rischia di avere poche informazioni su di essi
 churn_dataset <- churn_dataset %>%
   filter(FIRST_PURCHASE_DATE < reference_date)
 
@@ -102,24 +108,33 @@ prop.table(table(churn_dataset$CHURN))
 sapply(churn_dataset, function(x) sum(is.na(x)))
 
 
-# aggiungo altre feature potenzialmente rilevanti, oltre a FIRST_PURCHASE_DATE, LAST_PURCHASE_DATE, TOT_PURCHASE, TOT_SCONTO, TOT_SPESA, NUM_OF_PURCHASE, RECENCY
+# si considerano altre feature potenzialmente rilevanti, oltre a FIRST_PURCHASE_DATE, 
+# LAST_PURCHASE_DATE, TOT_PURCHASE, TOT_SCONTO, TOT_SPESA, NUM_OF_PURCHASE, RECENCY:
+
 # df1: LAST_COD_FID, FIRST_ID_NEG
 # df2: TYP_CLI_ACCOUNT
 # df3: REGION
 
 
-churn_dataset <- left_join(churn_dataset, df_1_cli_fid_clean[,c("ID_CLI", "LAST_COD_FID", "NUM_FIDs", "FIRST_ID_NEG")], by = "ID_CLI")  # LAST_COD_FID, FIRST_ID_NEG, NUM_FIDs
+churn_dataset <- left_join(churn_dataset, df_1_cli_fid_clean[,c("ID_CLI", "LAST_COD_FID", 
+                                                                "NUM_FIDs", "FIRST_ID_NEG")], 
+                           by = "ID_CLI")  # LAST_COD_FID, FIRST_ID_NEG, NUM_FIDs
 churn_dataset$FIRST_ID_NEG <- as.factor(churn_dataset$FIRST_ID_NEG)
 
-churn_dataset <- left_join(churn_dataset, df_2_cli_account_clean[,c("ID_CLI", "TYP_CLI_ACCOUNT")], by = "ID_CLI")  # TYP_CLI_ACCOUNT
+churn_dataset <- left_join(churn_dataset, df_2_cli_account_clean[,c("ID_CLI", 
+                                                                    "TYP_CLI_ACCOUNT")], 
+                           by = "ID_CLI")  # TYP_CLI_ACCOUNT
 
 
 df_2_df_3 <- left_join(df_2_cli_account_clean, df_3_cli_address_clean, by = "ID_ADDRESS")
 churn_dataset <- left_join(churn_dataset, df_2_df_3[,c("ID_CLI", "REGION")], by = "ID_CLI")  # REGION
-# dal momento in cui vi sarebbero troppe variabili dummy si procede nel raggruppare le regioni in macroregioni (basandosi sulla seguente suddivisione: https://www.tuttitalia.it/statistiche/nord-centro-mezzogiorno-italia/)
-NORD <- c("VALLE D'AOSTA", "PIEMONTE", "LOMBARDIA", "LIGURIA", "FRIULI VENEZIA GIULIA", "VENETO", "TRENTINO ALTO ADIGE", "EMILIA ROMAGNA")
+# dal momento in cui vi sarebbero troppe variabili dummy si procede nel raggruppare 
+# le regioni in macroregioni (basandosi sulla seguente suddivisione: https://www.tuttitalia.it/statistiche/nord-centro-mezzogiorno-italia/)
+NORD <- c("VALLE D'AOSTA", "PIEMONTE", "LOMBARDIA", "LIGURIA", "FRIULI VENEZIA GIULIA", 
+          "VENETO", "TRENTINO ALTO ADIGE", "EMILIA ROMAGNA")
 CENTRO <- c("TOSCANA", "MARCHE", "LAZIO", "UMBRIA")
-MEZZOGIORNO <- c("ABRUZZO", "MOLISE", "CAMPANIA", "BASILICATA", "PUGLIA", "CALABRIA", "SICILIA", "SARDEGNA")
+MEZZOGIORNO <- c("ABRUZZO", "MOLISE", "CAMPANIA", "BASILICATA", "PUGLIA", "CALABRIA", 
+                 "SICILIA", "SARDEGNA")
 
 nord_regioni <- churn_dataset %>%
   filter(REGION %in% NORD) %>%
@@ -134,8 +149,9 @@ mezzogiorno_regioni <- churn_dataset %>%
   mutate(REGION = "MEZZOGIORNO")
 
 
-# non considero le regioni con valore null (altrimenti errori nell'esecuzione di alcuni modelli)
-sum(is.na(churn_dataset$REGION))  # 5922 regioni non indicate
+# non si considerano le regioni con valore null (altrimenti si potrebbero verificare 
+# errori nell'esecuzione di alcuni modelli)
+sum(is.na(churn_dataset$REGION))  # 5922 regioni non riportate
 churn_dataset <- na.omit(churn_dataset)
 sum(is.na(churn_dataset$REGION))  # check
 
@@ -158,7 +174,8 @@ churn_dataset$LAST_PURCHASE_DATE <- NULL
 
 var_num <- c("TOT_PURCHASE", "TOT_SCONTO", "TOT_SPESA", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
-# si nota, come prevedibile, TOT_PURCHASE e TOT_SPESA sono correlate in maniera molto elevata. Si procede dunque considerando solamente TOT_PURCHASE 
+# si nota, come prevedibile, TOT_PURCHASE e TOT_SPESA sono correlate in maniera molto elevata. 
+# Si procede dunque considerando solamente TOT_PURCHASE 
 
 var_num <- c("TOT_PURCHASE", "TOT_SCONTO", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
@@ -179,7 +196,6 @@ corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", metho
 
 #### 6. Apply models #### 
 
-# install.packages('caret')
 train_index <- createDataPartition(churn_dataset$CHURN, 
                                    p = .70, 
                                    list = FALSE, 
@@ -189,8 +205,9 @@ test <- churn_dataset[-train_index,]
 
 table(train$CHURN)
 table(test$CHURN)
-# essendo il numero di churner più elevateo (secondo questa partizione) si potrebbe pensare
-# che di migliorare le attività di retention
+
+# in generale essendo il numero di churner più elevato (secondo questa partizione) 
+# si potrebbe pensare di migliorare le attività di retention
 
 prop.table(table(train$CHURN))
 prop.table(table(test$CHURN))
@@ -204,7 +221,8 @@ prop.table(table(test$CHURN))
 # install.packages("MLmetrics")
 # install.packages("rpart.plot")
 
-tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
+tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + 
+                      LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
                     data = train, method = "class")
  
 rpart.plot(tree.model, extra = 1)  # la variabile più importante è RECENCY
@@ -214,15 +232,9 @@ fancyRpartPlot(tree.model)
 summary(tree.model) 
 printcp(tree.model) 
 
-
-# N.b.
-# The number above these proportions indicates the way that the node is voting 
-# and the number below indicates the proportion of the population that resides in 
-# this node, or bucket
-
-# le percentuali 100%, 36% ecc. rappresentano il numero delle osservazioni in percentuale prese in considerazione in quel nodo
 # il numero 0/1 in alto nel nodo dice come sono state classificate tutte le osservazioni di quel nodo
-# le percentuali di mezzo indicano per lo 0 qual'è la percentuale e per l'1 qual è la percentuale
+# le percentuali 100%, 36% ecc. rappresentano il numero delle osservazioni in percentuale prese in considerazione in quel nodo
+# i numeri di mezzo indicano per lo 0 qual'è la percentuale e per l'1 qual è la percentuale
 
 # ad esempio: nodo 4, riguarda l'11% delle osservazioni totali, in questo nodo (recency < 104 & num_of_purchases >= 8.5) tutte 
 # le osservazioni sono classificate come no churner (in particolare si hanno il 73%
@@ -272,7 +284,8 @@ tree.auc  # 0.6824019
 # Fitting The Model
 # install.packages(randomForest)
 # memory.limit(100000)
-rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
+rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + 
+                           REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                          data = train , ntree = 100)
 print(rf.model)
 
@@ -323,7 +336,8 @@ rf.auc  # 0.7386719
 # There’s different types of GLMs, which includes logistic regression. To specify that we want to perform a binary logistic regression, we’ll use the argument family=binomial.
 
 # Fitting The Model
-logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
+logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + 
+                        REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
                       data = train, family=binomial)
 summary(logistic.model)
 
@@ -365,7 +379,8 @@ logistic.auc  # 0.7461111
 
 
 #### Neural Network Model ####
-nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train, size = 3)
+nm.model <- nnet(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + 
+                   LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train, size = 3)
 summary(nm.model)
 
 # Making Predictions
@@ -406,7 +421,9 @@ nm.auc  # 0.7462316
 
 
 #### Naive Bayes #### 
-nb.model <- naiveBayes(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, data = train)
+nb.model <- naiveBayes(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + 
+                         REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG, 
+                       data = train)
 summary(nb.model)
 
 # Making Predictions
@@ -444,7 +461,8 @@ nb.auc  # 0.7339499
 
 
 #### Confronto modelli ####
-Modello <- c("Decision Tree", "Random Forest", "Logistic Regression", "Neural Network Model", "Naive Bayes")
+Modello <- c("Decision Tree", "Random Forest", "Logistic Regression", 
+             "Neural Network Model", "Naive Bayes")
 
 
 # ACCURACY: ratio of correctly predicted observation to the total observations
@@ -515,8 +533,11 @@ AUC <- c(tree.auc,
 AUC_results <- data.frame(Modello, AUC)
 
 # overview risultati
-overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, Precision_results$Precision, Recall_results$Recall, F1_score_results$F1_score, AUC_results$AUC)
-colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall", "F1_score", "AUC")
+overview_results <- data.frame(Modello,  Accuracy_results$Accuracy, 
+                               Precision_results$Precision, Recall_results$Recall, 
+                               F1_score_results$F1_score, AUC_results$AUC)
+colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall", 
+                                "F1_score", "AUC")
 # View(overview_results)
 
 # Modello              Accuracy     Precision    Recall       F1_score     AUC
@@ -538,7 +559,8 @@ rocs <- performance(pred, "tpr", "fpr")
 par(lwd= 4, lty= 6)
 plot(rocs, col = as.list(1:m), main = "ROC Curves")
 legend(x = "bottomright", 
-       legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model", "Naive Bayes"),
+       legend = c("Decision Tree", "Logistic", "Random Forest", "Neural Network Model", 
+                  "Naive Bayes"),
        fill = 1:m)
 abline(a=0, b= 1, col=c("grey"))
 

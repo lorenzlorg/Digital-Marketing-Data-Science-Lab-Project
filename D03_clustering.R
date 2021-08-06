@@ -1,4 +1,4 @@
-# CLUSTERING
+# CLUSTERING: si cerca di individurare dei cluster di clienti con caratterische simili
 
 #### preparazione dataset ####
 
@@ -8,7 +8,7 @@
 # TOT SPESA
 # TOTO SCONTO
 
-# si prende un considerazione un periodo temporale specifico
+# si considerano tutte gli acqisti effettuati l'1 gennaio 2019 o successivamente
 clustering_dataset <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATETIME >= as.Date("01/01/2019",
@@ -28,7 +28,6 @@ clustering_dataset <- clustering_dataset %>%
 clustering_dataset <- clustering_dataset %>%
   filter(NUM_OF_PURCHASES > 3)
 
-
 # complessivamente
 str(clustering_dataset)
 
@@ -38,15 +37,16 @@ sapply(clustering_dataset, function(x) sum(is.na(x)))  # non sono presenti valor
 
 # attenzione agli outliers
 # l'algorimto k-means è molto sensibile agli outliers
-# sarebbe da considerare con più attenzione, sulla base di ulteriorI dettagli forniti dal cliente
+# sarebbe da considerare con più attenzione, sulla base di ulteriori dettagli forniti dal cliente
+# che al momento non sono disponibili
 
-# non considero l'ID_CLI
+# non si considera l'ID_CLI
 customer_data <- clustering_dataset[,-1]
 
 
 #### setting clustering ####
 
-# standardizzazione
+# i dati vengono standardizzati
 customer_data_stand <- scale(customer_data) 
 
 
@@ -61,12 +61,12 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # dal grafico sopra riportato si potrebbe pensare al valore 3, 4 o 5, come numero ottimale di cluster suggerito
 
 # per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
-# si possono consideare i metodi sotto riportati (non eseguiti per limiti computazionali)
+# si possono considerare i metodi sotto riportati (non eseguiti per limiti computazionali)
 
 
 # Elbow method
 # fviz_nbclust(customer_data_stand, kmeans, method = "wss") +
-#   geom_vline(xintercept = 4, linetype = 2) + # add line for better visualisation
+#   geom_vline(xintercept = 4, linetype = 2) + 
 #   labs(subtitle = "Elbow method") # add subtitle
 
 
@@ -76,12 +76,11 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 
 
 # Gap statistic
-# fviz_nbclust(customer_data_stand, kmeans,  # - TROPPO LENTO
+# fviz_nbclust(customer_data_stand, kmeans,  
 #              nstart = 25,
 #              method = "gap_stat",
-#              nboot = 500 # reduce it for lower computation time (but less precise results)
-# ) +
-#   labs(subtitle = "Gap statistic method")
+#              nboot = 500 
+# ) + labs(subtitle = "Gap statistic method")
 
 
 # NbClust
@@ -90,14 +89,12 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 #   distance = "euclidean",
 #   min.nc = 2, # minimum number of clusters
 #   max.nc = 5, # maximum number of clusters
-#   method = "kmeans" # one of: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid", "kmeans"
-# )
+#   method = "kmeans" # one of: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid", "kmeans")
 
 
 # un metodo alternativo per trovare il numero ottimale di cluster è il seguente
 duda <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", max.nc = 9, index = "duda")
 pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", max.nc = 9, index = "pseudot2")
-
 
 # il valore ottimale di numero di cluster dovrebbe coincidere con il valore più
 # elevato di duda a cui corrisponde il valore pseudo-T2 minore
@@ -118,13 +115,11 @@ duda$Best.nc  # numero ottimale cluster = 5
 
 
 #### K-means ####
-# Using K-Means Instead of the Traditional Approach
-# The traditional RFM approach requires you to manually rank customers from 1 to 5 on each of their RFM features.
 
-# vengono provati tre scenari, K=3,4,5
+# vengono testati tre scenari, K=3,4,5
 
 ##### K = 3 ##### 
-# possiamo selezionare n cluster = 3, applichiamo l'algoritmo kmeans
+# vengono selezionati n cluster = 3, viene applicato l'algoritmo kmeans
 km_3 <-kmeans(customer_data_stand, centers = 3, nstart=20)
 
 # general info
@@ -133,24 +128,29 @@ str(km_3)
 # dimensioni dei cluster identificati
 # km_3$size
 table(km_3$cluster)
-# 1     2     3 
+# 1     2       3 
 # 2833 21443    18 
 
 km_3$withinss
 # 25609.158 14007.608  8312.117
 
-# valutazione qualità: The quality of a k-means partition is found by calculating the percentage of 
-# the TSS “explained” by the partition using the following formula: BSS / TSS * 100 
+# valutazione qualità: la qualità di una partizione ottenuta applicando l'algoritmo
+# k-means può essere valutata calcolando la percentuale di "TSS" speigata dalla
+# partizione usando la seguente formula: BSS / TSS * 100 
+
+# BSS: Between Sum of Square
+# TSS:Total Sum of Squares
+
 BSS_km_3 <- km_3$betweenss
 TSS_km_3 <- km_3$totss
 BSS_km_3 / TSS_km_3 * 100  #  50.67624 
-# higher quality means a higher explained percentage
-# where BSS and TSS stand for Between Sum of Squares and Total Sum of Squares, respectively. 
-# The higher the percentage, the better the score (and thus the quality) because 
-# it means that BSS is large and/or WSS is small
+# una maggiore qualità signfica una valore più alto spiegato
+
+# maggiore è la percentuale ottenuta maggiore sarà lo score, dunque la qualità 
+# perchè significa che BSS è elevato e/o WSS è piccolo
 
 
-# riconvertiamo i valori standardizzati per rendere chiaro l'output
+# si riconvertono i valori standardizzati per rendere chiaro l'output
 data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
@@ -200,7 +200,7 @@ ggscatter(
 
 
 #####   K = 4 ##### 
-# possiamo selezionare n cluster = 4, applichiamo l'algoritmo kmeans
+# vengono selezionati n cluster = 4, viene applicato l'algoritmo kmeans
 km_4 <-kmeans(customer_data_stand, centers = 4, nstart=20)
 
 # general info
@@ -267,7 +267,7 @@ ggscatter(
   stat_mean(aes(color = cluster), size = 4)
 
 #####   K = 5 ##### 
-# possiamo selezionare n cluster = 5, applichiamo l'algoritmo kmeans
+# vengono selezionati n cluster = 5, viene applicato l'algoritmo kmeans
 km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 
 # general info
@@ -307,11 +307,11 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
 # 11                    48          1742.9595     132.93016
 # 12                    62          104990.8267   12376.54111
 
-# N.B.
-# With more classes, the partition will be finer, and the BSS contribution will be higher. 
-# On the other hand, the “model” will be more complex, requiring more classes. 
-# In the extreme case where k = n (each observation is a singleton class), we have BSS = TSS, 
-# but the partition has lost all interest.
+# Con tante classi, la partizione sarà più fine e il contributo di BSS sarà maggiore
+# D'altro canto il modello sarà più complesso, dovendo gestire più classi
+# Nel caso estremo in cui il numero di cluster coincide con il numero di osservazioni
+# si ha BSS = TSS, ma in questo caso la partizione perde di utilità
+
 
 # alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
 dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
@@ -340,12 +340,13 @@ ggscatter(
 ) +
   stat_mean(aes(color = cluster), size = 4)
 
-# per il clustering si potrebbero usare anche K-medians o DBSCAN che sono più robusti agli outliers
+# per il clustering si potrebbero usare anche i seguenti metodi:
+# K-medians o DBSCAN che sono più robusti agli outliers
 
 #### K-medians ####
 
 # in base ai risultati precedenti, k = 5
-pam.res <- pam(customer_data_stand, 5)  # esecuzione lenta
+pam.res <- pam(customer_data_stand, 5)  # esecuzione che richiede molte risorse
 print(pam.res)
 
 # The function pam() returns an object of class pam which components include:
@@ -403,4 +404,4 @@ Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
 # Checking cluster
 Dbscan_cl$cluster
 
-# DBSCAN visti i risultati poco soddisfacienti non viene considerato
+# DBSCAN visti i risultati poco soddisfacienti non viene considerato per analisi successive
