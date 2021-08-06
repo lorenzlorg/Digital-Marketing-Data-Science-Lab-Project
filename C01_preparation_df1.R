@@ -1,4 +1,4 @@
-# The data contains info about fedility subscriptions of each customer:
+# The data contains info about fidelity subscriptions of each customer:
 # ID_CLI: identity client 
 # ID_FID: identity fidelity program (key)
 # ID_NEG: identity reference program
@@ -37,13 +37,13 @@ df_1_cli_fid_clean %>%
             , TOT_ROWs = n())
 
 # ci sono 370135 osservazioni
-# ci sono 369472 valori unici per gli ID cliente (ci sono degli id cliente che si ripetono, per la precisione 663)
-# ci sono 367925 valori unici per gli ID fidelity (ci sono degli id fidelity che si ripetono)
+# ci sono 369472 valori unici per gli ID cliente (ci sono degli ID cliente che si ripetono, per la precisione 663)
+# ci sono 367925 valori unici per gli ID fidelity (ci sono degli ID fidelity che si ripetono)
 # ci sono 370135 valori unici per coppie ciente-fidelity (essendo le osservazioni totali 370135, si può dire non vi siano duplicati nelle coppie id_cli-id_fid)
 
 # concentrandosi sui duplicati di ID_CLI
 sum(duplicated(df_1_cli_fid_clean$ID_CLI))  # 663
-df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)]  # id_cliente che si ripetono
+df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)]  # ID_CLI che si ripetono
 
 # è possibile osservare che ci sono più registrazioni di carte fedeltà per ciascun 
 # cliente dal momento in cui il numero di identificativi dei clienti è maggiore del 
@@ -64,7 +64,7 @@ df_1_cli_fid_clean<- df_1_cli_fid_clean%>%
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID)) %>%
-  mutate(COD_FID = as.factor(COD_FID)) # è stato trasformato anche cod_fid in factor
+  mutate(COD_FID = as.factor(COD_FID)) # è stato trasformato anche COD_FID in factor
 str(df_1_cli_fid_clean)
 
 
@@ -87,7 +87,6 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
   group_by(NUM_FIDs, NUM_DATEs) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT_CLIs = TOT_CLIs/tot_id_cli)
-
 
 dist_num_fid_x_cli
 
@@ -121,9 +120,10 @@ df_1_cli_fid %>% filter(ID_CLI == 621814)
 # there could be subscriptions at the same dates [possibly for technical reasons]
 df_1_cli_fid %>% filter(ID_CLI == 320880)
 
-# ad esempio, il cliente 320880 ha sottoscritto 3 fidelity nello stesso negozio: la prima sottoscrizione standard nel giorno 25-04-2018
-# il giorno dopo è passato ad una sottoscrizione premium per poi lo stesso giorno ripassare ad una sottoscrizione standard
-# (le prime due sottoscrizioni non sono più attive).
+# ad esempio, il cliente 320880 ha sottoscritto 3 fidelity nello stesso negozio: 
+# la prima sottoscrizione standard nel giorno 25-04-2018 il giorno dopo è passato 
+# ad una sottoscrizione premium per poi lo stesso giorno ripassare ad una sottoscrizione 
+# standard (le prime due sottoscrizioni non sono più attive)
 
 #### RESHAPING df_1 ####
 
@@ -282,7 +282,7 @@ num_monthly_activation_plot <- ggplot(data=num_monthly_activation, aes(Month, nu
   theme_light()
 print(num_monthly_activation_plot)
 
-# nel 2018 ci sono state più "activations" rispetto al 2019
+# nel 2018 ci sono state più attivazioni rispetto al 2019
 
 
 #### FINAL REVIEW df_1_clean ####

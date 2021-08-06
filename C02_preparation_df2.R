@@ -1,4 +1,4 @@
-# The data contains info sugli account of each customer:
+# The data contains info about account of each customer:
 # ID_CLI: identify client
 # EMAIL_PROVIDER: email account provider
 # W_PHONE: phone number added (0/1)

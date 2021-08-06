@@ -1,8 +1,16 @@
-# Churn Model: propensity modello supervised 
+# Churn Model: propensity model supervised 
+
 # Churn event: moment when the customer stops purchasing
-# Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, secondo diverse ricerche pubblicate
-# Riprendendo la "the days for next purchase curve" presente nel dataset 7, si nota per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto, per l'80% passano 40 giorni
-# Questo significa che dato che la maggior parte delle persone acquista dopo 70 giorni, se un cliente non dovesse acquistare questo deve essere un campanello d'allarme, un possibile churn
+# Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, 
+#secondo diverse ricerche pubblicate
+
+# Riprendendo la "the days for next purchase curve" presente nel dataset 7, 
+# si nota per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto, 
+# per l'80% passano 40 giorni
+
+# Questo significa che dato che la maggior parte delle persone acquista dopo 70 giorni, 
+# se un cliente non dovesse acquistare questo deve essere un campanello d'allarme, 
+# il cliente potrebbe essere un possibile churn
 
 # [ 1 maggio 2018 ------------lockback period------------ 28 febbraio 2019) [28 febbraio 2019 ------------holdout period ------------ 30 aprile 2019]
 
@@ -166,6 +174,7 @@ cor(churn_dataset[,var_num])
 numeric.var <- sapply(churn_dataset, is.numeric)
 corr.matrix <- cor(churn_dataset[,numeric.var])
 corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", method="number")
+
 
 
 #### 6. Apply models #### 

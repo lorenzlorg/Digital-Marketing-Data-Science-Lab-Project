@@ -1,4 +1,4 @@
-#The data contains info sugli indirizzi of each customer:
+#The data contains info about address of each customer:
 # ID_ADDRESS: identify address
 # CAP: postal code
 # PRV: province
