@@ -89,7 +89,8 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   
 # viene corretta TIC_DATE_WEEKDAY dato che domenica viene mappata come 1. Si vuole lunedì come 1
 
-df_7_tic_clean_final$TIC_DATE_WEEKDAY <- dplyr::recode(df_7_tic_clean_final$TIC_DATE_WEEKDAY, `1` = 7, `2` = 1, `3` = 2, `4` = 3, `5` = 4, `6` = 5, `7` = 6)
+df_7_tic_clean_final$TIC_DATE_WEEKDAY <- dplyr::recode(df_7_tic_clean_final$TIC_DATE_WEEKDAY, 
+                                                       `1` = 7, `2` = 1, `3` = 2, `4` = 3, `5` = 4, `6` = 5, `7` = 6)
 
 df_7_tic_clean_final <- df_7_tic_clean_final %>% 
   mutate(TIC_DATE_TYP = case_when(

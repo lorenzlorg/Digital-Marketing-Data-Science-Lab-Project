@@ -4,7 +4,7 @@
 # CHANNEL_CAMP: channel campaign (only email)
 
 #### INSIGHTS ####
-# Il canale utilizzato per la campagna è quello via email
+# Il canale utilizzato per la campagna è quello email
 # Il tipo di campagna più utilizzato risulta essere "PRODUCT", seguito da "PERSONALIZED" e "NATIONAL"
 
 
@@ -52,4 +52,3 @@ plot_df5_dist_typ_camp <- (
 plot_df5_dist_typ_camp
 
 # Il tipo di campagna più utilizzato risulta essere "PRODUCT"
-
