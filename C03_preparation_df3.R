@@ -1,4 +1,4 @@
-#The data contains info about address of each customer:
+# The data contains info about address of each customer:
 # ID_ADDRESS: identify address
 # CAP: postal code
 # PRV: province
@@ -8,7 +8,9 @@
 # Ogni cliente non ha necessariamente un ID_ADDRESS diverso 
 # Ci sono 850000 record che si ripetono, si provvede ad eliminarli
 # Si eliminano i record mal strutturati
-# I 3 CAP più frequenti sono 20090, 20900, 20060. Le 3 province più frequenti sono MI, RM e NA. Le 3 regioni più frequenti sono LOMBARDIA, LAZIO, CAMPANIA in accordo con le osservazioni fatte precedentemente
+# I 3 CAP più frequenti sono 20090, 20900, 20060. 
+# Le 3 province più frequenti sono MI, RM e NA. 
+# Le 3 regioni più frequenti sono LOMBARDIA, LAZIO, CAMPANIA in accordo con le osservazioni fatte precedentemente
 
 #### FIRST LOOK of df_3 ####
 
@@ -41,20 +43,23 @@ df_3_cli_address_clean <- df_3_cli_address_clean %>%
 # calcolo nuovamente il numero esatto di record duplicati
 sum(duplicated(df_3_cli_address_clean))  # 0
 
-# rimangono due ID_ADDRESS identici che si riferiscono a record differenti
+# rimangono due ID_ADDRESS identici (come osservato precedentemente) che si 
+# riferiscono a record differenti
 sum(duplicated(df_3_cli_address_clean$ID_ADDRESS))
-df_3_cli_address_clean$ID_ADDRESS[duplicated(df_3_cli_address_clean$ID_ADDRESS)]  # per identificare i duplicati
-# risultano essere gli indirizzi 201232 e 637914, ad esempio:
+df_3_cli_address_clean$ID_ADDRESS[duplicated(df_3_cli_address_clean$ID_ADDRESS)]  # per identificare i duplicati in questione
+# risultano essere gli indirizzi 201232 e 637914:
 # 201232 18025 CN PIEMONTE
 # 201232 18025 IM LIGURIA
 
 # 637914 18025 CN PIEMONTE
 # 637914 18025 IM LIGURIA
 
-# si potrebbe eventualemnte pensare di procedere nell'eliminazione di questi due record dal momento in cui due id_address identici non possono riferirsi a due istanze diverse
-# df_3_cli_address_clean <- df_3_cli_address_clean[-c(110043, 110044, 162649, 162650), ]
+# si potrebbe eventualmente pensare di procedere nell'eliminazione di questi due record 
+# dal momento in cui due id_address identici non possono riferirsi a due istanze diverse oppure
+# si potrebbe contattare l'esperto di dominio per chiedere delucidazioni in merito
+# df_3_cli_address_clean <- df_3_cli_address_clean[-c(110043, 110044, 162649, 162650), ]  # eliminazione duplicati id_address
 
-# procedo dunque sul dataset privo di record identici
+# si procede dunque sul dataset privo di record identici
 
 #### CLEANING DATA TYPES in df_3 ####
 
@@ -99,7 +104,7 @@ cons_idaddress_df2_df3 <- df_2_cli_account_clean %>%
 
 cons_idaddress_df2_df3
 
-# sembrerebbero esserci 23919 indirizzi presenti in df_2 che non sono mappati in df_3
+# vi sono 23919 indirizzi presenti in df_2 che non sono mappati in df_3
 # ad esempio in df_2 è presente l'indirizzo 900091 che compare 6974 volte, ma non risulta essere mappato in df_3
 
 #!!! NOTE:  there are ID_ADDRESSes actually not mapped in df_3 !!!#
@@ -156,7 +161,7 @@ df_3_dist_region
 values = df_3_dist_region$TOT_ADDs  
 id = df_3_dist_region$REGION
  mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi con installazione libreria
-# qui non si sta considerando il numero di clienti totale perchè inizialmente si sono rimossi i duplicati
+# in questo caso non si sta considerando il numero di clienti totale perchè inizialmente si sono rimossi i duplicati
 
 #### FINAL REVIEW df_3_clean ####
 
