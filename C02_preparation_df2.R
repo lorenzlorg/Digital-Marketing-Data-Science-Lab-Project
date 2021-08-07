@@ -204,7 +204,7 @@ plot_df2_dist_emailproviderclean <- (
   ggplot(data=df2_dist_emailproviderclean
          , aes(x=EMAIL_PROVIDER_CLEAN, y=TOT_CLIs)) +
     geom_bar(stat="identity"
-             , fill="steelblue") +
+             , fill="turquoise3") +
     theme_minimal() + 
     scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
     xlab("Email provider") + ylab("Number of clients")
@@ -261,7 +261,7 @@ plot_df2_dist_typ_job <- (
 
 plot_df2_dist_typ_job
 
-# per visualizzare meglio i dati adotto una scala di tipo logaritmica (rispetto all'asse y)
+# per visualizzare meglio i dati si considera una scala di tipo logaritmica (rispetto all'asse y)
 plot_df2_dist_typ_job <- (
   ggplot(data=df_2_dist_typ_job
          , aes(x=TYP_JOB, y=TOT_CLIs)) +
