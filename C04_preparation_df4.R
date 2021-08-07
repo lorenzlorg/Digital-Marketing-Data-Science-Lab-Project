@@ -82,7 +82,7 @@ df_4_cli_privacy_clean %>%
   scale_y_continuous(labels = scales::percent)+
   scale_x_discrete(labels=c("1" = "accepted", "0" = "not accepted"))+
   theme_classic()+
-  labs(x = 'Flag privacy policy', y = 'Percentage')
+  labs(x = 'Flag privacy', y = 'Percentage')
 
 # 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 (34%) no
 
@@ -107,7 +107,7 @@ df_4_cli_privacy_clean %>%
   scale_y_continuous(labels = scales::percent)+
   scale_x_discrete(labels=c("1" = "accepted", "0" = "not accepted"))+
   theme_classic()+
-  labs(x = 'Flag profiling policy', y = 'Percentage')
+  labs(x = 'Flag profiling', y = 'Percentage')
 
 # 345682 (94%) hanno accettato la flag profiling policy mentre 23790 (6%) no 
 
@@ -134,7 +134,7 @@ df_4_cli_privacy_clean %>%
   scale_y_continuous(labels = scales::percent)+
   scale_x_discrete(labels=c("1" = "accepted", "0" = "not accepted"))+
   theme_classic()+
-  labs(x = 'Flag direct marketing privacy', y = 'Percentage')
+  labs(x = 'Flag direct marketing', y = 'Percentage')
 
 # 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 (33%) no
 
@@ -158,12 +158,10 @@ num_flag_cli$ACCEPTED<-as.factor(c(3,1,2,2,2,0,1,1))
 
 num_flag_cli_data <- num_flag_cli[,c("PERCENT", "TOT_CLIs", "ACCEPTED")]
 
-
 num_flag_cli_data <- num_flag_cli_data %>%       
   group_by(ACCEPTED) %>%                         
   summarise_at(vars(PERCENT, TOT_CLIs),          
                list(name = sum)) 
-
 
 colnames(num_flag_cli_data) <- c( "ACCEPTED", "PERCENT_aggregate", "TOT_CLIs_aggregate")
 
