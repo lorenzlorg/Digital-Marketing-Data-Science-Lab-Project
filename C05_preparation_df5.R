@@ -1,5 +1,5 @@
 # The data contains info about campaigns:
-# ID_CAMP: identify email campaign
+# ID_CAMP: identify email campaign (key)
 # TYP_CAMP: type email campaign
 # CHANNEL_CAMP: channel campaign (only email)
 

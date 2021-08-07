@@ -1,7 +1,7 @@
 # The data contains contains the purchase and refund transaction of each customer
-# ID_SCONTRINO: identify the transaction (all the products purchased or refund within the same transaction have the same id)
-# ID_CLI: identify client
-# ID_NEG: identify reference store
+# ID_SCONTRINO: identify the transaction (all the products purchased or refund within the same transaction have the same id) (key)
+# ID_CLI: identify client (foreign key)
+# ID_NEG: identify reference store (foreign key)
 # ID_ARTICOLO: identify the purchased or refund item
 # COD_REPARTO: identify the business unit corresponding to the item
 # DIREZIONE: purchase (1) or refund (-1)

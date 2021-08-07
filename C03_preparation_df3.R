@@ -1,5 +1,5 @@
 # The data contains info about address of each customer:
-# ID_ADDRESS: identify address
+# ID_ADDRESS: identify address (key)
 # CAP: postal code
 # PRV: province
 # REGION: region

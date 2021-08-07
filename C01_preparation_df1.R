@@ -1,5 +1,5 @@
 # The data contains info about fidelity subscriptions of each customer:
-# ID_CLI: identity client 
+# ID_CLI: identity client (foreign key)
 # ID_FID: identity fidelity program (key)
 # ID_NEG: identity reference program
 # TYP_CLI_FID: main account (1/0)

@@ -1,8 +1,8 @@
 # The data contains info about account of each customer:
-# ID_CLI: identify client
+# ID_CLI: identify client (key)
 # EMAIL_PROVIDER: email account provider
 # W_PHONE: phone number added (0/1)
-# ID_ADDRESS: identify address
+# ID_ADDRESS: identify address (foreign key)
 # TYP_CLI_ACCOUNT: type client account
 # TYP_JOB: client job
 
