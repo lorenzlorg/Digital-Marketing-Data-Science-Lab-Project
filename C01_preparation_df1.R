@@ -1,7 +1,7 @@
 # The data contains info about fidelity subscriptions of each customer:
 # ID_CLI: identity client (foreign key)
 # ID_FID: identity fidelity program (key)
-# ID_NEG: identity reference program
+# ID_NEG: identity reference store
 # TYP_CLI_FID: main account (1/0)
 # COD_FID: type fidelity program
 # STATUS_FDT: active account(1/0)
@@ -13,6 +13,7 @@
 # Il 99.8% dei clienti, ovvero 368833 clienti, hanno associato 1 sottoscrizione in una sola data
 # Per alcuni clienti ci sono più sottoscrizioni di carte fedeltà anche lo stesso giorno
 # La maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una una sottoscrizione standard
+# Il reference store con la percentuale più elevata (15% circa) rilevato in concomitanza della prima sottoscrizione è l'ID_NEG 1
 # Il 99% dei clienti possiede una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
 # Nel 2018 sono state attivate più carte fedeltà rispetto al 2019
 
@@ -50,7 +51,7 @@ df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)]  # ID_CLI che s
 # numero degli identificavi delle carte fedeltà
 
 # nonostante ciò, non ci sono duplicati considerando la coppia cliente-fidelty. 
-# Questo significa che ci sono clienti a cui è associata più di uan carta fidelty, 
+# Questo significa che ci sono clienti a cui è associata più di una carta fidelty, 
 # ma queste sono tra loro diverse.
 
 
@@ -96,7 +97,6 @@ dist_num_fid_x_cli
 # 2 clienti con 4 sottoscrizioni in una sola data
 
 # viene mostrata la distribuzione dei clienti con più di una sottoscrizione
-
 dist_num_fid_x_cli2<-dist_num_fid_x_cli[dist_num_fid_x_cli$NUM_FIDs>1,]
 ggplot(dist_num_fid_x_cli2
        , aes(x=NUM_FIDs,y=TOT_CLIs, fill=factor(NUM_DATEs))) +
@@ -161,7 +161,7 @@ df_1_cli_fid_first %>%
   scale_y_continuous(labels = scales::percent)+
   labs(x = 'First code fidelity subscription', y = 'Percentage')+  theme_classic()
 
-# la maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una una sottoscrizione standard
+# la maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una sottoscrizione standard
 
 
 # si ricavano informazioni da'ultima sottoscrizione: type of fidelity, status
@@ -197,7 +197,7 @@ summary(df_1_cli_fid_clean)
 
 #### EXPOLORE COLUMNS of df_1 ####
 
-##compute the distribution LAST_STATUS_FID
+## compute the distribution LAST_STATUS_FID
 
 df_1_cli_fid_clean %>%
   group_by(LAST_STATUS_FID) %>%
@@ -221,6 +221,42 @@ df_1_cli_fid_clean %>%
 # il 99% dei clienti possiede una sottoscrizione attiva (rilevata sull'ultima data di registrazione)
 
 
+## compute the distribution LAST_TYP_CLI_FID
+
+df_1_cli_fid_clean %>%
+  group_by(LAST_TYP_CLI_FID) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT))
+
+df_1_cli_fid_clean %>% 
+  count(LAST_TYP_CLI_FID = factor(LAST_TYP_CLI_FID )) %>% 
+  mutate(count = prop.table(n)) %>% 
+  ggplot(aes(x = LAST_TYP_CLI_FID, y = count, label = scales::percent(count))) +
+  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5, 
+            size = 3)+
+  scale_y_continuous(labels = scales::percent)+
+  scale_x_discrete(labels=c("0" = "no main account", "1" = "main account"))+
+  theme_classic()+
+  labs(x = 'Last active account status', y = 'Percentage')
+
+# il 98% dei clienti utilizza il main account (rilevata sull'ultima data di registrazione)
+
+
+## compute the distribution: FIRST_ID_NEG
+
+df_1_cli_fid_clean %>%
+  group_by(FIRST_ID_NEG) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT))
+
+# il reference store con la percentuale più elevata (15% circa) rilevato in 
+# concomitanza della prima sottoscrizione è l'ID_NEG 1
+
+
 ## compute the distribution: LAST_COD_FID
 
 df_1_cli_fid_clean %>%
@@ -230,7 +266,7 @@ df_1_cli_fid_clean %>%
   arrange(desc(PERCENT))
 
 df_1_cli_fid_clean %>% 
-  count(LAST_COD_FID= factor(LAST_COD_FID )) %>% 
+  count(LAST_COD_FID= factor(LAST_COD_FID)) %>% 
   mutate(count = prop.table(n)) %>% 
   ggplot(aes(x = LAST_COD_FID, y = count, label = scales::percent(count))) +
   geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") + 
@@ -241,10 +277,9 @@ df_1_cli_fid_clean %>%
   theme_classic()+
   labs(x = 'Laste code fidelity subscription', y = 'Percentage')
 
-
 # sproporzione elevata tra clienti con sottoscrizione standard rispetto agli altri con 
-# sottocrizioni di categoria premium, con sottocategorizzazione tra premium e premium business
-# standard e standard business, in concomitanza dell'utlima data registrata per cliente
+# sottocrizioni standard biz, premium e premium biz in concomitanza dell'utlima data 
+# registrata per cliente
 
 
 ## compute distribution of NUM_FIDs
@@ -268,7 +303,7 @@ df_1_cli_fid_clean %>%
 
 # quasi la totalità dei clienti posseggono una sola sottoscrizione
 
-# si procede con un'ulteriore esplorazione: monthly activations 
+# si procede con un'ulteriore esplorazione: monthly activations ??????
 num_monthly_activation <- df_1_cli_fid_clean %>%
   mutate(Month=floor_date(LAST_DT_ACTIVE, "month")) %>%
   group_by(Month)  %>%
@@ -277,12 +312,12 @@ num_monthly_activation <- df_1_cli_fid_clean %>%
 num_monthly_activation_plot <- ggplot(data=num_monthly_activation, aes(Month, num_activation)) +
   geom_line(colour='turquoise3') +
   geom_point() +
-  labs(y='Active Users') +
+  labs(y='Number Activations') +
   scale_y_continuous(labels = scales::comma) +
   theme_light()
 print(num_monthly_activation_plot)
 
-# nel 2018 ci sono state più attivazioni rispetto al 2019
+# nel 2018 ci sono state più attivazioni (considerando LAST_DT_ACTIVE) rispetto al 2019
 
 
 #### FINAL REVIEW df_1_clean ####
