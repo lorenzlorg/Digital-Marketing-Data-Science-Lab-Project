@@ -143,27 +143,6 @@ df_1_cli_fid_first <- df_1_cli_fid_clean %>%
   as.data.frame()
 
 
-# si osserva meglio qual è la tipologia di sottoscrizione più frequente in occasione dell'attivazione
-df_1_cli_fid_first %>%
-  group_by(COD_FID) %>%
-  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
-  arrange(desc(PERCENT))
-
-df_1_cli_fid_first %>% 
-  count(COD_FID= factor(COD_FID )) %>% 
-  mutate(count = prop.table(n)) %>% 
-  ggplot(aes(x = COD_FID, y = count, label = scales::percent(count))) +
-  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") + 
-  geom_text(position = position_dodge(width = .9),
-            vjust = -0.5, 
-            size = 3)+
-  scale_y_continuous(labels = scales::percent)+
-  labs(x = 'First code fidelity subscription', y = 'Percentage')+  theme_classic()
-
-# la maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una sottoscrizione standard
-
-
 # si ricavano informazioni da'ultima sottoscrizione: type of fidelity, status
 df_1_cli_fid_last <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
@@ -257,6 +236,29 @@ df_1_cli_fid_clean %>%
 # concomitanza della prima sottoscrizione è l'ID_NEG 1
 
 
+## compute the distribution: COD_FID (considering activation date)
+# si osserva meglio qual è la tipologia di sottoscrizione più frequente in occasione dell'attivazione
+
+df_1_cli_fid_first %>%
+  group_by(COD_FID) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT))
+
+df_1_cli_fid_first %>% 
+  count(COD_FID= factor(COD_FID )) %>% 
+  mutate(count = prop.table(n)) %>% 
+  ggplot(aes(x = COD_FID, y = count, label = scales::percent(count))) +
+  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5, 
+            size = 3)+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x = 'First code fidelity subscription', y = 'Percentage')+  theme_classic()
+
+# la maggior parte dei clienti (78.4%) per la loro prima attivazione hanno optato per una sottoscrizione standard
+
+
 ## compute the distribution: LAST_COD_FID
 
 df_1_cli_fid_clean %>%
@@ -317,7 +319,7 @@ num_monthly_activation_plot <- ggplot(data=num_monthly_activation, aes(Month, nu
   theme_light()
 print(num_monthly_activation_plot)
 
-# nel 2018 ci sono state più attivazioni (considerando LAST_DT_ACTIVE) rispetto al 2019
+# nel 2018 ci sono state più attivazioni, considerando LAST_DT_ACTIVE (= DT_ACTIVE), rispetto al 2019
 
 
 #### FINAL REVIEW df_1_clean ####
