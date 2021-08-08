@@ -8,9 +8,9 @@
 
 
 #### INSIGHTS ####
-# Ci sono dei clienti a cui non è associata nessuna informazione relativa a comunicazioni mail di marketing, si può pensare a clienti che non hanno dunque ricevuto alcuna comunicazione mail
-# Ci sono delle campagne (in df5) a cui non sono associati particolari eventi, si può pensare a campagne che non sono state fatte ancora partire
-# Le rilevazioni sono state effettuate da gennaio 2019 a marzo 2019 per un totale di 1556646 comunicazioni mail di marketing che riguardano 190427 clienti
+# Ci sono dei clienti a cui non è associata nessuna informazione relativa a comunicazioni email di marketing, si può pensare a clienti che non hanno dunque ricevuto alcuna comunicazione email
+# Ci sono delle campagne (in df5) alle quali non sono associati particolari eventi, si può pensare a campagne che non sono state fatte ancora partire
+# Le rilevazioni sono state effettuate da gennaio 2019 a marzo 2019 per un totale di 1556646 comunicazioni email di marketing che riguardano 190427 clienti
 # Il tipo di campagna che registra più eventi (aperture, clicks, fallimenti) risulta essere national. Vengono coinvolti 177153 clienti 
 # La maggior parte delle comunicazioni email di marketing (di qualsiasi tipologia di campagna) non vengono aperte
 # La maggior parte dei clienti tende ad aprire l'email il giorno stesso
@@ -58,7 +58,7 @@ cons_idcli_df1_df6
 
 #!!! NOTE: all ID_CLI in df_6 are mapped in df_1, but not all ID_CLI in df_1 are mapped in df_6 !!!#  
 # questo significa che ci sono dei clienti a cui non è associata nessuna informazione 
-# relativa a comunicazioni mail di marketing 
+# relativa a comunicazioni email di marketing 
 
 
 #### CONSISTENCY CHECK ID_CAMP in df_5/df_6 ####
@@ -90,7 +90,7 @@ cons_idcamp_df5_df6
 ## remapping TYPE_EVENT values "E" [ERROR] and "B" [BOUNCE] into a level "F" [FAILURE] ##
 df_6_camp_event_clean <- df_6_camp_event_clean %>%
   mutate(TYP_EVENT = as.factor(if_else(TYP_EVENT == "E" | TYP_EVENT == "B", "F", as.character(TYP_EVENT))))
-# l'utente ha indicato ad esempio una mail sbagliata e si ha un errore come feedback
+# l'utente ha indicato ad esempio una email sbagliata e si ha un errore come feedback
 
 ## adding type from df_5 ##
 df_6_camp_event_clean <- df_6_camp_event_clean %>%
@@ -367,7 +367,7 @@ plot_df6_dist_daystoopen <- (
   ggplot(data=df6_dist_daystoopen %>%
            filter(AVG_DAYS_TO_OPEN < 14)
          , aes(x=AVG_DAYS_TO_OPEN, y=TOT_CLIs)) +
-    geom_bar(stat="identity", fill="steelblue") +
+    geom_bar(stat="identity", fill="turquoise3") +
     xlab("Average days to open") + ylab("Number of clients") +
     scale_x_continuous(breaks=seq(0, 14, 1)) + 
     scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
@@ -392,6 +392,7 @@ plot_df6_dist_daystoopen_vs_cumulate <- (
          , aes(x=AVG_DAYS_TO_OPEN, y=PERCENT_COVERED)) +
     geom_line() +
     geom_point() +
+    geom_line(colour='turquoise3') +
     scale_x_continuous(breaks=seq(0,14,2), minor_breaks=0:14) +
     xlab("Average days to open") + ylab(" Percent covered") +
     theme_classic()
@@ -495,7 +496,7 @@ df6_dist_failed <- df_6_camp_event_clean_final %>%
          , PERCENT_CLIs = TOT_CLIs/df6_overview$TOT_CLIs)
 
 df6_dist_failed
-# solo 27928 comunicazione email di marketing hanno un esito fallimentare nell'invio
+# solo 27928 comunicazioni email di marketing hanno un esito fallimentare nell'invio
 # per la maggior parte dei clienti le comunicazioni vengono spedite correttamente, senza errori
 
 ## plot aggregate
@@ -582,28 +583,6 @@ ggplot(data = df6_dist_numopens[1:10,],
 # si nota che nella maggior parte dei casi si registra una sola apertura
 
 
-## compute aggregate
-# df6_dist_numopens <- df_6_camp_event_clean_final %>%
-#   group_by(ID_CLI) %>%
-#   summarize(AVG_NUM_OPENS = floor(mean(NUM_OPENs))) %>%
-#   ungroup() %>%
-#   group_by(AVG_NUM_OPENS) %>%
-#   summarize(TOT_CLIs = n_distinct(ID_CLI))
-# 
-# df6_dist_numopens
-
-## plot aggregate
-# plot_df6_dist_numopens <- (
-#   ggplot(data=df6_dist_numopens %>%
-#            filter(AVG_NUM_OPENS < 8)
-#          , aes(x=AVG_NUM_OPENS, y=TOT_CLIs)) +
-#     geom_bar(stat="identity", fill="steelblue") +
-#     theme_minimal()
-# )
-# 
-# plot_df6_dist_numopens
-
-
 # - NUM_CLICKs
 
 df6_dist_numclicks <- df_6_camp_event_clean_final %>%
@@ -624,27 +603,6 @@ ggplot(data = df6_dist_numclicks[1:10,],
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   theme_classic()    
 # si nota che nella maggior parte dei casi si registra un click
-
-## compute aggregate
-# df6_dist_numclicks <- df_6_camp_event_clean_final %>%
-#   group_by(ID_CLI) %>%
-#   summarize(AVG_NUM_CLICKs = floor(mean(NUM_CLICKs))) %>%
-#   ungroup() %>%
-#   group_by(AVG_NUM_CLICKs) %>%
-#   summarize(TOT_CLIs = n_distinct(ID_CLI))
-# 
-# df6_dist_numclicks
-
-## plot aggregate
-# plot_df6_dist_numclicks <- (
-#   ggplot(data=df6_dist_numclicks %>%
-#            filter(AVG_NUM_CLICKs < 9)
-#          , aes(x=AVG_NUM_CLICKs, y=TOT_CLIs)) +
-#     geom_bar(stat="identity", fill="steelblue") +
-#     theme_minimal()
-# )
-# 
-# plot_df6_dist_numclicks
 
 
 #### FINAL REVIEW df_6_clean ####

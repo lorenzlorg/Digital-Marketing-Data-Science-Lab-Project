@@ -26,7 +26,7 @@
 # per cod_reparto: la media dello sconto per purchase risulta essere 762487, mentre per refund -53409
 # per id_cli: la media dell'importo lordo per purchase risulta essere 703, mentre per refund -212
 # per id_cli:la media dello sconto per purchase risulta essere 50.3, mentre per refund -16.0
-# i 3 clienti che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 con rispettivamente 177, 155, 154 acquisti
+# I 3 clienti che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 con rispettivamente 177, 155, 154 acquisti
 # Gran parte dei clienti (173939, circa il 47% dei clienti) ha effettuato 1 o più acqusiti. Ad aver effettuato 6 o più acquisti sono 8504 clienti, circa lo 0,2% dei clienti
 # Per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto
 
@@ -88,10 +88,9 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) 
   
 # viene corretta TIC_DATE_WEEKDAY dato che domenica viene mappata come 1. Si vuole lunedì come 1
-
 df_7_tic_clean_final$TIC_DATE_WEEKDAY <- dplyr::recode(df_7_tic_clean_final$TIC_DATE_WEEKDAY, 
-                                                       `1` = 7, `2` = 1, `3` = 2, `4` = 3, `5` = 4, `6` = 5, `7` = 6)
-
+                                                       `1` = 7, `2` = 1, `3` = 2, 
+                                                       `4` = 3, `5` = 4, `6` = 5, `7` = 6)
 df_7_tic_clean_final <- df_7_tic_clean_final %>% 
   mutate(TIC_DATE_TYP = case_when(
     (TIC_DATE_WEEKDAY %in% c(6,7)) ~ "weekend"
@@ -242,7 +241,7 @@ df7_dist_date
 
 ## plot aggregate
 ggplot(data=df7_dist_date, aes(x=TIC_DATE, y=TOT_TICs))+
-  geom_line()+
+  geom_line(colour='turquoise3') +
   theme_classic()+
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   labs(x = "Date", 
@@ -333,7 +332,6 @@ plot_df7_dist_importo <- (
 plot_df7_dist_importo
 
 
-
 ## plot aggregate
 plot_df7_dist_sconto <- (
   ggplot(data=df7_dist_importosconto %>%
@@ -372,23 +370,22 @@ df7_dist_avgimportosconto_by_codreparto
 # per cod_reparto: la media dell'importo lordo per purchase risulta essere 10649178, mentre per refund -706252
 # per cod_reparto: la media dello sconto per purchase risulta essere 762487, mentre per refund -53409
 
-# evetuali plot aggiuntivi
+## plot aggregate
 
-# IMPORTO LORDO
+# focalizzandosi su IMPORTO LORDO
 plot_df7_dist_importo_by_codreparto <- (
 ggplot(data = df7_dist_importosconto_by_codreparto,
        aes(fill = DIREZIONE, x = COD_REPARTO, y = IMPORTO_LORDO)) +
   geom_bar(stat = "identity") + 
-  xlab("Business unit code")+ylab("Gross amount")+
+  xlab("Business unit code")+ylab("Importo lordo")+
   scale_fill_discrete(name = "DIREZIONE", labels = c("Refund", "Purchase")) +
   theme_classic() +
   scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6))
 )
-
 plot_df7_dist_importo_by_codreparto
 
 
-# SCONTO
+# focalizzandosi su SCONTO
 plot_df7_dist_sconto_by_codreparto <- (
   ggplot(data = df7_dist_importosconto_by_codreparto,
          aes(fill = DIREZIONE, x = COD_REPARTO, y = SCONTO)) +
@@ -409,13 +406,15 @@ df7_dist_id_articolo <- df_7_tic_clean_final %>%
   ungroup() %>%
   as.data.frame() %>%
   arrange(desc(NUM_TICs))
+
+head(df7_dist_id_articolo)
 # i tre id_articolo per cui si registra il maggior numero di transazioni sono 33700716, 33817091, 34843564 
 # ad esempio, per l'articolo con id 33700716 sono registrate 57806 transazioni
 
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
-# si calcola per id cliente reparto l'importo lordo e lo sconto (e i relativi valori medi)
+# si calcola per id cliente l'importo lordo e lo sconto (e i relativi valori medi)
 
 # IMPORTO_LORDO and SCONTO by ID_CLI
 df7_dist_importosconto_by_idcli <- df_7_tic_clean_final %>%
@@ -435,7 +434,7 @@ df7_dist_avgimportosconto_by_idcli
 # per id_cli:la media dello sconto per purchase risulta essere 50.3, mentre per refund -16.0
 
 
-# compute the distribution of customers by number of purchases (as described in the slides)
+# distribution of customers by number of purchases 
 
 df7_dist_num_purch_customer <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
@@ -444,9 +443,12 @@ df7_dist_num_purch_customer <- df_7_tic_clean_final %>%
   arrange(desc(NUM_PURCHASES))
   
 df7_dist_num_purch_customer
-# i 3 id_cliente che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 con rispettivamente 177, 155, 154 acquisti
+head(df7_dist_num_purch_customer)
+# i 3 id_cliente che registrano il numero maggiore di acquisti sono: 376925, 117212, 248975 
+# con rispettivamente 177, 155, 154 acquisti
 
-# compute the days for next purchase curve (as described in the slides) - check
+
+# days for next purchase curve 
 
 data_for_next_purchase <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>% 
@@ -466,12 +468,11 @@ data_for_next_purchase_diff <- data_for_next_purchase %>%
 
 data_for_next_purchase_diff
 
-
 diff_days_diff <- as.data.frame(table(data_for_next_purchase_diff$diff_days))
 diff_days_diff <- diff_days_diff[-1, ]  # si considera una differenza > 0
 diff_days_diff$Perc <- diff_days_diff$Freq/sum(diff_days_diff$Freq)
 
-
+# visualize curve
 ggplot(diff_days_diff, 
        aes(x = as.numeric(Var1),
            y = cumsum(Perc))) +
@@ -484,10 +485,10 @@ ggplot(diff_days_diff,
   geom_vline(xintercept = 40, linetype = "dotted") +
   scale_x_continuous(breaks=seq(0, 300, 20)) +
   scale_y_continuous(breaks=seq(0, 1.00, 0.10)) +
-  geom_line(size = 1) +
+  geom_line(size = 1, colour='turquoise3') +
   theme_classic() 
 
-# dopo circa 70 giorni dall'ultimo acquisto il 90% dei clienti totali ha effettuto nuovamente un acquisto ????
+# dopo circa 70 giorni dall'ultimo acquisto il 90% dei clienti totali ha effettuto nuovamente un acquisto 
 # dopo circa 40 giorni dall'ultimo acquisto l'80% dei clienti totali ha effettuato nuovamente un acquisto
 
 # EXPLORE distribuzione net amount (importo lordo - sconto)
@@ -503,7 +504,7 @@ df7_nett_amount_monthly<-df_7_tic_clean %>%
 df7_nett_amount_monthly
 
 plot_df7_nett_amount_monthly<- ggplot(data=df7_nett_amount_monthly, aes(Date, nett_amount_monthly)) +
-  geom_line(colour='darkblue') +
+  geom_line(colour='turquoise3') +
   geom_point() + 
   scale_y_continuous(labels = scales::dollar) + 
   labs(y='Nett amount') + 
@@ -513,7 +514,7 @@ plot_df7_nett_amount_monthly<- ggplot(data=df7_nett_amount_monthly, aes(Date, ne
 plot_df7_nett_amount_monthly
 # il picco di nett amount è stato raggiunto tra Ottobre e Gennaio 2018
 
-# si analizza più nel dettaglio il numero di purchase per cliente
+# si analizza più nel dettaglio il numero di purchase effettuati dai clienti
 
 num_purch_customer <- df7_dist_num_purch_customer %>% 
   group_by(NUM_PURCHASES) %>% 
@@ -530,7 +531,8 @@ num_purch_customer_redux_cumulate <- num_purch_customer_redux_cumulate %>%
 
 num_purch_customer_redux_cumulate
 
-plot_num_purch_customer_redux_cumulate<- ggplot(data=num_purch_customer_redux_cumulate, aes(NUM_PURCHASES, num)) +
+plot_num_purch_customer_redux_cumulate<- ggplot(data=num_purch_customer_redux_cumulate, 
+                                                aes(NUM_PURCHASES, num)) +
   geom_bar(stat = "identity") +
   labs(y='NUM_CUSTOMERS') + 
   theme_light() +
