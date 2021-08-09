@@ -454,4 +454,3 @@ rfm_plot_median_frequency(segment)
 
 # aggiungo anche altri grafici
 
-

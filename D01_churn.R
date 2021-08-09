@@ -1,8 +1,8 @@
 # Churn Model: propensity model supervised 
 
-# Eveneto di churn event: il momento in cui il cliente smette di acquistare
+# Evento di churn: il momento in cui il cliente smette di acquistare
 # Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, 
-#secondo diverse ricerche pubblicate
+# secondo diverse ricerche pubblicate
 
 # Riprendendo la "the days for next purchase curve" presente nel dataset 7, 
 # si nota per circa il 90% dei clienti passano circa 70 giorni per il successivo acquisto, 
@@ -104,11 +104,11 @@ str(churn_dataset)
 table(churn_dataset$CHURN)
 prop.table(table(churn_dataset$CHURN))
 
-# controllo nuovamente la presenza di eventuali na
+# si controlla nuovamente la presenza di eventuali na
 sapply(churn_dataset, function(x) sum(is.na(x)))
 
 
-# si considerano altre feature potenzialmente rilevanti, oltre a FIRST_PURCHASE_DATE, 
+# si considerano altre features potenzialmente rilevanti, oltre a FIRST_PURCHASE_DATE, 
 # LAST_PURCHASE_DATE, TOT_PURCHASE, TOT_SCONTO, TOT_SPESA, NUM_OF_PURCHASE, RECENCY:
 
 # df1: LAST_COD_FID, FIRST_ID_NEG
@@ -128,6 +128,7 @@ churn_dataset <- left_join(churn_dataset, df_2_cli_account_clean[,c("ID_CLI",
 
 df_2_df_3 <- left_join(df_2_cli_account_clean, df_3_cli_address_clean, by = "ID_ADDRESS")
 churn_dataset <- left_join(churn_dataset, df_2_df_3[,c("ID_CLI", "REGION")], by = "ID_CLI")  # REGION
+
 # dal momento in cui vi sarebbero troppe variabili dummy si procede nel raggruppare 
 # le regioni in macroregioni (basandosi sulla seguente suddivisione: https://www.tuttitalia.it/statistiche/nord-centro-mezzogiorno-italia/)
 NORD <- c("VALLE D'AOSTA", "PIEMONTE", "LOMBARDIA", "LIGURIA", "FRIULI VENEZIA GIULIA", 
@@ -158,7 +159,7 @@ sum(is.na(churn_dataset$REGION))  # check
 churn_dataset <- rbind(nord_regioni, centro_regioni, mezzogiorno_regioni)
 churn_dataset$REGION <- as.factor(churn_dataset$REGION )
 
-# churn_dataset <- left_join(churn_dataset, df_2_cli_account_clean[,c("ID_CLI", "TYP_JOB")], by = "ID_CLI")  # TYP_JOB non considero la seguente variabile dal momento in cui presenta troppi valori mancanti
+# churn_dataset <- left_join(churn_dataset, df_2_cli_account_clean[,c("ID_CLI", "TYP_JOB")], by = "ID_CLI")  # TYP_JOB non si considera la seguente variabile dal momento in cui presenta troppi valori mancanti
 
 str(churn_dataset)
 summary(churn_dataset)
@@ -174,8 +175,8 @@ churn_dataset$LAST_PURCHASE_DATE <- NULL
 
 var_num <- c("TOT_PURCHASE", "TOT_SCONTO", "TOT_SPESA", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
-# si nota, come prevedibile, TOT_PURCHASE e TOT_SPESA sono correlate in maniera molto elevata. 
-# Si procede dunque considerando solamente TOT_PURCHASE 
+# si nota, come prevedibile, TOT_PURCHASE e TOT_SPESA sono correlate in maniera molto elevata
+# si procede dunque considerando solamente TOT_PURCHASE 
 
 var_num <- c("TOT_PURCHASE", "TOT_SCONTO", "NUM_OF_PURCHASES")
 cor(churn_dataset[,var_num])
@@ -209,20 +210,17 @@ table(test$CHURN)
 # in generale essendo il numero di churner più elevato (secondo questa partizione) 
 # si potrebbe pensare di migliorare le attività di retention
 
+# verifica se dataset sia sbilanciato o meno
 prop.table(table(train$CHURN))
 prop.table(table(test$CHURN))
-# check dataset sbilanciato 
-
 
 
 #### Decision Trees #### 
 
 # Fitting The Model
-# install.packages("MLmetrics")
-# install.packages("rpart.plot")
 
 tree.model <- rpart(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + REGION + 
-                      LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  # bisognerebbe avere variabili categoriche
+                      LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,  
                     data = train, method = "class")
  
 rpart.plot(tree.model, extra = 1)  # la variabile più importante è RECENCY
@@ -282,7 +280,6 @@ tree.auc  # 0.6824019
 ####  Random Forest #### 
 
 # Fitting The Model
-# install.packages(randomForest)
 # memory.limit(100000)
 rf.model <- randomForest(CHURN ~  TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + 
                            REGION + LAST_COD_FID + TYP_CLI_ACCOUNT + FIRST_ID_NEG,
@@ -333,7 +330,10 @@ rf.auc  # 0.7386719
 
 
 ####  Logistic Regression #### 
-# There’s different types of GLMs, which includes logistic regression. To specify that we want to perform a binary logistic regression, we’ll use the argument family=binomial.
+# I modelli lineari generalizzati (GLM) sono una generalizzazione del più classico 
+# modello lineare nell'ambito della regressione lineare. Tra questi si può individuare
+# la logistic regression (si utilizza il parametro family=binomial)
+
 
 # Fitting The Model
 logistic.model <- glm(CHURN ~ TOT_PURCHASE + NUM_OF_PURCHASES + RECENCY + 
@@ -589,5 +589,6 @@ rbind(roc_tree, roc_rf, roc_logistic, roc_nm, roc_nb) %>%
   geom_abline(a=1, b=0, linetype=2) +
   theme(legend.position=c(0.8,0.2), legend.title=element_blank())
 
-# si può notare che il Neural Network Model insieme al modello Logistic è il modello che rispetto agli altri ha performance migliori, anche se di poco.
+# si può notare che il Neural Network Model insieme al modello Logistic è il modello 
+# che rispetto agli altri ha performance migliori, anche se di poco.
 # i seguenti modelli potrebbero essere utilizzati poi per fare previsioni
