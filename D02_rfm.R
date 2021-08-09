@@ -1,6 +1,12 @@
 ### RFM MODEL: provides a deterministic description of the value of each customer 
 # in term of purchase behaviour
 
+#### INSIGHTS ####
+#
+#
+#
+#
+
 # Le metriche utilizzate sono:
 # Recency: How recently a customer has made a purchase
 # Frequency: How often a customer makes a purchase

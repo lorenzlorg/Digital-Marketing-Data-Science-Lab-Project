@@ -1,5 +1,11 @@
 # Churn Model: propensity model supervised 
 
+#### INSIGHTS ####
+#
+#
+#
+#
+
 # Evento di churn: il momento in cui il cliente smette di acquistare
 # Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, 
 # secondo diverse ricerche pubblicate

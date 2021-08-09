@@ -1,5 +1,11 @@
 # CLUSTERING: si cerca di individurare dei cluster di clienti con caratterische simili
 
+#### INSIGHTS ####
+#
+#
+#
+#
+
 #### preparazione dataset ####
 
 # variabili da considerare
