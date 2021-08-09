@@ -120,10 +120,13 @@ rfm_data_clean %>%
   summarise(Count = n())
 
 recency_var <- as.data.frame(table(rfm_data_clean$RECENCY_CLASS))
+target <- c("low", "medium", "high")
+recency_var <- recency_var[match(target, recency_var$Var1),]
+recency_var$Var1 <- factor(recency_var$Var1, levels = recency_var$Var1)
 
 ggplot(data = recency_var,
-       aes(x = Var1, y = Freq,
-           fill = Freq)) +                       
+       aes( x=Var1, y=Freq
+           )) +                       
   geom_bar(stat = "identity", fill="turquoise3") +                  
   labs(x     = "Recency classes",
        y     = "Total Purchase") +               
@@ -134,8 +137,7 @@ ggplot(data = recency_var,
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# La classe media è la più frequente: la maggior parte dei clienti ha effettuato degli acquisti abbastanza recenti
-
+# La classe high è la più frequente
 
 
 #### FREQUENCY CLASS ####
@@ -154,6 +156,9 @@ rfm_data_clean %>%
   summarise(Count = n())
 
 frequency_var <- as.data.frame(table(rfm_data_clean$FREQUENCY_CLASS))
+target <- c("low", "medium", "high")
+frequency_var <- frequency_var[match(target, frequency_var$Var1),]
+frequency_var$Var1 <- factor(frequency_var$Var1, levels = frequency_var$Var1)
 
 ggplot(data = frequency_var,
        aes(x = Var1, y = Freq,
@@ -163,7 +168,7 @@ ggplot(data = frequency_var,
        y     = "Total Purchases") +               
   theme_classic() +                             
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("High", "Low", "Medium")) + 
+  scale_x_discrete(labels = c("Low", "Medium", "High")) + 
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
@@ -187,8 +192,10 @@ rfm_data_clean %>%
   group_by(MONETARY_CLASS) %>%
   summarise(Count = n())
 
-
 monetary_var <- as.data.frame(table(rfm_data_clean$MONETARY_CLASS))
+target <- c("low", "medium", "high")
+monetary_var <- monetary_var[match(target, monetary_var$Var1),]
+monetary_var$Var1 <- factor(monetary_var$Var1, levels = monetary_var$Var1)
 
 ggplot(data = monetary_var,
        aes(x = Var1, y = Freq,
@@ -199,7 +206,7 @@ ggplot(data = monetary_var,
        y     = "Total Amount") +                  
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("High", "Low", "Medium")) +
+  scale_x_discrete(labels = c("Low", "Medium", "High")) +
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)

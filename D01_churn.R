@@ -1,10 +1,13 @@
 # Churn Model: propensity model supervised 
 
 #### INSIGHTS ####
-#
-#
-#
-#
+# La rete neurele sviluppata risulta essere il modello che meglio si adatta ai
+# dati. I regressori presi in considerazione sono: spesa totale, numero di acqusiti,
+# recency, regione di provenienza, il tipo di programma fedeltà a cui è iscritto il
+# cliente (rispetto all'aggiornamento più recente), se l'account del cliente è primario
+# o meno (rispetto all'aggiornamento più recente) e l'identidificativo del reference
+# store (rispetto all'aggiornamento più recente).
+
 
 # Evento di churn: il momento in cui il cliente smette di acquistare
 # Dopo 60 (o 30) giorni di inattività si possono categorizzare i clienti come churner, 
