@@ -31,18 +31,18 @@ recency_data<-rfm_data %>%
 
 recency_data
 
-# costruisco la variabile RECENCY 
+# si costruisce la variabile RECENCY 
 recency_data$RECENCY_VALUE <- difftime(as.Date("30/04/2019",
                                       format="%d/%m/%Y"),
                                   recency_data$LAST_PURCHASE_DATE,
                               units = "days")
 recency_data$RECENCY_VALUE <- as.numeric(recency_data$RECENCY_VALUE, units="days")
 
+recency_data
+ggplot(recency_data) + geom_density(aes(x= RECENCY_VALUE), colour='turquoise3')
 
-ggplot(recency_data) + geom_density(aes(x= RECENCY_VALUE))
-
-# la recency è ottenuta come differenza tra l'ultimo giorno di acquisto per cliente e l'ultimo giorno di rilevazione
-# as esempio: il cliente con ID 5 ha acquistato l'ultima volta il 23 novembre 2018, ovvero 158 giorni entro l'ultima data di rilevazione
+# la recency è ottenuta come differenza tra l'ultimo giorno di acquisto per cliente 
+# e l'ultimo giorno di rilevazione
 
 
 #### FREQUENCY VALUE: total number of purchase in the reference range ####
@@ -55,8 +55,7 @@ frequency_data <- rfm_data %>%
 frequency_data$FREQUENCY_VALUE <- as.numeric(frequency_data$FREQUENCY_VALUE)
 
 frequency_data
-
-ggplot(frequency_data) + geom_density(aes(x = FREQUENCY_VALUE))
+ggplot(frequency_data) + geom_density(aes(x = FREQUENCY_VALUE), colour='turquoise3')
 
 
 
@@ -74,7 +73,7 @@ monetary_data <- rfm_data %>%
 monetary_data$MONETARY_VALUE <- as.numeric(monetary_data$MONETARY_VALUE)
 
 monetary_data
-ggplot(monetary_data) + geom_density(aes(x = MONETARY_VALUE))
+ggplot(monetary_data) + geom_density(aes(x = MONETARY_VALUE), colour='turquoise3')
 
 
 
@@ -93,9 +92,9 @@ sum(is.na(rfm_data_clean))
 rfm_data_clean <- rfm_data_clean[,c(1,2,5,7)]
 
 # analizzo le distribuzioni
-hist(as.numeric(rfm_data_clean$RECENCY_VALUE), main = "Distribution RECENCY")
-hist(as.numeric(rfm_data_clean$FREQUENCY_VALUE), main = "Distribution FREQUENCY")
-hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY")
+hist(as.numeric(rfm_data_clean$RECENCY_VALUE), main = "Distribution RECENCY", col='turquoise3')
+hist(as.numeric(rfm_data_clean$FREQUENCY_VALUE), main = "Distribution FREQUENCY", col='turquoise3')
+hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY", col='turquoise3')
 
 #### RECENCY CLASS ####
 
@@ -124,6 +123,7 @@ ggplot(data = recency_var,
        y     = "Total Purchase") +               
   theme_classic() +                             
   theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   scale_x_discrete(labels = c("Low", "Medium", "High")) + 
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
@@ -158,6 +158,7 @@ ggplot(data = frequency_var,
   theme_classic() +                             
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete(labels = c("High", "Low", "Medium")) + 
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -192,7 +193,8 @@ ggplot(data = monetary_var,
        y     = "Total Amount") +                  
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
-  scale_x_discrete(labels = c("High", "Low", "Medium")) + 
+  scale_x_discrete(labels = c("High", "Low", "Medium")) +
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -254,6 +256,7 @@ ggplot(data = recency_frequency_var,
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete(labels = c("Top", "Leaving Top", "Engaged", "Leaving", "One-Timer")) + 
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -356,6 +359,7 @@ ggplot(data = recency_frequency_monetary_var,
   theme_classic() +                               
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete(labels = c("Bronze", "Cheap", "Copper", "Diamond", "Gold", "Silver", "Tin")) + 
+  scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
@@ -367,7 +371,7 @@ ggplot(data = recency_frequency_monetary_var,
 # Silver
 # Tin
 
-recency_frequency_monetary__df <- as.data.frame(rbind(c("Top", "High", "Diamond", top_high_count),
+recency_frequency_monetary_df <- as.data.frame(rbind(c("Top", "High", "Diamond", top_high_count),
                               c("Top", "Medium", "Gold", top_medium_count),
                               c("Top", "Low", "Silver", top_low_count),
                               c("Leaving Top", "High", "Gold", leavingtop_high_count),
@@ -383,18 +387,18 @@ recency_frequency_monetary__df <- as.data.frame(rbind(c("Top", "High", "Diamond"
                               c("One Timer", "Medium", "Tin", onetimer_medium_count),
                               c("One Timer", "Low", "Cheap", onetimer_low_count)))
 
-colnames(recency_frequency_monetary__df) <- c("RF", "Monetary", "Level", "Value")
+colnames(recency_frequency_monetary_df) <- c("RF", "Monetary", "Level", "Value")
 
-recency_frequency_monetary__df$RF <- factor(recency_frequency_monetary__df$RF,
+recency_frequency_monetary_df$RF <- factor(recency_frequency_monetary_df$RF,
                     levels = c("Top", "Leaving Top",
                                "Engaged", "Leaving", "One Timer"))
 
-recency_frequency_monetary__df$Monetary <- factor(recency_frequency_monetary__df$Monetary,
+recency_frequency_monetary_df$Monetary <- factor(recency_frequency_monetary_df$Monetary,
                           levels = c("Low", "Medium", "High"))
 
-recency_frequency_monetary__df$Value <- as.numeric(recency_frequency_monetary__df$Value)
+recency_frequency_monetary_df$Value <- as.numeric(recency_frequency_monetary_df$Value)
 
-ggplot(recency_frequency_monetary__df, aes(x = RF, y = Monetary, fill = Value)) + 
+ggplot(recency_frequency_monetary_df, aes(x = RF, y = Monetary, fill = Value)) + 
   geom_tile() +
   geom_text(aes(label = Level)) +
   scale_fill_distiller(palette = "Spectral") +
@@ -443,11 +447,9 @@ segment <- rfm_segment(rfm_result,
                        monetary_lower,
                        monetary_upper)
 
-head(segment) %>% 
-  kable() %>% 
-  kable_classic_2()
+# View(segment)
 
-# visualizzo i risultati finali
+# si visualizzano i risultati finali
 rfm_plot_median_recency(segment)
 rfm_plot_median_monetary(segment)
 rfm_plot_median_frequency(segment)
