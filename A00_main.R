@@ -10,7 +10,7 @@ packages <- c("dplyr",  "ggplot2", "forcats", "lubridate", "RQuantLib", "devtool
               "data.table", "corrplot", "rpart", "rpart.plot", "MLmetrics", "caret",
               "rattle", "randomForest", "ROCR", "nnet", "e1071",
               "factoextra", "NbClust", "ggpubr", "cluster", 
-              "dbscan", "rfm", "kableExtra", "scales") 
+              "dbscan", "rfm", "kableExtra", "scales", "plotrix") 
 
 
 # Install packages not yet installed

@@ -2,10 +2,12 @@
 # in term of purchase behaviour
 
 #### INSIGHTS ####
-#
-#
-#
-#
+# La classe media è la più frequente: la maggior parte dei clienti ha effettuato degli acquisti abbastanza recenti
+# La maggior parte dei clienti ha una frequency associata di tipo high
+# Più della metà dei clienti viene categorizzata come medium dal punto di vista di monetary
+# Gran parte dei clienti vengono classificati come clienti top
+# Più della metà dei clienti presi in considerazione vengono definiti come Gold o Silver
+# ...
 
 # Le metriche utilizzate sono:
 # Recency: How recently a customer has made a purchase
@@ -137,7 +139,7 @@ ggplot(data = recency_var,
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# La classe high è la più frequente
+# la classe media è la più frequente: la maggior parte dei clienti ha effettuato degli acquisti abbastanza recenti
 
 
 #### FREQUENCY CLASS ####
@@ -279,6 +281,8 @@ ggplot(data = recency_frequency_var,
 # Top: cienti che hanno acquistato recentemnte/abbastanza recentemente e con alta frequenza
 # Leaving Top: cienti che non hanno acquistato di recente ma con alta frequenza
 
+# gran parte dei clienti vengono classificati come clienti top
+
 recency_frequency_df <- as.data.frame(rbind(c("Top",         "High",   "Low",    low_high_count),
                              c("Top",         "High",   "Medium", medium_high_count),
                              c("Leaving Top", "High",   "High",   high_high_count),
@@ -384,6 +388,8 @@ ggplot(data = recency_frequency_monetary_var,
 # Silver
 # Tin
 
+# più della metà dei clienti presi in considerazione vengono definiti come Gold o Silver
+
 recency_frequency_monetary_df <- as.data.frame(rbind(c("Top", "High", "Diamond", top_high_count),
                               c("Top", "Medium", "Gold", top_medium_count),
                               c("Top", "Low", "Silver", top_low_count),
@@ -418,6 +424,8 @@ ggplot(recency_frequency_monetary_df, aes(x = RF, y = Monetary, fill = Value)) +
   theme_minimal()
 
 
+#### libreria rfm ####
+
 # In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"
 
@@ -434,15 +442,33 @@ rfm_result <- rfm_table_order(
 
 # visualizzo i risultati ottenuti
 rfm_heatmap(rfm_result) 
-rfm_bar_chart(rfm_result)  
-rfm_rm_plot(rfm_result) 
-rfm_fm_plot(rfm_result)
+# si osservano valori elevati di monetary in corrispondenza di valori e di 
+# recency e frequency elevati
 
+rfm_bar_chart(rfm_result)
+# per osservare meglio le distribuzioni delle categorie
+
+rfm_rm_plot(rfm_result) 
+# si può osservare che nella maggior parte dei casi i clienti dal valore monetary 
+# elevato sono clienti che hanno effettuato un acquisto negli ultimi 20 giorni
+
+rfm_fm_plot(rfm_result)
+# si può osservare una forte correlazione tra quanto frequente un cliente acquista 
+# e il rispettivo valore di monetary. Si osservano anche diversi outliers
 
 # vengono create delle categorie
 segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
                    "New Customers", "Promising", "Need Attention", "About To Sleep",
                    "At Risk", "Can't Lose Them", "Lost")
+
+# Potential Loyalist: Recent customers, but spent a good amount and bought more than once
+# Others
+# Need Attention:	Above average recency, frequency and monetary values. May not have bought very recently though
+# Loyal Customers:	Spend good money with us often. Responsive to promotions
+# Lost:	Lowest recency, frequency and monetary scores (RFM score)
+# Champions:	Bought recently, buy often and spend the most
+# At Risk:	Spent big money and purchased often. But long time ago. Need to bring them back
+# About To Sleep:	Below average recency, frequency and monetary values. Will lose them if not reactivated
 
 recency_lower <- c(4, 2, 3, 4, 3, 2, 2, 1, 1, 1)
 recency_upper <- c(5, 5, 5, 5, 4, 3, 3, 2, 1, 2)
@@ -461,11 +487,27 @@ segment <- rfm_segment(rfm_result,
                        monetary_upper)
 
 # View(segment)
+# https://rpubs.com/omerperach/RFM_IDC
+ggplot(data = customer_sement) + aes(x = cus_seg, fill = cus_seg)+ geom_bar() + 
+  labs(title = "Customer Segmentation", x = "Segment", y = "Total Customer") + coord_flip()+ theme_minimal()
+
+# aggiungo eventuali altri grafici/commenti
+
+x <- table(segment$segment)
+piepercent <- round(100*x/sum(x), 1)
+lbls = paste(names(x), " ", piepercent,"%")
+plotrix::pie3D(x, labels = lbls, main = "Pie chart for Customer Segments", explode = 0.1)
 
 # si visualizzano i risultati finali
 rfm_plot_median_recency(segment)
+# come prevedibile il valore mediano di recency per i clienti "lost" e "at risk"
+# è molto più elevato rispetto ai clienti "champions"
+
 rfm_plot_median_monetary(segment)
+# in questo caso il valore monetary è molto elevato per i clienti champions, più 
+# del doppio della categoria vicina "loyal customers". Si osserva anche un discreto 
+# valore mediano di monetary per i clienti "at risk"
+
 rfm_plot_median_frequency(segment)
-
-# aggiungo anche altri grafici
-
+# anche in questo caso per i clienti "champions" (e per i clienti "loyal customers") 
+# si nota un elevato valore mediano di frequency
