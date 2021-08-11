@@ -7,7 +7,7 @@
 # Più della metà dei clienti viene categorizzata come medium dal punto di vista di monetary
 # Gran parte dei clienti vengono classificati come clienti top
 # Più della metà dei clienti presi in considerazione vengono definiti come Gold o Silver
-# ...
+# Risultati analoghi sono stati utilizzando la libreria rfm
 
 # Le metriche utilizzate sono:
 # Recency: How recently a customer has made a purchase
@@ -380,13 +380,13 @@ ggplot(data = recency_frequency_monetary_var,
   guides(fill = FALSE)+
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
-# Bronze-Time
-# Cheap
-# Copper
-# Diamond
-# Gold
-# Silver
-# Tin
+# Bronze-Time: "Leaving Top", "Low" oppure "Leaving", "High" oppure "Engaged", "Medium"
+# Cheap: "One Timer", "Low"
+# Copper: "Engaged", "Low" oppure "Leaving", "Medium" oppure "One Timer", "High"
+# Diamond: "Top", "High"
+# Gold: "Top", "Medium" oppure "Leaving Top", "High"
+# Silver: "Top", "Low" oppure "Leaving Top", "Medium" oppure "Engaged", "High"
+# Tin: "Leaving", "Low" oppure "One Timer", "Medium"
 
 # più della metà dei clienti presi in considerazione vengono definiti come Gold o Silver
 
@@ -423,6 +423,14 @@ ggplot(recency_frequency_monetary_df, aes(x = RF, y = Monetary, fill = Value)) +
   scale_fill_distiller(palette = "Spectral") +
   theme_minimal()
 
+slices <- c(10725,   907,  3584, 11300, 25027, 22634,  2390)
+lbls <- c("Bronze",  "Cheap",   "Copper",  "Diamond", "Gold",    "Silver",  "Tin" )
+slices_percent <- round(100*slices/sum(slices), 1)
+slices_percent = paste(lbls, " ", slices_percent,"%")
+pie3D(slices,labels=slices_percent,explode=0.1,
+      main="Pie Chart of Countries ")
+# come si osserva anche in questo grafico le categorie Gold e Silver sono quelle 
+# più presenti
 
 #### libreria rfm ####
 
@@ -461,14 +469,14 @@ segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
                    "New Customers", "Promising", "Need Attention", "About To Sleep",
                    "At Risk", "Can't Lose Them", "Lost")
 
-# Potential Loyalist: Recent customers, but spent a good amount and bought more than once
+# Potential Loyalist: Clienti recenti, ma che hanno speso una buona quantità e hanno acquistato più di una volta
 # Others
-# Need Attention:	Above average recency, frequency and monetary values. May not have bought very recently though
-# Loyal Customers:	Spend good money with us often. Responsive to promotions
-# Lost:	Lowest recency, frequency and monetary scores (RFM score)
-# Champions:	Bought recently, buy often and spend the most
-# At Risk:	Spent big money and purchased often. But long time ago. Need to bring them back
-# About To Sleep:	Below average recency, frequency and monetary values. Will lose them if not reactivated
+# Need Attention:	CLienti i cui valori di recency, frequency e monetary sono superiori ai valori medi. Nonostante non abbiano acquistato recentemente
+# Loyal Customers:	Clienti che spendono spesso e che rispondono in modo positivo alle promozioni
+# Lost:	Clienti con i valori di recency, frequency e monetary più bassi
+# Champions:	Clienti che hanno acquistato recentemente, acquistano spesso e per grandi quantità
+# At Risk:  Clienti che hanno speso tanto e acquistato tanto ma tanto tempo fa. Bisognerebbe riconoquistarli
+# About To Sleep:	Clienti i cui valori di recency, frequency e monetary sono inferiori alla media. Se non vegono "riattivati" verrano persi come clienti
 
 recency_lower <- c(4, 2, 3, 4, 3, 2, 2, 1, 1, 1)
 recency_upper <- c(5, 5, 5, 5, 4, 3, 3, 2, 1, 2)
@@ -487,11 +495,8 @@ segment <- rfm_segment(rfm_result,
                        monetary_upper)
 
 # View(segment)
-# https://rpubs.com/omerperach/RFM_IDC
 ggplot(data = customer_sement) + aes(x = cus_seg, fill = cus_seg)+ geom_bar() + 
   labs(title = "Customer Segmentation", x = "Segment", y = "Total Customer") + coord_flip()+ theme_minimal()
-
-# aggiungo eventuali altri grafici/commenti
 
 x <- table(segment$segment)
 piepercent <- round(100*x/sum(x), 1)
