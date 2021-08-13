@@ -184,7 +184,7 @@ fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+# visualizing the clustering results using the first two principle Ccmponents
 dimensione_pca_k3 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -256,7 +256,7 @@ fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+# visualizing the clustering results using the first two principle Ccmponents
 dimensione_pca_k4 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -333,7 +333,7 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
 # si ha BSS = TSS, ma in questo caso la partizione perde di utilità
 
 
-# alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
+# visualizing the clustering results using the first two principle Ccmponents
 dimensione_pca_k5 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
