@@ -1,10 +1,14 @@
 # CLUSTERING: si cerca di individurare dei cluster di clienti con caratterische simili
 
 #### INSIGHTS ####
-#
-#
-#
-#
+# Si sono considerati tutti i clienti che hannoe ffettuato un acquisto dopo l'1 gennaio 2019
+# Il numero di cluster ottimale varia tra i seguenti valori: 3, 4, 5 (i seguenti valori sono stati ottenuti tramite diversi metodi ad hoc)
+# Per cercare di individuare i cluster in questione sono stati utilizzati diversi
+# algoritmi tra cui:
+# k-means: con k=3,4,5, sensibile agli outliers
+# k-medians: con k=5, più robusto agli outliers
+# dbscan: con k=5, più robusto agli outliers, per come impostato le performance sono state deludenti
+# In generale si è osservato che: ....
 
 #### preparazione dataset ####
 
@@ -14,7 +18,7 @@
 # TOT SPESA
 # TOTO SCONTO
 
-# si considerano tutte gli acqisti effettuati l'1 gennaio 2019 o successivamente
+# si considerano tutte gli acquisti effettuati l'1 gennaio 2019 o successivamente
 clustering_dataset <- df_7_tic_clean_final %>%
   filter(DIREZIONE == 1) %>%
   filter(TIC_DATETIME >= as.Date("01/01/2019",
@@ -52,9 +56,8 @@ customer_data <- clustering_dataset[,-1]
 
 #### setting clustering ####
 
-# i dati vengono standardizzati
+# i dati vengono standardizzati in modo tale che i dati abbiano la stessa scala
 customer_data_stand <- scale(customer_data) 
-
 
 # Number of Clusters
 k_max <- 10
@@ -64,7 +67,8 @@ g <- qplot(x = 1:k_max, y = twcss, geom = 'line')
 g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # questo grafico deve essere letto da destra verso sinistra
 # si deve trovare il punto in cui la curva tende a salire in modo più consistente
-# dal grafico sopra riportato si potrebbe pensare al valore 3, 4 o 5, come numero ottimale di cluster suggerito
+# dal grafico sopra riportato si potrebbe pensare al valore 3, 4 o 5, come numero 
+# ottimale di cluster suggerito
 
 # per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
 # si possono considerare i metodi sotto riportati (non eseguiti per limiti computazionali)
@@ -99,8 +103,10 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 
 
 # un metodo alternativo per trovare il numero ottimale di cluster è il seguente
-duda <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", max.nc = 9, index = "duda")
-pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", max.nc = 9, index = "pseudot2")
+duda <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", 
+                max.nc = 9, index = "duda")
+pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", 
+                    max.nc = 9, index = "pseudot2")
 
 # il valore ottimale di numero di cluster dovrebbe coincidere con il valore più
 # elevato di duda a cui corrisponde il valore pseudo-T2 minore
@@ -157,7 +163,8 @@ BSS_km_3 / TSS_km_3 * 100  #  50.67624
 
 
 # si riconvertono i valori standardizzati per rendere chiaro l'output
-data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand,
+                                                             'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
 data.orig_km_3
@@ -170,36 +177,38 @@ data.orig_km_3
 # lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
 # visualizzazione grafica
-fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800"), 
+fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
+                                                         "#E7B800"), 
              geom = "point",
              ellipse.type = "convex", 
              ggtheme = theme_bw()
 )
 
 # alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
-dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
+dimensione_pca_k3 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
-index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
+index_coordinate_k3 <- as.data.frame(get_pca_ind(dimensione_pca_k3)$coord)
 
 # si aggiungono i cluster ottenuti con l'algoritmo k-means
-index_coordinate$cluster <- factor(km_3$cluster)
+index_coordinate_k3$cluster <- factor(km_3$cluster)
 
 # ispezione
-head(index_coordinate)
+head(index_coordinate_k3)
 
 # si ottiene la percentuale di varianza spiegata dalla dimensioni
-eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
-variance_percent <- eigen_value$variance_percent
-head(eigen_value)
+eigen_value_k3 <- round(get_eigenvalue(dimensione_pca_k3), 1)
+variance_percent_k3 <- eigen_value_k3$variance_percent_k3
+head(eigen_value_k3)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
 ggscatter(
-  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  index_coordinate_k3, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  title = "K = 3",
   size = 1.5,  legend = "right", ggtheme = theme_bw(),
-  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
-  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+  xlab = paste0("Dim 1 (", variance_percent_k3[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent_k3[2], "% )" )
 ) +
   stat_mean(aes(color = cluster), size = 4)
 
@@ -227,7 +236,8 @@ TSS_km_4 <- km_4$totss
 BSS_km_4 / TSS_km_4 * 100   # 59.37233
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand,
+                                                             'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 data.orig_km_4[,c(1, 2)] <- round(data.orig_km_4[,c(1, 2)])
 data.orig_km_4
@@ -239,36 +249,38 @@ data.orig_km_4
 # 25                    113         3955.607      315.22485
 
 # visualizzazione grafica
-fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800", "#FF0000"), 
+fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
+                                                         "#E7B800", "#FF0000"), 
              geom = "point",
              ellipse.type = "convex", 
              ggtheme = theme_bw()
 )
 
 # alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
-dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
+dimensione_pca_k4 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
-index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
+index_coordinate_k4 <- as.data.frame(get_pca_ind(dimensione_pca_k4)$coord)
 
 # si aggiungono i cluster ottenuti con l'algoritmo k-means
-index_coordinate$cluster <- factor(km_4$cluster)
+index_coordinate_k4$cluster <- factor(km_4$cluster)
 
 # ispezione
-head(index_coordinate)
+head(index_coordinate_k4)
 
 # si ottiene la percentuale di varianza spiegata dalla dimensioni
-eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
-variance_percent <- eigen_value$variance_percent
-head(eigen_value)
+eigen_value_k4 <- round(get_eigenvalue(dimensione_pca_k4), 1)
+variance_percent_k4 <- eigen_value_k4$variance_percent_k4
+head(eigen_value_k4)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
 ggscatter(
-  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  index_coordinate_k4, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  title = "K = 4",
   size = 1.5,  legend = "right", ggtheme = theme_bw(),
-  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
-  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+  xlab = paste0("Dim 1 (", variance_percent_k4[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent_k4[2], "% )" )
 ) +
   stat_mean(aes(color = cluster), size = 4)
 
@@ -294,13 +306,15 @@ TSS_km_5 <- km_5$totss
 BSS_km_5 / TSS_km_5 * 100   # 67.60994
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
-data.orig_km_5 <- t(apply(km_5$centers, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_km_5 <- t(apply(km_5$centers, 1, function(r)r*attr(customer_data_stand,
+                                                             'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 data.orig_km_5[,c(1, 2)] <- round(data.orig_km_5[,c(1, 2)])
 data.orig_km_5
 
 # visualizzazione grafica
-fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "#E7B800","#01AFBB","#E8D800"), 
+fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
+                                                         "#E7B800","#01AFBB","#E8D800"), 
              geom = "point",
              ellipse.type = "convex", 
              ggtheme = theme_bw()
@@ -320,29 +334,30 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", "
 
 
 # alternativamente si prova ad estrarre le coordinate individualmente con il metodo PCA
-dimensione_pca <- prcomp(customer_data_stand,  scale = TRUE)
+dimensione_pca_k5 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
-index_coordinate <- as.data.frame(get_pca_ind(dimensione_pca)$coord)
+index_coordinate_k5 <- as.data.frame(get_pca_ind(dimensione_pca_k5)$coord)
 
 # si aggiungono i cluster ottenuti con l'algoritmo k-means
-index_coordinate$cluster <- factor(km_5$cluster)
+index_coordinate_k5$cluster <- factor(km_5$cluster)
 
 # ispezione
-head(index_coordinate)
+head(index_coordinate_k5)
 
 # si ottiene la percentuale di varianza spiegata dalla dimensioni
-eigen_value <- round(get_eigenvalue(dimensione_pca), 1)
-variance_percent <- eigen_value$variance_percent
-head(eigen_value)
+eigen_value_k5 <- round(get_eigenvalue(dimensione_pca_k5), 1)
+variance_percent_k5 <- eigen_value_k5$variance_percent_k5
+head(eigen_value_k5)
 
 # visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
 ggscatter(
-  index_coordinate, x = "Dim.1", y = "Dim.2", 
+  index_coordinate_k5, x = "Dim.1", y = "Dim.2", 
   color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  title = "K = 5",
   size = 1.5,  legend = "right", ggtheme = theme_bw(),
-  xlab = paste0("Dim 1 (", variance_percent[1], "% )" ),
-  ylab = paste0("Dim 2 (", variance_percent[2], "% )" )
+  xlab = paste0("Dim 1 (", variance_percent_k5[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent_k5[2], "% )" )
 ) +
   stat_mean(aes(color = cluster), size = 4)
 
@@ -353,17 +368,14 @@ ggscatter(
 
 # in base ai risultati precedenti, k = 5
 pam.res <- pam(customer_data_stand, 5)  # esecuzione che richiede molte risorse
+
 print(pam.res)
 
-# The function pam() returns an object of class pam which components include:
-# medoids: Objects that represent clusters
-# clustering: a vector containing the cluster number of each object
-
 # Cluster medoids
-pam.res$medoids
+pam.res$medoids  # objects that represent clusters
 
 # Number obs for each cluster
-pam.res.list <- pam.res$clustering
+pam.res.list <- pam.res$clustering  # a vector containing the cluster number of each object
 pam.res.df <- data.frame(matrix(unlist(pam.res.list), nrow=length(pam.res.list), byrow=TRUE))
 names(pam.res.df)[1] <- "cluster"
 pam.res.df %>% 
@@ -377,7 +389,8 @@ pam.res.df %>%
 
 
 # scale data -> original data
-data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,'scaled:scale') + 
+data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,
+                                                               'scaled:scale') + 
                       attr(customer_data_stand, 'scaled:center')))
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO

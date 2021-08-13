@@ -29,7 +29,7 @@ install_github("nicolasturaro/mapIT")
 library(mapIT)
 
 #### DIRECTORIES ####
-working_dir = "~/Desktop/progetto digital/progetto_digital_marketing"  # <path for scripts directory>
+working_dir = "~/Desktop/progetti uni github/progetto_digital_marketing"  # <path for scripts directory>
 
 data_dir = "/Users/lorenzolorgna/Google Drive/Progetto digital marketing/DMktg_DSLab_Data"  # <path for datasets directory>
 
@@ -45,9 +45,9 @@ PIPELINE_scripts <- c(
   , 'C05_preparation_df5.R'
   , 'C06_preparation_df6.R'
   , 'C07_preparation_df7.R'
-  , 'D01_churn.R'
-  , 'D02_rfm.R'
-  , 'D03_clustering.R'
+  # , 'D01_churn.R'
+  # , 'D02_rfm.R'
+  # , 'D03_clustering.R'
 )
 
 for(i in PIPELINE_scripts){
