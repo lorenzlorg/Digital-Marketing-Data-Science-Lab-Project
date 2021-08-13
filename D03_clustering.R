@@ -169,6 +169,10 @@ data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand
 data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
 data.orig_km_3
 
+# The final cluster centers are computed as the mean for each variable within each 
+# final cluster. The final cluster centers reflect the characteristics of the typical 
+# case for each cluster
+
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
 # 16                    73            3198.2312  287.73131
 # 6                     21            688.3021   43.36208
