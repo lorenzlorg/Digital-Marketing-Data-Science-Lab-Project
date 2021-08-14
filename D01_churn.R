@@ -163,7 +163,7 @@ mezzogiorno_regioni <- churn_dataset %>%
 # errori nell'esecuzione di alcuni modelli)
 sum(is.na(churn_dataset$REGION))  # 5922 regioni non riportate
 churn_dataset <- na.omit(churn_dataset)
-sum(is.na(churn_dataset$REGION))  # check
+sum(is.na(churn_dataset$REGION))  
 
 churn_dataset <- rbind(nord_regioni, centro_regioni, mezzogiorno_regioni)
 churn_dataset$REGION <- as.factor(churn_dataset$REGION )

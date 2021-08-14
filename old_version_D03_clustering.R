@@ -1,19 +1,13 @@
 # CLUSTERING: si cerca di individuare dei cluster di clienti con caratterische simili
 
 #### INSIGHTS ####
-# Le variabili prese in considerazione sono: numero acquisti, numero articoli, spesa
 # Si sono considerati tutti i clienti che hanno effettuato un acquisto dopo l'1 gennaio 2019
-# Il numero di cluster ottimale varia tra i seguenti valori: 3, 4 (i seguenti valori sono stati ottenuti tramite diversi metodi ad hoc)
+# Il numero di cluster ottimale varia tra i seguenti valori: 3, 4, 5 (i seguenti valori sono stati ottenuti tramite diversi metodi ad hoc)
 # Per cercare di individuare i cluster in questione sono stati utilizzati diversi
 # algoritmi tra cui:
-# k-means: con k=3,4, sensibile agli outliers
-# k-medians: con k=4 con e senza outliers, più robusto agli outliers
-# dbscan: più robusto agli outliers, per come impostato le performance sono state deludenti
-# In generale, prendendo come riferimento l'output dell'algoritmo K-medians, 
-# si è osservato ad esempio che: i clienti che fanno più acquisti sono quelli 
-# che acquistano più articoli ma non sono i clienti che spendono di più. I clienti
-# che spendono di più fanno un numero discreto di acquisti comprendente un numero
-# non troppo elevato di articoli.
+# k-means: con k=3,4,5, sensibile agli outliers
+# k-medians: con k=5, più robusto agli outliers
+# dbscan: con k=5, più robusto agli outliers, per come impostato le performance sono state deludenti
 
 
 #### preparazione dataset ####
@@ -21,7 +15,8 @@
 # variabili da considerare
 # NUMERO ACQUISTI
 # NUMERO ARTICOLI
-# SPESA
+# TOT SPESA
+# TOTO SCONTO
 
 # si considerano tutte gli acquisti effettuati l'1 gennaio 2019 o successivamente
 clustering_dataset <- df_7_tic_clean_final %>%
@@ -36,11 +31,8 @@ clustering_dataset <- clustering_dataset %>%
     NUM_OF_PURCHASES = n_distinct(ID_SCONTRINO),
     NUM_OF_ARTICLES = n_distinct(ID_ARTICOLO),
     TOT_PURCHASE = sum(IMPORTO_LORDO),
-    TOT_SCONTO = sum(SCONTO),
-    SPESA = TOT_PURCHASE - TOT_SCONTO  
+    TOT_SCONTO = sum(SCONTO)
   ) 
-# si è considerata la variabile SPESA dopo aver attestato la presenza di una 
-# elevata correlazione tra TOT_PURCHASE E TOT_SCONTO
 
 # si considerano i clienti che hanno effettuato più di 1 acquisto
 clustering_dataset <- clustering_dataset %>%
@@ -49,44 +41,25 @@ clustering_dataset <- clustering_dataset %>%
 # complessivamente
 str(clustering_dataset)
 
-
 # controllo la presenza di eventuali na
 sapply(clustering_dataset, function(x) sum(is.na(x)))  # non sono presenti valori mancanti
 
 
 # attenzione agli outliers
 # l'algorimto k-means è molto sensibile agli outliers
-boxplot(clustering_dataset$NUM_OF_PURCHASES)
-boxplot(clustering_dataset$NUM_OF_ARTICLES)
-boxplot(clustering_dataset$SPESA)
+# sarebbe da considerare con più attenzione, sulla base di ulteriori dettagli forniti dal cliente
+# che al momento non sono disponibili
 
-# only keep rows in dataframe with all z-scores less than absolute value of 3 
-z_scores <- as.data.frame(sapply(clustering_dataset, function(clustering_dataset)
-  (abs(clustering_dataset-mean(clustering_dataset))/sd(clustering_dataset))))
-clustering_dataset <- clustering_dataset[!rowSums(z_scores>3), ]
+# non si considera l'ID_CLI
+customer_data <- clustering_dataset[,-1]
 
-# controllo nuovamente gli outliers: la situazione è migliorata
-boxplot(clustering_dataset$NUM_OF_PURCHASES)
-boxplot(clustering_dataset$NUM_OF_ARTICLES)
-boxplot(clustering_dataset$SPESA)
-
-
-# eliminazione variabili non utili
-clustering_dataset_original <- clustering_dataset
-clustering_dataset <- clustering_dataset[,-c(1, 4, 5)]
-
-
-# si verifica la correlazione tra esse
-numeric.var <- sapply(clustering_dataset, is.numeric)
-corr.matrix <- cor(clustering_dataset[,numeric.var])
-corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", method="number")
 
 #### setting clustering ####
 
 # i dati vengono standardizzati in modo tale che i dati abbiano la stessa scala
-customer_data_stand <- scale(clustering_dataset) 
+customer_data_stand <- scale(customer_data) 
 
-# number of Clusters
+# Number of Clusters
 k_max <- 10
 twcss <- sapply(1:k_max, function(k){kmeans(customer_data_stand, k)$tot.withinss})
 
@@ -94,7 +67,7 @@ g <- qplot(x = 1:k_max, y = twcss, geom = 'line')
 g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # questo grafico deve essere letto da destra verso sinistra
 # si deve trovare il punto in cui la curva tende a salire in modo più consistente
-# dal grafico sopra riportato si potrebbe pensare al valore 3 o 4, come numero 
+# dal grafico sopra riportato si potrebbe pensare al valore 3, 4 o 5, come numero 
 # ottimale di cluster suggerito
 
 # per individuare in maniera più precisa e analitica il numero ottimale di cluster da considerare
@@ -130,26 +103,32 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 
 
 # un metodo alternativo per trovare il numero ottimale di cluster è il seguente
-# duda <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2",
-#                 max.nc = 9, index = "duda")
-# pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", 
-#                     max.nc = 9, index = "pseudot2")
+duda <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", 
+                max.nc = 9, index = "duda")
+pseudot2 <- NbClust(customer_data_stand, distance = "euclidean", method = "ward.D2", 
+                    max.nc = 9, index = "pseudot2")
 
 # il valore ottimale di numero di cluster dovrebbe coincidere con il valore più
 # elevato di duda a cui corrisponde il valore pseudo-T2 minore
 
-# duda$All.index
+duda$All.index
+# 2      3      4      5      6      7      8      9 
+# 0.5921 0.6235 0.6254 1.3995 0.7372 0.6309 0.4539 0.7500 
 
-# pseudot2$All.index
+pseudot2$All.index
+# 2          3          4          5          6          7          8         9
+# 832.0622   723.8854 13827.2146    -1.9982  3541.1738   560.3696   287.5806  2371.9318  
+
 
 # oppure più semplicemente
-# duda$Best.nc  # numero ottimale cluster 
-
+duda$Best.nc  # numero ottimale cluster = 5
+# Number_clusters     Value_Index 
+# 5.0000          1.3995 
 
 
 #### K-means ####
 
-# vengono testati due scenari, K=3,4
+# vengono testati tre scenari, K=3,4,5
 
 ##### K = 3 ##### 
 # vengono selezionati n cluster = 3, viene applicato l'algoritmo kmeans
@@ -161,11 +140,11 @@ str(km_3)
 # dimensioni dei cluster identificati
 # km_3$size
 table(km_3$cluster)
-# 1       2     3 
-# 17532  1362  4517 
+# 1     2       3 
+# 2833 21443    18 
 
 km_3$withinss
-# 12153.85  6762.29 11550.14
+# 25609.158 14007.608  8312.117
 
 # valutazione qualità: la qualità di una partizione ottenuta applicando l'algoritmo
 # k-means può essere valutata calcolando la percentuale di "TSS" speigata dalla
@@ -176,7 +155,7 @@ km_3$withinss
 
 BSS_km_3 <- km_3$betweenss
 TSS_km_3 <- km_3$totss
-BSS_km_3 / TSS_km_3 * 100  #  56.61928 
+BSS_km_3 / TSS_km_3 * 100  #  50.67624 
 # una maggiore qualità signfica una valore più alto spiegato
 
 # maggiore è la percentuale ottenuta maggiore sarà lo score, dunque la qualità 
@@ -199,11 +178,6 @@ data.orig_km_3
 # 6                     21            688.3021   43.36208
 # 10                    51            72378.6839 9631.48222
 
-# NUM_OF_PURCHASES    NUM_OF_ARTICLES     SPESA
-#         5                 17            459.2832
-#         9                 40            3902.5796
-#         11                46            995.9989
-
 # lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
 # visualizzazione grafica
@@ -214,7 +188,7 @@ fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# visualizing the clustering results using the first two principle Components
+# visualizing the clustering results using the first two principle Ccmponents
 dimensione_pca_k3 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -255,15 +229,15 @@ str(km_4)
 # km_4$size
 table(km_4$cluster)
 # 1     2     3     4 
-# 1163 13820  6427  2001 
+# 18 18524  5037   715 
 
 km_4$withinss
-# 5411.670 5768.792 7578.557 5578.400
+# 8312.117  6625.369 16067.988  8473.249
 
 # valutazione qualità
 BSS_km_4 <- km_4$betweenss
 TSS_km_4 <- km_4$totss
-BSS_km_4 / TSS_km_4 * 100   # 65.34612
+BSS_km_4 / TSS_km_4 * 100   # 59.37233
 
 # riconvertiamo i valori standardizzati per rendere chiaro l'output
 data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand,
@@ -272,11 +246,11 @@ data.orig_km_4 <- t(apply(km_4$centers, 1, function(r)r*attr(customer_data_stand
 data.orig_km_4[,c(1, 2)] <- round(data.orig_km_4[,c(1, 2)])
 data.orig_km_4
 
-# NUM_OF_PURCHASES NUM_OF_ARTICLES     SPESA
-# 8                     39            4077.2940
-# 5                     14            384.6349
-# 8                     33            816.5407
-# 14                    57            1279.8293
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
+# 10                    51          72378.684     9631.48222
+# 5                     18          559.086       32.39457
+# 11                    48          2111.392      182.54776
+# 25                    113         3955.607      315.22485
 
 # visualizzazione grafica
 fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
@@ -314,13 +288,91 @@ ggscatter(
 ) +
   stat_mean(aes(color = cluster), size = 4)
 
+#####   K = 5 ##### 
+# vengono selezionati n cluster = 5, viene applicato l'algoritmo kmeans
+km_5 <-kmeans(customer_data_stand, centers = 5, nstart=20)
 
+# general info
+str(km_5)
+
+# dimensioni dei cluster identificati
+# km_5$size
+table(km_5$cluster)
+# 1     2     3     4     5 
+# 18261   700   113  5211     9 
+
+km_5$withinss
+# 6613.788 6997.301 3650.434 9528.098 4684.452
+
+# valutazione qualità
+BSS_km_5 <- km_5$betweenss
+TSS_km_5 <- km_5$totss
+BSS_km_5 / TSS_km_5 * 100   # 67.60994
+
+# riconvertiamo i valori standardizzati per rendere chiaro l'output
+data.orig_km_5 <- t(apply(km_5$centers, 1, function(r)r*attr(customer_data_stand,
+                                                             'scaled:scale') + 
+                            attr(customer_data_stand, 'scaled:center')))
+data.orig_km_5[,c(1, 2)] <- round(data.orig_km_5[,c(1, 2)])
+data.orig_km_5
+
+# visualizzazione grafica
+fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
+                                                         "#E7B800","#01AFBB","#E8D800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
+
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE  TOT_SCONTO 
+# 5                     18          570.7831      34.42337
+# 25                    114         3548.1202     259.29213
+# 9                     41          19366.6642    2691.37265
+# 11                    48          1742.9595     132.93016
+# 12                    62          104990.8267   12376.54111
+
+# Con tante classi, la partizione sarà più fine e il contributo di BSS sarà maggiore
+# D'altro canto il modello sarà più complesso, dovendo gestire più classi
+# Nel caso estremo in cui il numero di cluster coincide con il numero di osservazioni
+# si ha BSS = TSS, ma in questo caso la partizione perde di utilità
+
+
+# visualizing the clustering results using the first two principle Ccmponents
+dimensione_pca_k5 <- prcomp(customer_data_stand,  scale = TRUE)
+
+# si estraggono le coordinate
+index_coordinate_k5 <- as.data.frame(get_pca_ind(dimensione_pca_k5)$coord)
+
+# si aggiungono i cluster ottenuti con l'algoritmo k-means
+index_coordinate_k5$cluster <- factor(km_5$cluster)
+
+# ispezione
+head(index_coordinate_k5)
+
+# si ottiene la percentuale di varianza spiegata dalla dimensioni
+eigen_value_k5 <- round(get_eigenvalue(dimensione_pca_k5), 1)
+variance_percent_k5 <- eigen_value_k5$variance_percent_k5
+head(eigen_value_k5)
+
+# visualizzazione grafica (si ottiene lo stesso grafico sopra riportato)
+ggscatter(
+  index_coordinate_k5, x = "Dim.1", y = "Dim.2", 
+  color = "cluster", palette = "npg", ellipse = TRUE, ellipse.type = "convex",
+  title = "K = 5",
+  size = 1.5,  legend = "right", ggtheme = theme_bw(),
+  xlab = paste0("Dim 1 (", variance_percent_k5[1], "% )" ),
+  ylab = paste0("Dim 2 (", variance_percent_k5[2], "% )" )
+) +
+  stat_mean(aes(color = cluster), size = 4)
+
+# per il clustering si potrebbero usare anche i seguenti metodi:
+# K-medians o DBSCAN che sono più robusti agli outliers
 
 #### K-medians ####
 
-# in base ai risultati precedenti, si procede con k = 4
-pam.res <- pam(customer_data_stand, 4)  # esecuzione che richiede molte risorse
-View(customer_data_stand)
+# in base ai risultati precedenti, k = 5
+pam.res <- pam(customer_data_stand, 5)  # esecuzione che richiede molte risorse
+
 print(pam.res)
 
 # Cluster medoids
@@ -333,21 +385,26 @@ names(pam.res.df)[1] <- "cluster"
 pam.res.df %>% 
   group_by(pam.res.df$cluster) %>%
   summarise(Count = n())
-# cluster 1  8489
-# cluster 2  3734
-# cluster 3  8947
-# cluster 4  2241
+# cluster 1  7816
+# cluster 2  2490
+# cluster 3  8294
+# cluster 4  4531
+# cluster 5  1163
+
 
 # scale data -> original data
 data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,
                                                                'scaled:scale') + 
                            attr(customer_data_stand, 'scaled:center')))
 
-# NUM_OF_PURCHASES NUM_OF_ARTICLES   SPESA
-# 6                     24            446.91
-# 11                    47            939.29
-# 4                     11            232.03
-# 7                     29            2575.03
+# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
+# 6                     20            491.20      19.23
+# 13                    46            1303.14     71.99
+# 4                     11            276.16      13.50
+# 7                     38            1086.10     64.72
+# 19                    92            3234.32     234.36
+
+
 
 
 #### DBSCAN ####
@@ -360,8 +417,8 @@ Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
 
 # The clustering contains 11 cluster(s) and 748 noise points.
 # 
-# 0     1       2     3     4     5     6     7     8     9    10    11    12    13    14 
-# 285 23024     7    22    11     6    10    12     6     3     5     1    11     5     3 
+# 0     1       2     3     4     5     6     7     8     9    10    11 
+# 748 23497     3     5     6     5     7     3     5     4     6     5 
 
 # N.b.
 # noise point: A selected point that is neither a core point nor a border point. 
@@ -371,6 +428,3 @@ Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
 Dbscan_cl$cluster
 
 # DBSCAN visti i risultati poco soddisfacienti non viene considerato per analisi successive
-
-# è stata testata anche un'altra versione di clustering con variabili diverse:
-# "old_version_D03_clustering.R"
