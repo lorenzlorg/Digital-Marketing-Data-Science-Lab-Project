@@ -1,11 +1,11 @@
 # Churn Model: propensity model supervised 
 
 #### INSIGHTS ####
-# La rete neurele sviluppata risulta essere il modello che meglio si adatta ai
-# dati. I regressori presi in considerazione sono: spesa totale, numero di acqusiti,
+# La rete neurale sviluppata risulta essere il modello che meglio si adatta ai
+# dati. I regressori presi in considerazione sono: spesa totale, numero di acquisti,
 # recency, regione di provenienza, il tipo di programma fedeltà a cui è iscritto il
 # cliente (rispetto all'aggiornamento più recente), se l'account del cliente è primario
-# o meno (rispetto all'aggiornamento più recente) e l'identidificativo del reference
+# o meno (rispetto all'aggiornamento più recente) e l'identificativo del reference
 # store (rispetto all'aggiornamento più recente).
 
 
@@ -555,6 +555,16 @@ colnames(overview_results) <- c("Modello", "Accuracy","Precision", "Recall",
 # Logistic Regression  0.7183756    0.7315945    0.9008095    0.8074316    0.7461111
 # Neural Network Model 0.7205038    0.7439924    0.8744774    0.8039749    0.7462316
 # Naive Bayes          0.7042069    0.7079008    0.9341696    0.8054458    0.7339499
+
+
+# plot overview_results accuracy
+hist(overview_results$Accuracy, col = "turquoise3")
+ggplot(overview_results, aes(x = Modello, y = Accuracy, label = round(Accuracy, digits = 3))) +
+  geom_bar(stat="identity") + 
+  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") +
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5, 
+            size = 4)
 
 # overview ROC
 preds_list <- list(tree.prob[,2], logistic.prob, rf.prob[,2], nm.prob, nb.prob[,2])

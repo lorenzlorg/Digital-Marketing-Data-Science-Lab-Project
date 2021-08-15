@@ -100,9 +100,9 @@ sum(is.na(rfm_data_clean))
 rfm_data_clean <- rfm_data_clean[,c(1,2,5,7)]
 
 # analizzo le distribuzioni
-hist(as.numeric(rfm_data_clean$RECENCY_VALUE), main = "Distribution RECENCY", col='turquoise3')
-hist(as.numeric(rfm_data_clean$FREQUENCY_VALUE), main = "Distribution FREQUENCY", col='turquoise3')
-hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY", col='turquoise3')
+hist(as.numeric(rfm_data_clean$RECENCY_VALUE), main = "Distribution RECENCY", col='turquoise3', xlab="Recency")
+hist(as.numeric(rfm_data_clean$FREQUENCY_VALUE), main = "Distribution FREQUENCY", col='turquoise3', xlab="Frequency")
+hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY", col='turquoise3', xlab="Monetary")
 
 #### RECENCY CLASS ####
 
@@ -278,8 +278,8 @@ ggplot(data = recency_frequency_var,
 # One-Timer: clienti che hanno acquistato recentemente/abbastanza recentementente ma con scarsa frequenza
 # Leaving: clienti che non hanno acquistato recentemente e con scarsa/media frequenza
 # Engaged: clienti che hanno acquistato recentemente/abbastanza recentemente e con media frequenza
-# Top: cienti che hanno acquistato recentemnte/abbastanza recentemente e con alta frequenza
-# Leaving Top: cienti che non hanno acquistato di recente ma con alta frequenza
+# Top: clienti che hanno acquistato recentemente/abbastanza recentemente e con alta frequenza
+# Leaving Top: clienti che non hanno acquistato di recente ma con alta frequenza
 
 # gran parte dei clienti vengono classificati come clienti top
 

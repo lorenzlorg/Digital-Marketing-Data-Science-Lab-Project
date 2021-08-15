@@ -13,7 +13,7 @@
 # si è osservato ad esempio che: i clienti che fanno più acquisti sono quelli 
 # che acquistano più articoli ma non sono i clienti che spendono di più. I clienti
 # che spendono di più fanno un numero discreto di acquisti comprendente un numero
-# non troppo elevato di articoli.
+# non troppo elevato di articoli
 
 
 #### preparazione dataset ####

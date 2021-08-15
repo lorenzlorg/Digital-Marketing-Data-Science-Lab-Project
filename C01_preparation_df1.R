@@ -305,7 +305,7 @@ df_1_cli_fid_clean %>%
 
 # quasi la totalità dei clienti posseggono una sola sottoscrizione
 
-# si procede con un'ulteriore esplorazione: monthly activations ??????
+# si procede con un'ulteriore esplorazione: monthly activations
 num_monthly_activation <- df_1_cli_fid_clean %>%
   mutate(Month=floor_date(LAST_DT_ACTIVE, "month")) %>%
   group_by(Month)  %>%
