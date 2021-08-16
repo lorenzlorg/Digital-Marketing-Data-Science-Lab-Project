@@ -494,14 +494,20 @@ segment <- rfm_segment(rfm_result,
                        monetary_lower,
                        monetary_upper)
 
-# View(segment)
-ggplot(data = customer_sement) + aes(x = cus_seg, fill = cus_seg)+ geom_bar() + 
-  labs(title = "Customer Segmentation", x = "Segment", y = "Total Customer") + coord_flip()+ theme_minimal()
+segment_dist <- as.data.frame(table(segment$segment))
 
-x <- table(segment$segment)
-piepercent <- round(100*x/sum(x), 1)
-lbls = paste(names(x), " ", piepercent,"%")
-plotrix::pie3D(x, labels = lbls, main = "Pie chart for Customer Segments", explode = 0.1)
+
+ggplot(segment_dist, aes(x=Var1, y=Freq)) +
+  geom_bar(stat="identity") +  xlab("Customer Segments") + ylab("Count") +
+  
+  geom_col(position = 'dodge', fill="turquoise3", colour="turquoise3") +
+  geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
+
+segment_dist <- table(segment$segment)
+piepercent <- round(100*segment_dist/sum(segment_dist), 1)
+lbls = paste(names(segment_dist), " ", piepercent,"%")
+plotrix::pie3D(segment_dist, labels = lbls, main = "Pie chart for Customer Segments", explode = 0.1)
+
 
 # si visualizzano i risultati finali
 rfm_plot_median_recency(segment)

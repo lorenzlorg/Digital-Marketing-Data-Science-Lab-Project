@@ -1,3 +1,5 @@
+# old version
+
 # CLUSTERING: si cerca di individuare dei cluster di clienti con caratterische simili
 
 #### INSIGHTS ####
