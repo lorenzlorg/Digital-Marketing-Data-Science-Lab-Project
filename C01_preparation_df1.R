@@ -8,7 +8,7 @@
 # DT_ACTIVE: date activation
 
 #### INSIGHTS ####
-# Ci sono 369472 id clienti univoci mentre ci sono 370135 coppie cliente-fidelty
+# Ci sono 369472 id clienti univoci mentre ci sono 370135 coppie univoche cliente-fidelty
 # Infatti ci sono dei clienti a cui è associata più di una carta fedeltà. Nel dataset non risultano esserci duplicati
 # Il 99.8% dei clienti, ovvero 368833 clienti, hanno associato 1 sottoscrizione in una sola data
 # Per alcuni clienti ci sono più sottoscrizioni di carte fedeltà anche lo stesso giorno

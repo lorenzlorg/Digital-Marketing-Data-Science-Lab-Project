@@ -241,12 +241,12 @@ printcp(tree.model)
 
 # il numero 0/1 in alto nel nodo dice come sono state classificate tutte le osservazioni di quel nodo
 # le percentuali 100%, 36% ecc. rappresentano il numero delle osservazioni in percentuale prese in considerazione in quel nodo
-# i numeri di mezzo indicano per lo 0 qual'è la percentuale e per l'1 qual è la percentuale
+# i numeri di mezzo indicano per lo 0 qual è la percentuale e per l'1 qual è la percentuale
 
 # ad esempio: nodo 4, riguarda l'11% delle osservazioni totali, in questo nodo (recency < 104 & num_of_purchases >= 8.5) tutte 
 # le osservazioni sono classificate come no churner (in particolare si hanno il 73%
-# delle osservazioni no churner (0) e il 27% delle oss. churner (1). Di conseguenza prelave lo 0, no churner,
-# che ha anche senso, ovvero sono clienti che non aspettano troppo e fanno tanti acquisti.
+# delle osservazioni no churner (0) e il 27% delle oss. churner (1). Di conseguenza prevale lo 0, no churner,
+# che ha anche senso, ovvero sono clienti che non aspettano troppo e fanno tanti acquisti
 
 # in rpart.plot sopra le percentuali del numero totale di osservazioni viene
 # riportata solo la percentuale degli 1, ovvero dei churner

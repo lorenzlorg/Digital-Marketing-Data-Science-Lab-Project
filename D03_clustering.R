@@ -63,7 +63,7 @@ boxplot(clustering_dataset$SPESA)
 # only keep rows in dataframe with all z-scores less than absolute value of 3 
 z_scores <- as.data.frame(sapply(clustering_dataset, function(clustering_dataset)
   (abs(clustering_dataset-mean(clustering_dataset))/sd(clustering_dataset))))
-clustering_dataset <- clustering_dataset[!rowSums(z_scores>3), ]
+clustering_dataset <- clustering_dataset[!rowSums(z_scores > 3), ]
 
 # controllo nuovamente gli outliers: la situazione è migliorata
 boxplot(clustering_dataset$NUM_OF_PURCHASES)
@@ -79,7 +79,8 @@ clustering_dataset <- clustering_dataset[,-c(1, 4, 5)]
 # si verifica la correlazione tra esse
 numeric.var <- sapply(clustering_dataset, is.numeric)
 corr.matrix <- cor(clustering_dataset[,numeric.var])
-corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", method="number")
+corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", 
+         method = "number")
 
 #### setting clustering ####
 
@@ -194,17 +195,11 @@ data.orig_km_3
 # final cluster. The final cluster centers reflect the characteristics of the typical 
 # case for each cluster
 
-# NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
-# 16                    73            3198.2312  287.73131
-# 6                     21            688.3021   43.36208
-# 10                    51            72378.6839 9631.48222
-
 # NUM_OF_PURCHASES    NUM_OF_ARTICLES     SPESA
 #         5                 17            459.2832
 #         9                 40            3902.5796
 #         11                46            995.9989
 
-# lo scontrino medio sarebbe: TOT_PURCHASE/NUM_OF_PURCHASES
 
 # visualizzazione grafica
 fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
@@ -222,9 +217,6 @@ index_coordinate_k3 <- as.data.frame(get_pca_ind(dimensione_pca_k3)$coord)
 
 # si aggiungono i cluster ottenuti con l'algoritmo k-means
 index_coordinate_k3$cluster <- factor(km_3$cluster)
-
-# ispezione
-head(index_coordinate_k3)
 
 # si ottiene la percentuale di varianza spiegata dalla dimensioni
 eigen_value_k3 <- round(get_eigenvalue(dimensione_pca_k3), 1)
@@ -273,10 +265,10 @@ data.orig_km_4[,c(1, 2)] <- round(data.orig_km_4[,c(1, 2)])
 data.orig_km_4
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES     SPESA
-# 8                     39            4077.2940
-# 5                     14            384.6349
-# 8                     33            816.5407
-# 14                    57            1279.8293
+# 8                       39            4077.2940
+# 5                       14            384.6349
+# 14                      57            1279.8293
+# 8                       33            816.5407
 
 # visualizzazione grafica
 fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB", 
@@ -286,7 +278,7 @@ fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# visualizing the clustering results using the first two principle Ccmponents
+# visualizing the clustering results using the first two principle Components
 dimensione_pca_k4 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -294,9 +286,6 @@ index_coordinate_k4 <- as.data.frame(get_pca_ind(dimensione_pca_k4)$coord)
 
 # si aggiungono i cluster ottenuti con l'algoritmo k-means
 index_coordinate_k4$cluster <- factor(km_4$cluster)
-
-# ispezione
-head(index_coordinate_k4)
 
 # si ottiene la percentuale di varianza spiegata dalla dimensioni
 eigen_value_k4 <- round(get_eigenvalue(dimensione_pca_k4), 1)
@@ -320,8 +309,8 @@ ggscatter(
 
 # in base ai risultati precedenti, si procede con k = 4
 pam.res <- pam(customer_data_stand, 4)  # esecuzione che richiede molte risorse
-View(customer_data_stand)
-print(pam.res)
+# View(customer_data_stand)
+# print(pam.res)
 
 # Cluster medoids
 pam.res$medoids  # objects that represent clusters
@@ -339,7 +328,7 @@ pam.res.df %>%
 # cluster 4  2241
 
 # scale data -> original data
-data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,
+data.orig_pam_kmed_4 <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_stand,
                                                                'scaled:scale') + 
                            attr(customer_data_stand, 'scaled:center')))
 
@@ -356,7 +345,6 @@ data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_sta
 
 # scaled data
 Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
-
 
 # The clustering contains 11 cluster(s) and 748 noise points.
 # 

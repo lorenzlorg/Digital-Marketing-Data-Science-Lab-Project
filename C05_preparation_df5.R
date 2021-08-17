@@ -30,7 +30,7 @@ df_5_camp_cat_clean <- df_5_camp_cat_clean %>%
 str(df_5_camp_cat_clean)
 summary(df_5_camp_cat_clean)
 
-# procedo nell'espolarazione di TYPE_CAMP
+# si procede nell'espolarazione di TYPE_CAMP
 
 df_5_dist_type_camp <- df_5_camp_cat_clean %>%
   group_by(TYP_CAMP) %>%

@@ -136,7 +136,7 @@ ggplot(data = recency_var,
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
   scale_x_discrete(labels = c("Low", "Medium", "High")) + 
-  guides(fill = FALSE)+
+  guides(fill = FALSE) +
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
 # la classe media è la più frequente: la maggior parte dei clienti ha effettuato degli acquisti abbastanza recenti
@@ -172,7 +172,7 @@ ggplot(data = frequency_var,
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete(labels = c("Low", "Medium", "High")) + 
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-  guides(fill = FALSE)+
+  guides(fill = FALSE) +
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
 # la maggior parte dei clienti ha una frequency associata di tipo high
@@ -210,7 +210,7 @@ ggplot(data = monetary_var,
   theme(plot.title = element_text(hjust = 0.5)) + 
   scale_x_discrete(labels = c("Low", "Medium", "High")) +
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-  guides(fill = FALSE)+
+  guides(fill = FALSE) +
   geom_text(aes(label=Freq), position=position_dodge(width=0.9), vjust=-0.25)
 
 # più della metà dei clienti viene categorizzata come medium dal punto di vista di monetary
@@ -448,7 +448,7 @@ rfm_result <- rfm_table_order(
   analysis_date = as.Date("2019-04-30") 
 )
 
-# visualizzo i risultati ottenuti
+# si visualizzano i risultati ottenuti
 rfm_heatmap(rfm_result) 
 # si osservano valori elevati di monetary in corrispondenza di valori e di 
 # recency e frequency elevati
@@ -461,7 +461,7 @@ rfm_rm_plot(rfm_result)
 # elevato sono clienti che hanno effettuato un acquisto negli ultimi 20 giorni
 
 rfm_fm_plot(rfm_result)
-# si può osservare una forte correlazione tra quanto frequente un cliente acquista 
+# si può osservare una forte correlazione tra quanto frequentemente un cliente acquista 
 # e il rispettivo valore di monetary. Si osservano anche diversi outliers
 
 # vengono create delle categorie
@@ -476,7 +476,7 @@ segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
 # Lost:	Clienti con i valori di recency, frequency e monetary più bassi
 # Champions:	Clienti che hanno acquistato recentemente, acquistano spesso e per grandi quantità
 # At Risk:  Clienti che hanno speso tanto e acquistato tanto ma tanto tempo fa. Bisognerebbe riconoquistarli
-# About To Sleep:	Clienti i cui valori di recency, frequency e monetary sono inferiori alla media. Se non vegono "riattivati" verrano persi come clienti
+# About To Sleep:	Clienti i cui valori di recency, frequency e monetary sono inferiori alla media. Se non vengono "riattivati" verrano persi come clienti
 
 recency_lower <- c(4, 2, 3, 4, 3, 2, 2, 1, 1, 1)
 recency_upper <- c(5, 5, 5, 5, 4, 3, 3, 2, 1, 2)

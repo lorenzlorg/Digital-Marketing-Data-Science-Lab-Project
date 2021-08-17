@@ -1,3 +1,7 @@
+#### Project info ####
+# Elmazaj Tiziana, 814799
+# Lorgna Lorenzo, 829776 
+
 #### OPTIONS ####
 
 options(scipen=999)
