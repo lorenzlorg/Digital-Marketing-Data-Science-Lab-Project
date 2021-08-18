@@ -293,9 +293,6 @@ recency_frequency_df <- as.data.frame(rbind(c("Top",         "High",   "Low",   
                              c("One Timer",   "Low",    "Medium", medium_low_count),
                              c("Leaving",     "Low",    "High",   high_low_count)))
 
-# in alternativa si può usare lo stesso valore per stessi classi senza fare distinzioni in base a recency e frequency
-# dunque per onetimer usare in entrambi i casi il valore 5357
-
 colnames(recency_frequency_df) <-  c("Level", "Frequency", "Recency", "Value")
 
 recency_frequency_df$Frequency <- factor(recency_frequency_df$Frequency,
@@ -471,7 +468,7 @@ segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
 
 # Potential Loyalist: Clienti recenti, ma che hanno speso una buona quantità e hanno acquistato più di una volta
 # Others
-# Need Attention:	CLienti i cui valori di recency, frequency e monetary sono superiori ai valori medi. Nonostante non abbiano acquistato recentemente
+# Need Attention:	Clienti i cui valori di recency, frequency e monetary sono superiori ai valori medi. Nonostante non abbiano acquistato recentemente
 # Loyal Customers:	Clienti che spendono spesso e che rispondono in modo positivo alle promozioni
 # Lost:	Clienti con i valori di recency, frequency e monetary più bassi
 # Champions:	Clienti che hanno acquistato recentemente, acquistano spesso e per grandi quantità

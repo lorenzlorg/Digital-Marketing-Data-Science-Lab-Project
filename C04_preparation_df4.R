@@ -7,7 +7,7 @@
 
 #### INSIGHTS ####
 # 242251 (66%) clienti hanno accettato la flag privacy mentre 127221 (34%) no
-# 345682 (94%) hanno accettato la flag profiling policy mentre 23790 (6%) no 
+# 345682 (94%) clienti hanno accettato la flag profiling policy mentre 23790 (6%) no 
 # 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 (33%) no
 
 #### FIRST LOOK of df_4 ####
