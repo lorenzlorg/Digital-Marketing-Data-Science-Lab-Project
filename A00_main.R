@@ -29,8 +29,8 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 
 # Load package with potential compatibility issues
-install_github("nicolasturaro/mapIT")
-library(mapIT)
+# install_github("nicolasturaro/mapIT")
+# library(mapIT)
 
 #### DIRECTORIES ####
 working_dir = "~/Desktop/progetti uni github/progetto_digital_marketing"  # <path for scripts directory>
