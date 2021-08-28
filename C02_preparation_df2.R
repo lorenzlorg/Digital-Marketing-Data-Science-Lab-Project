@@ -207,7 +207,8 @@ plot_df2_dist_emailproviderclean <- (
              , fill="turquoise3") +
     theme_minimal() + 
     scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-    xlab("Email provider") + ylab("Number of clients")
+    xlab("Email provider") + ylab("Number of clients") +
+    geom_text(aes(label=TOT_CLIs), position=position_dodge(width=0.9), vjust=-0.25)
 )
 
 plot_df2_dist_emailproviderclean

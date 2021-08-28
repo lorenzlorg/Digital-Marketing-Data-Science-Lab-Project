@@ -371,8 +371,8 @@ plot_df6_dist_daystoopen <- (
     xlab("Average days to open") + ylab("Number of clients") +
     scale_x_continuous(breaks=seq(0, 14, 1)) + 
     scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-    theme_classic()
-)
+    theme_classic() + 
+    geom_text(aes(label=TOT_CLIs), position=position_dodge(width=0.9), vjust=-0.25))
 
 plot_df6_dist_daystoopen
 
@@ -579,7 +579,8 @@ ggplot(data = df6_dist_numopens[1:10,],
   xlab("Number of opens") + ylab("Number of emails") +
   scale_x_continuous(breaks=seq(0, 10, 1)) +  
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-  theme_classic()    
+  theme_classic() +
+  geom_text(aes(label=TOT_ID), position=position_dodge(width=0.9), vjust=-0.25)      
 # si nota che nella maggior parte dei casi si registra una sola apertura
 
 
@@ -601,7 +602,8 @@ ggplot(data = df6_dist_numclicks[1:10,],
   xlab("Number of clicks") + ylab("Number of emails") +
   scale_x_continuous(breaks=seq(0, 10, 1))+ 
   scale_y_continuous(labels = function(x){paste0(x/1000, 'K')}) +
-  theme_classic()    
+  theme_classic() +
+  geom_text(aes(label=TOT_ID), position=position_dodge(width=0.9), vjust=-0.25)   
 # si nota che nella maggior parte dei casi si registra un click
 
 
