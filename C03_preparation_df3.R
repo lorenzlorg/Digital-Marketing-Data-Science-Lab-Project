@@ -160,7 +160,7 @@ df_3_dist_region
 # mappa geografica
 values = df_3_dist_region$TOT_ADDs  
 id = df_3_dist_region$REGION
-# mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi compatibilità
+# mapIT(values = values, id = id, graphPar = list(guide.label = "Distribuzione ID_ADDRESS registrati"))  # possibili problemi compatibilità, miniatura presente nella slide 5 della presentazione
 # in questo caso non si sta considerando il numero di clienti totale perchè inizialmente si sono rimossi i duplicati
 
 #### FINAL REVIEW df_3_clean ####
