@@ -148,6 +148,8 @@ ggplot(data = recency_var,
 summary(rfm_data_clean$FREQUENCY_VALUE)  # si osservano i valori dei quantili qui riportati
 
 quantile(rfm_data_clean$FREQUENCY_VALUE)
+# 0%   25%   50%   75%  100% 
+# 1    1     1     2    44 
 
 rfm_data_clean$FREQUENCY_CLASS <- 0
 rfm_data_clean$FREQUENCY_CLASS[rfm_data_clean$RECENCY_VALUE <= 2] <- "low"
@@ -184,6 +186,8 @@ ggplot(data = frequency_var,
 summary(rfm_data_clean$MONETARY_VALUE)
 
 quantile(rfm_data_clean$MONETARY_VALUE)
+# 0%        25%        50%        75%       100% 
+# 0.000     31.300     88.910     247.515    156885.920 
 
 rfm_data_clean$MONETARY_CLASS <- 0
 rfm_data_clean$MONETARY_CLASS[rfm_data_clean$MONETARY_VALUE <= 31.30] <- "low"
