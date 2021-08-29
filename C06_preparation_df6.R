@@ -13,8 +13,8 @@
 # Le rilevazioni sono state effettuate da gennaio 2019 a marzo 2019 per un totale di 1556646 comunicazioni email di marketing che riguardano 190427 clienti
 # Il tipo di campagna che registra più eventi (aperture, clicks, fallimenti) risulta essere national. Vengono coinvolti 177153 clienti 
 # La maggior parte delle comunicazioni email di marketing (di qualsiasi tipologia di campagna) non vengono aperte
-# La maggior parte dei clienti tende ad aprire l'email il giorno stesso
-# Circa il 90% dei clienti apre la email entro 4,3,2,1 o 0 giorni
+# La maggior parte dei clienti che apre la email lo fa il giorno stesso della ricezione di essa
+# Circa il 90% dei clienti che aprono la email lo fanno entro 4,3,2,1 o 0 giorni dalla ricezione di essa
 # Il 99.7% dei clienti non interagisce cliccando sulla comunicazione ricevuta
 # Per la maggior parte dei clienti le comunicazioni vengono spedite correttamente, senza errori
 # Si nota che nella maggior parte delle comunicazioni si registra una sola apertura e un solo click
@@ -82,7 +82,7 @@ cons_idcamp_df5_df6 <- df_5_camp_cat_clean %>%
 cons_idcamp_df5_df6
 
 #!!! NOTE: all ID_CAMP in df_6 are mapped in df_5, but not all ID_CAMP in df_5 are mapped in df_6 !!!#
-# Ci sono delle campagne (in df5) a cui non sono associati particolari eventi
+# Ci sono delle campagne (in df5) a cui non sono associate particolari eventi
 
 
 #### RESHAPING df_6 ####

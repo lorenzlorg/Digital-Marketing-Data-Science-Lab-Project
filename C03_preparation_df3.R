@@ -28,19 +28,19 @@ df_3_cli_address_clean %>%
   summarize(TOT_ID_ADDRESSes = n_distinct(ID_ADDRESS)
             , TOT_ROWs = n())
 
-# calcolo il numero esatto di duplicati considerando ID_ADDRESS
+# si calcola il numero esatto di duplicati considerando ID_ADDRESS
 sum(duplicated(df_3_cli_address_clean$ID_ADDRESS))  # 850002
 
-# calcolo il numero esatto di record duplicati
+# si calcola il numero esatto di record duplicati
 sum(duplicated(df_3_cli_address_clean))  # 850000
 
 #!!! NOTE:  there are duplicates !!!#
 
-# procedo all'eliminazione di 850000 record identici
+# si procede all'eliminazione di 850000 record identici
 df_3_cli_address_clean <- df_3_cli_address_clean %>%
   distinct()
 
-# calcolo nuovamente il numero esatto di record duplicati
+# si calcola nuovamente il numero esatto di record duplicati
 sum(duplicated(df_3_cli_address_clean))  # 0
 
 # rimangono due ID_ADDRESS identici (come osservato precedentemente) che si 
@@ -78,7 +78,7 @@ df_3_cli_address_clean %>%
 ## let examine in details some of these missing cases
 df_3_cli_address_clean %>% filter(!is.na(PRV) & is.na(REGION))
 
-# Vi sono diversi missing values, in alcuni casi i dati sono inseriti in modo errato dal cliente
+# vi sono diversi missing values, in alcuni casi i dati sono inseriti in modo errato dal cliente
 
 ## MISSING VALUES rows are removed ##
 df_3_cli_address_clean <- df_3_cli_address_clean %>%  

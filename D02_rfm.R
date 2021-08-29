@@ -23,7 +23,8 @@
 # bisogna fissare una soglia di tempo oltre la quale i clienti verranno classificati come attivi
 
 # le rilevazioni vanno dal 01/05/2018 al 30/04/2019
-# si decide di utilizzare come reference date il 28/02/2018
+# si decide di utilizzare come reference date il 28/02/2018, 60 giorni prima 
+# dell'ultima rilevazione
 
 rfm_data<-df_7_tic_clean_final  %>%
   filter(TIC_DATE > as.Date("28/02/2019", format = "%d/%m/%Y"))
@@ -99,7 +100,7 @@ sum(is.na(rfm_data_clean))
 
 rfm_data_clean <- rfm_data_clean[,c(1,2,5,7)]
 
-# analizzo le distribuzioni
+# si analizzano le distribuzioni
 hist(as.numeric(rfm_data_clean$RECENCY_VALUE), main = "Distribution RECENCY", col='turquoise3', xlab="Recency")
 hist(as.numeric(rfm_data_clean$FREQUENCY_VALUE), main = "Distribution FREQUENCY", col='turquoise3', xlab="Frequency")
 hist(as.numeric(rfm_data_clean$MONETARY_VALUE), main = "Distribution MONETARY", col='turquoise3', xlab="Monetary")
@@ -220,7 +221,8 @@ ggplot(data = monetary_var,
 # recency, frequency, monetary
 
 #### RECENCY E FREQUENCY COMBINED ####
-# in modo tale che si vengano a creare delle nuove classi che descrivono i clienti
+# si combinano i valori ottenuti precedentemente in modo tale che si vengano a 
+# creare delle nuove classi che descrivono i clienti
 
 rfm_data_clean$RECENCY_FREQUENCY <- NA
 for(i in c(1:nrow(rfm_data_clean))){
@@ -431,7 +433,7 @@ pie3D(slices,labels=slices_percent,explode=0.1,
 
 #### libreria rfm ####
 
-# In alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
+# in alternativa alla procedura seguita sopra si potrebbe optare per l'utilizzo 
 # della libreria "rfm"
 
 rfm_data_auto <- rfm_data %>%
@@ -447,7 +449,7 @@ rfm_result <- rfm_table_order(
 
 # si visualizzano i risultati ottenuti
 rfm_heatmap(rfm_result) 
-# si osservano valori elevati di monetary in corrispondenza di valori e di 
+# si osservano valori elevati di monetary in corrispondenza di valori di 
 # recency e frequency elevati
 
 rfm_bar_chart(rfm_result)

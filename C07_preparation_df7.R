@@ -126,8 +126,8 @@ df7_dist_direction <- df_7_tic_clean_final %>%
          , PERCENT_CLIs = TOT_CLIs/df7_overview$TOT_CLIs)
 
 df7_dist_direction
-# si può notare che 907846 transazioni ovvero il 91% delle transazioni totale sono acquisti
-# queste 907846 transazioni sono associateal a 212124 clienti
+# si può notare che 907846 transazioni (ovvero il 91% delle transazioni totale) sono acquisti
+# queste 907846 transazioni sono associate a 212124 clienti
 
 ### Variable TIC_HOURS ###
 
@@ -163,7 +163,7 @@ plot_df7_dist_hour <- (
 plot_df7_dist_hour
 
 # la maggior parte delle transazioni sono acquisti. Si può notare che dalle 16 alle 20 
-# vi è una maggiore frequenza di acquisti.
+# vi è una maggiore frequenza di acquisti
 
 ## plot aggregate percent
 plot_df7_dist_hour_percent <- (
@@ -293,7 +293,8 @@ plot_df7_dist_datetyp_percent <- (
 )
 
 plot_df7_dist_datetyp_percent
-# per ogni categoria di giorno (holiday, weekday, weekend) la percentuale di purchase e di refund risulta essere simile
+# per ogni categoria di giorno (holiday, weekday, weekend) la percentuale di purchase 
+# e di refund risulta essere simile
 
 ### Variable average IMPORTO_LORDO and average SCONTO per TICKET ###
 
@@ -493,7 +494,8 @@ ggplot(diff_days_diff,
 
 # EXPLORE distribuzione net amount (importo lordo - sconto)
 
-# considerando i soli acquisti, si calcola per ogni mese il nett amount complessivo, considerando in generale i clienti
+# considerando i soli acquisti, si calcola per ogni mese il nett amount 
+# (importo_lordo - sconto) complessivo, considerando in generale i clienti
 df7_nett_amount_monthly<-df_7_tic_clean %>%
   filter(DIREZIONE==1) %>%
   mutate(nett_amount = IMPORTO_LORDO-SCONTO) %>%

@@ -51,4 +51,4 @@ plot_df5_dist_typ_camp <- (
 
 plot_df5_dist_typ_camp
 
-# Il tipo di campagna più utilizzato risulta essere "PRODUCT"
+# il tipo di campagna più utilizzato risulta essere "PRODUCT"

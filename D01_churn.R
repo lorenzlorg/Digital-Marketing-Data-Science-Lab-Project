@@ -25,8 +25,9 @@
 
 
 #### 1. choosing a reference date in the past (posizionarsi ad una data di riferimento nel passato) ####
-# eventualmente in presenza di clienti molto diversi tra loto si potrebbe optare per soglie differenti
-# reference date: 28 febbraio 2019, 60 giorni prima dell'ultima rilevazione
+# eventualmente in presenza di clienti molto diversi tra loro si potrebbe optare per soglie differenti
+# reference date: 28 febbraio 2019, 60 giorni prima dell'ultima rilevazione, una
+# via di mezzo tra le osservazioni precedenti
 
 reference_date <- as.Date("28/02/2019", format = "%d/%m/%Y")
 
@@ -49,7 +50,7 @@ holdout_period['CHURN'] <- 0
 
 
 #### 3. choosing the lenght of a lookback period before the reference date ####
-# non si definisce solitmante una lunghezza fissa. Bisogna controllare cosa conviene, 
+# non si definisce solitamente una lunghezza fissa. Bisogna controllare cosa conviene, 
 # se dunque può essere vantaggioso o meno considerare tutti i dati a nostra 
 # disposizione, a partire dal 1 maggio 2018, o meno
 # lookback period: 01 maggio 2018 - 28 febbraio 2019
@@ -70,7 +71,7 @@ holdout_period_temp <- holdout_period %>%
   select(ID_CLI, CHURN)
 
 # si aggiorna la variabile CHURN per i clienti presenti nel lookback period
-# tutti i clienti che comparivano nell'holdout saranno ovviamente no churner
+# tutti i clienti che comparivano nell'holdout saranno di conseguenza no churner
 setDT(lookback_period)[holdout_period_temp, CHURN := i.CHURN, on = .(ID_CLI)]
 
 table(lookback_period$CHURN)
@@ -239,13 +240,16 @@ fancyRpartPlot(tree.model)
 summary(tree.model) 
 printcp(tree.model) 
 
-# il numero 0/1 in alto nel nodo dice come sono state classificate tutte le osservazioni di quel nodo
-# le percentuali 100%, 36% ecc. rappresentano il numero delle osservazioni in percentuale prese in considerazione in quel nodo
-# i numeri di mezzo indicano per lo 0 qual è la percentuale e per l'1 qual è la percentuale
+# il numero 0/1 in alto nel nodo dice come sono state classificate tutte le 
+# osservazioni di quel nodo le percentuali. 100%, 36% ecc. rappresentano il numero 
+# delle osservazioni in percentuale prese in considerazione in quel nodo. I numeri 
+# di mezzo indicano per lo 0 qual è la percentuale e per l'1 qual è la percentuale
+# di osservazioni
 
-# ad esempio: nodo 4, riguarda l'11% delle osservazioni totali, in questo nodo (recency < 104 & num_of_purchases >= 8.5) tutte 
-# le osservazioni sono classificate come no churner (in particolare si hanno il 73%
-# delle osservazioni no churner (0) e il 27% delle oss. churner (1). Di conseguenza prevale lo 0, no churner,
+# ad esempio: nodo 4, riguarda l'11% delle osservazioni totali, in questo nodo 
+# (recency < 104 & num_of_purchases >= 8.5) tutte le osservazioni sono classificate 
+# come no churner (in particolare si hanno il 73% delle osservazioni no churner (0) 
+# e il 27% delle oss. churner (1)). Di conseguenza prevale lo 0, no churner,
 # che ha anche senso, ovvero sono clienti che non aspettano troppo e fanno tanti acquisti
 
 # in rpart.plot sopra le percentuali del numero totale di osservazioni viene
@@ -610,4 +614,4 @@ rbind(roc_tree, roc_rf, roc_logistic, roc_nm, roc_nb) %>%
 
 # si può notare che il Neural Network Model insieme al modello Logistic è il modello 
 # che rispetto agli altri ha performance migliori, anche se di poco.
-# i seguenti modelli potrebbero essere utilizzati poi per fare previsioni
+# i seguenti modelli potrebbero essere utilizzati poi per fare previsioni su valori nuovi

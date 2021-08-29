@@ -138,7 +138,7 @@ df_4_cli_privacy_clean %>%
 
 # 247790 (67%) clienti hanno accettato la flag direct marketing mentre 121682 (33%) no
 
-# si analizza in quali percentuali i clienti accentano una sola privacy policy, due, tre oppure nessuna
+# si analizza in quali percentuali i clienti accettano una sola privacy policy, due, tre oppure nessuna
 
 # compute distribution
 

@@ -48,11 +48,11 @@ df_1_cli_fid_clean$ID_CLI[duplicated(df_1_cli_fid_clean$ID_CLI)]  # ID_CLI che s
 
 # è possibile osservare che ci sono più registrazioni di carte fedeltà per ciascun 
 # cliente dal momento in cui il numero di identificativi dei clienti è maggiore del 
-# numero degli identificavi delle carte fedeltà
+# numero degli identificativi delle carte fedeltà
 
 # nonostante ciò, non ci sono duplicati considerando la coppia cliente-fidelty. 
 # Questo significa che ci sono clienti a cui è associata più di una carta fidelty, 
-# ma queste sono tra loro diverse.
+# ma queste sono tra loro diverse
 
 
 #### CLEANING DATA TYPES in df_1 ####
@@ -92,7 +92,7 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 dist_num_fid_x_cli
 
 # 368833 clienti con 1 sottoscrizione in una sola data
-# 254 clienti con 2 sottoscrizioni in una sola data e 363 in due data diverse
+# 254 clienti con 2 sottoscrizioni in una sola data e 363 in due date diverse
 # 7 clienti con 3 sottoscrizioni in una sola data e 8 in due date diverse e 5 in tre
 # 2 clienti con 4 sottoscrizioni in una sola data
 
@@ -303,7 +303,7 @@ df_1_cli_fid_clean %>%
   scale_y_continuous(labels = scales::percent)+
   labs(x = 'Number of fidelity subscriptions', y = 'Percentage')+  theme_classic()
 
-# quasi la totalità dei clienti posseggono una sola sottoscrizione
+# quasi la totalità dei clienti possiede una sola sottoscrizione
 
 # si procede con un'ulteriore esplorazione: monthly activations
 num_monthly_activation <- df_1_cli_fid_clean %>%

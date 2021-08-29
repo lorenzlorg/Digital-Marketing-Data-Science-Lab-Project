@@ -8,7 +8,7 @@
 # Per cercare di individuare i cluster in questione sono stati utilizzati diversi
 # algoritmi tra cui:
 # k-means: con k=3,4,5, sensibile agli outliers
-# k-medians: con k=5, più robusto agli outliers
+# k-medoids: con k=5, più robusto agli outliers
 # dbscan: con k=5, più robusto agli outliers, per come impostato le performance sono state deludenti
 
 
@@ -43,7 +43,7 @@ clustering_dataset <- clustering_dataset %>%
 # complessivamente
 str(clustering_dataset)
 
-# controllo la presenza di eventuali na
+# si controlla la presenza di eventuali na
 sapply(clustering_dataset, function(x) sum(is.na(x)))  # non sono presenti valori mancanti
 
 
@@ -79,7 +79,7 @@ g + scale_x_continuous(breaks = seq(0, 10, by = 1))
 # Elbow method
 # fviz_nbclust(customer_data_stand, kmeans, method = "wss") +
 #   geom_vline(xintercept = 4, linetype = 2) + 
-#   labs(subtitle = "Elbow method") # add subtitle
+#   labs(subtitle = "Elbow method") 
 
 
 # Silhouette method
@@ -171,9 +171,10 @@ data.orig_km_3 <- t(apply(km_3$centers, 1, function(r)r*attr(customer_data_stand
 data.orig_km_3[,c(1, 2)] <- round(data.orig_km_3[,c(1, 2)])
 data.orig_km_3
 
-# The final cluster centers are computed as the mean for each variable within each 
-# final cluster. The final cluster centers reflect the characteristics of the typical 
-# case for each cluster
+# i valori finali dei centri dei cluster sono ottenuti come media di ciascuno dei
+# valori presenti all'interno di ciascun cluster della configurazione finale. I valori 
+# finali dei centri dei cluster rappresentano dunque le caratteristiche dell'oservazione
+# tipica di ciascun cluster
 
 # NUM_OF_PURCHASES NUM_OF_ARTICLES TOT_PURCHASE TOT_SCONTO
 # 16                    73            3198.2312  287.73131
@@ -190,7 +191,7 @@ fviz_cluster(km_3, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# visualizing the clustering results using the first two principle Ccmponents
+# visualizzazione dei risultati di clustering attraverso PCA (Principal Component Analysis)
 dimensione_pca_k3 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -262,7 +263,7 @@ fviz_cluster(km_4, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
              ggtheme = theme_bw()
 )
 
-# visualizing the clustering results using the first two principle Ccmponents
+# visualizzazione dei risultati di clustering attraverso PCA (Principal Component Analysis)
 dimensione_pca_k4 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -339,7 +340,7 @@ fviz_cluster(km_5, data = customer_data_stand, palette=c("#2E9FDF", "#00AFBB",
 # si ha BSS = TSS, ma in questo caso la partizione perde di utilità
 
 
-# visualizing the clustering results using the first two principle Ccmponents
+# visualizzazione dei risultati di clustering attraverso PCA (Principal Component Analysis)
 dimensione_pca_k5 <- prcomp(customer_data_stand,  scale = TRUE)
 
 # si estraggono le coordinate
@@ -368,9 +369,13 @@ ggscatter(
   stat_mean(aes(color = cluster), size = 4)
 
 # per il clustering si potrebbero usare anche i seguenti metodi:
-# K-medians o DBSCAN che sono più robusti agli outliers
+# K-medoids o DBSCAN che sono più robusti agli outliers
 
-#### K-medians ####
+
+
+#### K-medoids ####
+
+# Il metodo k-medoids di clustering più comune è l'algoritmo PAM, Partitioning Around Medoids
 
 # in base ai risultati precedenti, k = 5
 pam.res <- pam(customer_data_stand, 5)  # esecuzione che richiede molte risorse
@@ -378,9 +383,9 @@ pam.res <- pam(customer_data_stand, 5)  # esecuzione che richiede molte risorse
 print(pam.res)
 
 # Cluster medoids
-pam.res$medoids  # objects that represent clusters
+pam.res$medoids  # medoids, ogetti che rappresentano il cluster di appertenenza
 
-# Number obs for each cluster
+# numero di osservazioni per cluster
 pam.res.list <- pam.res$clustering  # a vector containing the cluster number of each object
 pam.res.df <- data.frame(matrix(unlist(pam.res.list), nrow=length(pam.res.list), byrow=TRUE))
 names(pam.res.df)[1] <- "cluster"
@@ -416,15 +421,16 @@ data.orig_pam <- t(apply(pam.res$medoids, 1, function(r)r*attr(customer_data_sta
 # scaled data
 Dbscan_cl <- dbscan(customer_data_stand, eps = 0.45, MinPts = 5)
 
-
+ 
 # The clustering contains 11 cluster(s) and 748 noise points.
 # 
 # 0     1       2     3     4     5     6     7     8     9    10    11 
 # 748 23497     3     5     6     5     7     3     5     4     6     5 
 
 # N.b.
-# noise point: A selected point that is neither a core point nor a border point. 
-# It means these points are outliers that are not associated with any dense clusters
+# noise point: un punto che non è definito ne come un core point ne come un border
+# point. Significa che si tratta di punti etichettati come outliers che non sono
+# associati ad alcun cluster
 
 # Checking cluster
 Dbscan_cl$cluster
