@@ -79,7 +79,8 @@ cons_idcli_df1_df7 <- df_1_cli_fid_clean %>%
 cons_idcli_df1_df7
 # 157348 ID_CLI sono presenti in df1 ma non in df7
 
-#!!! NOTE: all ID_CLI in df_7 are mapped in df_1, but not all ID_CLI in df_1 are mapped in df_7 !!!#  
+# tutti gli idcli in df7 sono mappati in df1 ma non il viceversa
+
 
 #### RESHAPING df_7 ####
 

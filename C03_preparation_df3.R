@@ -34,8 +34,6 @@ sum(duplicated(df_3_cli_address_clean$ID_ADDRESS))  # 850002
 # si calcola il numero esatto di record duplicati
 sum(duplicated(df_3_cli_address_clean))  # 850000
 
-#!!! NOTE:  there are duplicates !!!#
-
 # si procede all'eliminazione di 850000 record identici
 df_3_cli_address_clean <- df_3_cli_address_clean %>%
   distinct()
@@ -106,9 +104,6 @@ cons_idaddress_df2_df3
 
 # vi sono 23919 indirizzi presenti in df_2 che non sono mappati in df_3
 # ad esempio in df_2 è presente l'indirizzo 900091 che compare 6974 volte, ma non risulta essere mappato in df_3
-
-#!!! NOTE:  there are ID_ADDRESSes actually not mapped in df_3 !!!#
-#!!!        this issue should be taken into account in joining these two tables !!!#
 
 # df_3_cli_address_clean <- left_join(df_2_cli_account_clean, df_3_cli_address_clean , by = "ID_ADDRESS")
 # si potrebbe pensare di eseguire un left join ma, allo stato attuale, non avendo 

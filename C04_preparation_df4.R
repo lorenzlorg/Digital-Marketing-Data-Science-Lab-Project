@@ -29,7 +29,6 @@ df_4_cli_privacy_clean %>%
 # ci sono un totale di 369472 valori unici per l'id cliente, pari al numero di osservazioni 
 # del dataset. Dunque non si osservano duplicati
 
-#!!! NOTE:  no duplicates !!!#
 
 #### CLEANING DATA TYPES in df_4 ####
 
@@ -57,7 +56,8 @@ cons_idcli_df1_df4 <- df_1_cli_fid_clean %>%
 
 cons_idcli_df1_df4
 
-#!!! NOTE: all ID_CLI in df_1 are also in df_4 and vice-versa !!!#
+# tutti gli idcli presenti in df1 sono presenti anche in df4 e viceversa
+
 
 #### EXPLORE COLUMNS of df_4 ####
 

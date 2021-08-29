@@ -56,7 +56,7 @@ cons_idcli_df1_df6 <- df_1_cli_fid_clean %>%
 
 cons_idcli_df1_df6
 
-#!!! NOTE: all ID_CLI in df_6 are mapped in df_1, but not all ID_CLI in df_1 are mapped in df_6 !!!#  
+# tutti gli idcli in df6 sono mappati in df1 ma non il viceversa
 # questo significa che ci sono dei clienti a cui non è associata nessuna informazione 
 # relativa a comunicazioni email di marketing 
 
@@ -81,8 +81,8 @@ cons_idcamp_df5_df6 <- df_5_camp_cat_clean %>%
 
 cons_idcamp_df5_df6
 
-#!!! NOTE: all ID_CAMP in df_6 are mapped in df_5, but not all ID_CAMP in df_5 are mapped in df_6 !!!#
-# Ci sono delle campagne (in df5) a cui non sono associate particolari eventi
+# tutti gli idcamp in df6 sono mappati in df5 ma non vale il viceversa
+# ci sono delle campagne (in df5) a cui non sono associate particolari eventi
 
 
 #### RESHAPING df_6 ####

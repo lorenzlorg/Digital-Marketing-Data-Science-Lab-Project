@@ -33,7 +33,7 @@ df_2_cli_account_clean %>%
             , TOT_ROWs = n())
 
 # come osservato nello script relativo a df_1 vi sono 369472 ID_CLI univoci
-#!!! NOTE:  no duplicates !!!#
+# non vi sono duplicati
 
 # concentradosi su ID_ADDRESS
 sum(n_distinct(df_2_cli_account_clean$ID_ADDRESS))  # 361385 
@@ -82,7 +82,8 @@ cons_idcli_df1_df2 <- df_1_cli_fid_clean %>%
 
 cons_idcli_df1_df2
 
-#!!! NOTE: all ID_CLI in df_1 are also in df_2 and vice-versa !!!#
+# tutti gli id_cli presenti in df1 sono presenti anche in df2 e viceversa
+
 
 #### EXPLORE COLUMNS of df_2 ####
 
@@ -101,9 +102,9 @@ df_2_dist_emailprovider
 tot_emailproviders <- n_distinct(df_2_dist_emailprovider$EMAIL_PROVIDER)
 
 tot_emailproviders
-# ci sono ben 20512 email providers diversi. Si procederà successivamente nel considerare solo quelli più frequenti
-
-#!!! NOTE: too many different values for EMAIL_PROVIDER to be an useful category !!!#
+# ci sono ben 20512 email providers diversi. Si procederà successivamente nel 
+# considerare solo quelli più frequenti altrimenti la variabile non risulta essere 
+# utile
 
 
 ### Variable W_PHONE ###
