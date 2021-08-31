@@ -6,9 +6,9 @@
 # Il numero di cluster ottimale varia tra i seguenti valori: 3, 4 (i seguenti valori sono stati ottenuti tramite diversi metodi ad hoc)
 # Per cercare di individuare i cluster in questione sono stati utilizzati diversi
 # algoritmi tra cui:
-# k-means: con k=3,4, sensibile agli outliers
-# k-medoids: con k=4 con e senza outliers, più robusto agli outliers
-# dbscan: più robusto agli outliers, per come impostato le performance sono state deludenti
+# k-means: con k=3,4, l'algoritmo è sensibile agli outliers
+# k-medoids: con k=4, l'algoritmo è più robusto agli outliers
+# dbscan: l'algoritmo è più robusto agli outliers, tuttavia per come impostato le performance sono state deludenti
 # In generale, prendendo come riferimento l'output dell'algoritmo K-medoids, 
 # si è osservato ad esempio che: i clienti che fanno più acquisti sono quelli 
 # che acquistano più articoli ma non sono i clienti che spendono di più. I clienti
@@ -82,10 +82,11 @@ corr.matrix <- cor(clustering_dataset[,numeric.var])
 corrplot(corr.matrix, main="\n\nCorrelation Plot for Numerical Variables", 
          method = "number")
 
-#### setting clustering ####
-
 # i dati vengono standardizzati in modo tale che essi abbiano la stessa scala
 customer_data_stand <- scale(clustering_dataset) 
+
+
+#### setting clustering ####
 
 # numero di cluster
 k_max <- 10
